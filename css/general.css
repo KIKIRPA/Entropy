@@ -1,0 +1,302 @@
+/********************
+ *      COMMON      *
+ * ******************/
+
+body {
+  margin-left: 20px;
+  margin-right: 20px;
+  background-color: #FAFAFA;
+  color: black;
+  font-size: 0.9em;
+  font-family: Verdana, Arial, Helvetica, sans-serif; }
+
+html,body {
+  height: 100%; }
+
+a {
+  color: red;
+  text-decoration: none; }
+
+a:hover { text-decoration: underline; }
+
+a:visited { color: red; }
+
+.wrapper { min-height: 100%; }
+
+
+/********************
+ *     TOOLTIP      *
+ * ******************/
+
+[tooltip]:before {
+    /* needed - do not touch */
+    content: attr(tooltip);
+    position: absolute;
+    opacity: 0;
+    /* customizable */
+    transition: all 0.15s ease;
+    padding: 10px;
+    color: #333;
+    border-radius: 10px;
+    box-shadow: 2px 2px 1px silver;    
+}
+
+[tooltip]:hover:before {
+    /* needed - do not touch */
+    opacity: 1;
+    /* customizable */
+    background: yellow;
+    margin-top: -50px;
+    margin-left: 20px;    
+}
+
+  
+/********************
+ *      HEADER      *
+ * ******************/
+
+.header {
+  width: 100%;
+  height: 130px;
+  background-color: grey;
+  background-image: url('../images/header.png');
+  background-repeat: no-repeat;
+  margin-left: -20px;
+  margin-top: -20px;
+  margin-right: -20px;
+  border: none;
+  /*margin-bottom: 50px;*/
+  padding: 20px; }
+  
+#logo {
+  margin: 0;
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  width: 120px;}  
+  
+#title {
+  margin: 0;
+  position: absolute;
+  top: 2px;
+  left: 160px; 
+  min-width: 630px;
+  vertical-align: left; }  
+  
+#menu {
+  position: absolute;
+  top: 95px;
+  right: 10px; }
+
+h1 {
+  font-size: 1.8em;}
+  
+h2 {
+  font-size: 1.2em;}
+
+
+/********************
+ *       MAIN       *
+ * ******************/
+
+.main {
+  margin-left: -20px;
+  margin-right: -20px;
+  padding-top: 15px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 50px;
+  width: 100%;
+  overflow: auto; }
+
+.nonboxed {
+  text-align: justify;
+  margin-right: 10px; }  
+
+.boxed {
+  border: dotted;
+  border-width: 1px;
+  text-align: justify;
+  font-size: 0.75em;
+  margin: 5px;
+  padding: 3px 8px; }
+
+#greybox.boxed {
+  border: none;
+  color: white;
+  background-color: grey; }
+
+#redbox.boxed {
+  border: none;
+  color: white;
+  background-color: red; }
+  
+.fullwidth {
+  float: left;
+  width: 100%;
+  text-align: justify; }
+  
+.libboxlink { text-align: right; }
+
+/* BIG WINDOW: Boxes left of main content */
+@media screen and (min-width: 850px){
+  .nonboxed {
+    float: left;
+    width: 65%; }  
+
+  .boxed {
+    float: right;
+    width: 30%; } 
+    
+  #libbox.boxed {
+    float: left;
+    width: 47%; }
+}
+
+/* MEDIUM WINDOW: Boxes next each other below the main content */
+@media screen and (min-width: 350px) and (max-width: 850px){
+  .nonboxed {
+    float: none;
+    width: 100%; }  
+
+  .boxed {
+    float: left;
+    width: 300px; }
+    
+    #libbox.boxed {
+    float: left;
+    width: 47%; }
+}
+
+/* SMALL WINDOW: all below each other*/
+@media screen and (max-width: 350px){
+  .nonboxed {
+    float: none;
+    width: 100%;
+    min-width: 300px; }  
+
+  .boxed {
+    float: none;
+    width: 100%;
+    min-width: 300px; }  
+    
+  #libbox.boxed {
+    float: none;
+    width: 100%; }
+}
+
+
+/* spectral data columns */
+  #one-true { 
+    width: 100%;
+    overflow: hidden; 
+    margin: 20px 0px 20px 0px; 
+    padding: 0px 0px 20px 0px; }
+
+  #one-true .col {
+    width: 27%;
+    padding: 10px 3.15% 10px; 
+    float: left;
+    margin-bottom: -99999px;
+    padding-bottom: 99999px; 
+    text-align: justify;
+    font-size: 0.75em; 
+    /* word-wrap: break-all; */ }
+
+  #one-true .col:nth-child(1) { margin-left: 33.3%; }
+  #one-true .col:nth-child(2) { margin-left: -66.3%; }
+  #one-true .col:nth-child(3) { left: 0; }
+  #one-true p { margin-bottom: 30px; } /* Bottom padding on col is busy */
+
+  table.alternate_color tr:nth-child(odd) td{ background-color: #eeeeee;}
+  table.alternate_color tr:nth-child(even) td{ background-color: #dddddd;}
+  table.alternate_color td { padding: 4px; }
+
+/* popup (download) */
+  .black_overlay {
+    display: none;
+    position: fixed;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    z-index:1001;
+    -moz-opacity: 0.8;
+    opacity:.80;
+    filter: alpha(opacity=80); }
+    
+  .white_content {
+    display: none;
+    position: fixed;
+    top: 25%;
+    left: 25%;
+    width: 50%;
+    padding: 16px;
+    border: 1px solid red;
+    background-color: white;
+    z-index:1002;
+    overflow: auto; }
+  .dlbox {
+    border: dotted;
+    border-width: 1px;
+    text-align: justify;
+    font-size: 0.75em;
+    margin: 8px 5px;
+    padding: 3px; }
+
+    
+/* buttons */    
+  .button {
+    background-color: #fe1a00;
+    border-radius: 5px;
+    text-indent: 0;
+    border: none;
+    display: inline-block;
+    color: #ffffff;
+    font-weight: bold;
+    font-style: normal;
+    height: 30px;
+    line-height: 30px;
+    width: 100px;
+    text-decoration: none;
+    text-align: center; }
+  .button:hover { background-color: #ce0100; }
+  .button:active { position: relative; top: 1px; }  
+
+/* dygraphs */
+#graphdiv .dygraph-label {font-size: 0.75em;}
+  
+    
+/********************
+ *      FOOTER      *
+ * ******************/
+
+.footer {
+  clear: both; /*stop floating*/
+  width: 100%;
+  height: 30px;
+  color: white;
+  background-color: grey;  
+  font-size: 0.7em;
+  margin-left: -20px;
+  margin-right: -20x;
+  margin-bottom: 0px;
+  margin-top: -28px;
+  border: none;
+  padding: 5px 20px; }
+  
+.footer #logo {
+  position: relative;
+  top: -12px;
+  float: left;
+  padding: 0px; }  
+  
+.footer #left {
+  float: left;
+  margin-left: -20px;
+  padding: 0px; }
+
+.footer #right {
+  vertical-align: central;
+  float: right; }

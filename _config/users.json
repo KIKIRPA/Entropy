@@ -1,0 +1,43 @@
+{
+    "admin": {
+        "name": "Administrator",
+        "institution": "INSTITUTION",
+        "email": "MAIL@ADDRESS",
+        "hash": "$2y$10$xzeOWIDeBooXU8yBBoZgvuVTo8gZe1qfKMWyIqpWw5S\/cu3TUaJoS",
+        "date": "2016-10-25 23:59:26.275473",
+        "reset": false,
+        "tries": [],
+        "trusted": [
+            "*"
+        ],
+        "permissions": {
+            "view": [
+                "_ALL"
+            ],
+            "libedit": [
+                "_ALL"
+            ],
+            "user": true,
+            "admin": true,
+            "libperm": [
+                "_ALL"
+            ],
+            "libdel": [
+                "_ALL"
+            ],
+            "upload": [
+                "_ALL"
+            ],
+            "download": [
+                "_ALL"
+            ],
+            "compare": [
+                "_ALL"
+            ],
+            "peaksearch": [
+                "_ALL"
+            ]
+        },
+        "lastlogin": "2016-10-25 23:59:08.318640 from 127.0.0.1"
+    }
+}

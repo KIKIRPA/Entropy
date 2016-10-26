@@ -1,0 +1,25 @@
+{
+    "test": {
+        "name": "test library",
+        "menu": "test library",
+        "header": "test library",
+        "view": "public",
+        "colour": "#ff0000",
+        "shortdescription": "test library",
+        "longdescription": "test library",
+        "contact": "test library",
+        "news": [
+            "test library"
+        ],
+        "ref": [
+            "test"
+        ],
+        "columns": [
+            "id",
+            "type"
+        ],
+        "allowformat": [
+            "txt"
+        ]
+    }
+}

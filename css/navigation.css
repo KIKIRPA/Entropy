@@ -1,0 +1,82 @@
+/********************
+ *    NAVIGATION    *
+ * ******************/
+
+nav a {
+  color: white;
+  text-decoration: none; }
+
+nav a:visited { 
+  color: white; }
+
+nav a:hover { 
+  color: white;
+  background: #EE0000;
+  text-decoration: none;}
+  
+nav a:active {
+  color: #FFCCCC; }
+
+
+ /* dropdown functionality */
+nav ul ul {
+  display: none; }
+
+nav ul li:hover > ul {
+  display: block; }
+
+/* first level */
+
+nav ul {
+  background: red; 
+  /*background: linear-gradient(top, red 0%, red 100%);  
+  background: -moz-linear-gradient(top, red 0%, red 100%); 
+  background: -webkit-linear-gradient(top, red 0%, red 100%); */
+  box-shadow: 0px 0px 9px rgba(0,0,0,0.15);
+  padding: 0 10px;
+  border-radius: 10px;  
+  list-style: none;
+  position: relative;
+  display: inline-table; }
+
+nav ul:after {
+  content: ""; 
+  clear: both; 
+  display: block; }
+
+/* second level */
+
+nav ul li {
+  float: left; }
+
+nav ul li:hover {
+  background: #EE0000; }
+
+nav ul li a {
+  display: block; 
+  padding: 10px 20px; }
+
+nav ul ul {
+  background: red; 
+  border-radius: 0px; 
+  padding: 0;
+  position: absolute; 
+  top: 100%; }
+
+nav ul ul li {
+  float: none; 
+  border-top: 1px solid red;
+  border-bottom: 1px solid red;
+  position: relative; }
+
+nav ul ul li a {
+  padding: 10px 20px; } 
+
+
+/* third level */
+
+nav ul ul ul {
+  position: absolute; 
+  left: 100%; 
+  top:0;
+}
