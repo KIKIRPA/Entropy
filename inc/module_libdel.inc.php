@@ -25,10 +25,10 @@
     // UPDATE JSON LIBRARIES FILE
     unset($libs[$id]);
     $error = writeJSONfile(LIB_DIR . LIB_FILE, $libs);
-    if ($error)
+    if (!$error)
       echo "      <span style='color:red'>Deleted library " . $id . "!</span><br><br>\n";
     else
-      echo "      <span style='color:red'>ERROR: " . $output . "!</span><br><br>\n";
+      echo "      <span style='color:red'>ERROR: " . $error . "!</span><br><br>\n";
     
     // BACKUP DATA DIR
     if (!backupFile(LIB_DIR, $id))

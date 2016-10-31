@@ -119,9 +119,10 @@
   function readAscii($lines, $coordinates = 0)
   {
     $array = array();
+    $i = 0;
     
     // we will decompose the file line by line in order to cope with comments (entire lines and following the data)
-    foreach ($lines as $i => $line)
+    foreach ($lines as $line)
     {
       if (is_numeric(substr($line, 0, 1)))            // don't include comments (only lines beginning with a number are considered)
       {
@@ -133,6 +134,8 @@
           $array[$i][$j] = floatval($val);
         }
         
+        $i++;
+        
         if (($coordinates > 0) and (count($array[$i]) != $coordinates))
           return eventLog("WARNING", "inconsistent data; expected " . $coordinates . " coordinates  [common_importfilters.readAscii]", False);
         if ($coordinates = 0)
@@ -141,8 +144,6 @@
           if ($n != count($array[$i]))
             return eventLog("WARNING", "inconsistent data; varying number of coordinates  [common_importfilters.readAscii]", False);
         }
-        //if (count($temp) >= $coordinates)
-        //  $array[$i] = array_slice($temp, 0, $coordinates); // add the number of coordinates, anything else is considered comments
       }
     }
     

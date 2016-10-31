@@ -214,8 +214,8 @@
       return 'Could not create upload directory.';
     
     foreach($_FILES[$upload]["tmp_name"] as $i => $value)
-      if (!move_uploaded_file($value, $updir . $prefix . basename($value)))
-        return 'Could not save ' . $prefix . basename($_FILES[$upload]["tmp_name"][$i]) . ' in the upload directory.';
+      if (!move_uploaded_file($value, $updir . $prefix . corrFilename($_FILES[$upload]["name"][$i])))
+        return 'Could not save ' . $prefix . corrFilename($_FILES[$upload]["name"][$i]) . ' in the upload directory.';
       
     return False;
   }

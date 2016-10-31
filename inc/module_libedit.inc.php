@@ -35,12 +35,7 @@
       $errormsg = "Some data is missing! (library id, name, menu, header and view need to be set)";
   }
   else
-  {
-    //if (isset($_REQUEST["lib"])) 
-      $f="edit";
-    //else
-    //  $errormsg = "No library selected!";
-  }
+    $f="edit";
   
   // disallowed combinations of $new and $libmk
   if (!$new and $libmk)  // libmk: cannot make this lib, because the libID already exists!

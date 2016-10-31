@@ -25,7 +25,7 @@
   $action = false;
   
   if (!file_exists(LIB_DIR . $_REQUEST["lib"]))
-    if (!mkdir2(LIB_DIR . $id))
+    if (!mkdir2(LIB_DIR . $_REQUEST["lib"] . "/"))
     {
       echo "<span style='color:red'>ERROR: Could not make library directory for: " . $id . "!</span><br><br>\n";
       eventLog("ERROR", "Could not make library directory for: " .$id . " [module_import]", true, false);

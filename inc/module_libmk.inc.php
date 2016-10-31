@@ -11,7 +11,7 @@
   
   include('./inc/module_libedit.inc.php');
   
-  if (($f == "set") and ($output == "success"))
+  if (($f == "set") and ($output == false))
   {
     // give the creator access rights in users.json
     $users = readJSONfile(USERS_FILE, true);
@@ -42,12 +42,6 @@
         eventLog("ERROR", "Could not make library: " .$error . " [module_libmk]", false, false);
       }
       
-      if (!mkdir2(LIB_DIR . $id))
-      {
-        echo "<span style='color:red'>ERROR: Could not make library directory for: " . $id . "!</span><br><br>\n";
-        eventLog("ERROR", "Could not make library directory for: " .$id . " [module_libmk]", false, false);
-      }
-      
     }
     else
     {
@@ -56,7 +50,7 @@
     }
     
     // create directory?
-    if (!mkdir2(LIB_DIR . $id))
+    if (!mkdir2(LIB_DIR . $id . "/"))
     {
       echo "<span style='color:red'>ERROR: could not create directory.</span><br><br>\n";
       eventLog("ERROR", "Could not create directory. [module_libmk]", false, true);
