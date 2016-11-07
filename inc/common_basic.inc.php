@@ -84,6 +84,11 @@
       
       logout()                              close session
       
+      sanitizeStr($string, $replaceby = "_", $others = False, $lowercase = False)
+                                            sanitize string, removes all characters, html-tags... that should not be there
+                                             eg. string to be used as a part of a filename, or for loose string comparisons
+                                             $others is other characters to replace, e.g. "-+:^"
+      
       calcPermMod($permtable, [$lib])       returns the allowed modules for a given user. 
                                              requires a user permissions table (array, part of users.json)
                                              if a library id is given, it will output only the library-specific modules (array) to which a user has access (for that library)
@@ -136,6 +141,22 @@
   {
     $_SESSION = array();
     session_destroy();
+  }
+  
+  
+  function sanitizeStr($string, $replaceby = "_", $others = False, $lowercase = False)
+  {
+    $replace = str_split(" _!\"#$%&'()*,/;<=>?@[\\]`{}~");
+    
+    if ($others) $replace = array_merge($replace, str_split($others));
+
+    $string = str_replace($replace, $replaceby, $string);
+    $string = preg_replace('/[' . $replaceby . ']+/', $replaceby, $string);  // replace multiple underscores by a single
+    $string = trim($string, "_");
+    
+    if ($lowercase) $string = strtolower($string);
+    
+    return filter_var($string, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
   }
   
   

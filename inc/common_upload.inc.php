@@ -28,6 +28,7 @@
   
     corrFilename($string, $replaceby = "_")
       remove all characters that should not be there to be used as a part of a filename
+      NOTE: depreciated, use sanitizeStr() instead
     
     csv2array($handle, $key, $delimiter = ",", $enclosure = '"', $escape = "\\")
         converts a CSV file handle into a flat array.
@@ -58,12 +59,8 @@
   
   function corrFilename($string, $replaceby = "_")
   {
-    $replace = str_split(" !\"#$%&'()*+,/:;<=>?@[\\]^`{}~");
-    $string = str_replace($replace, $replaceby, $string);
-    $string = preg_replace('/[' . $replaceby . ']+/', $replaceby, $string);  // replace multiple underscores by a single
-    $string = trim($string, "_");
-    
-    return filter_var($string, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
+    // depreciated, use sanitizeStr() instead
+    return sanitizeStr($string, $replaceby = "_");
   }
 
   

@@ -326,19 +326,9 @@
 
     $existing = readJSONfile(LIB_DIR . $_REQUEST["lib"] . "/measurements.json");  //if file does not exist: empty array
     $existing = array_keys($existing);
-    $formats = readJSONfile(FORMAT_FILE);
     
-    foreach ($formats as $fid => $fval)
-    {
-      // we are going to create $types array with all spectral formats from FORMAT_FILE
-      // the keys in $types will be lowercased, with all spaces, "-", "_", "/" removed
-      // the values in $types will be the original names of the spectral formats, which 
-      // will be used to autocorrect the values in the uploaded csv-file
-      $fval = strtolower($fid);
-      $fval = str_replace(array(" ", "_", "-", "/"), "", $fval);
-      $types[$fval] = $fid;
-    }
-    unset($formats, $fid, $fval);
+    $types = readJSONfile(FORMAT_FILE);
+    foreach ($types as $type => $tval) $types_sani[sanitizeStr($type, "", "-+:^", True)] = $type;
     
     unset($measurements[""]);   //remove empty rows
     
@@ -383,12 +373,10 @@
     foreach ($measurements as $id => $measurement)
     {
       // start with adding missing required fields (defined in libs.json)
-      unset($measurements[$id][""]);   //remove empty columns
-      //foreach ($required as $reqparam)
-      //  $measurements[$id][$reqparam] = NULL;      
+      unset($measurements[$id][""]);   //remove empty columns 
       
       echo "        <tr>\n";
-      $id_temp = corrFilename($id);
+      $id_sani = sanitizeStr($id);
       
       // 1. CHECK ACTION
       switch ($action) 
@@ -399,7 +387,7 @@
         case "update":
           if (count($existing) > 0)
           {
-            if (in_array($id_temp, $existing)) $measurements[$id]["_action"] = "U";
+            if (in_array($id_sani, $existing)) $measurements[$id]["_action"] = "U";
             else                               $measurements[$id]["_action"] = "A";
           }
           else $measurements[$id]["_action"] = "A";
@@ -408,7 +396,7 @@
         default:
           if (count($existing) > 0)
           {
-            if (in_array($id_temp, $existing)) $measurements[$id]["_action"] = "!";
+            if (in_array($id_sani, $existing)) $measurements[$id]["_action"] = "!";
             else                               $measurements[$id]["_action"] = "A";
           }
           else $measurements[$id]["_action"] = "A";
@@ -422,16 +410,16 @@
       }
       
       // 2. CHECK ID
-      if ($id != $id_temp)
+      if ($id != $id_sani)
       {
         //rename key $id in $measurements without changing the order
         $keys = array_keys($measurements);
-        $keys[array_search($id, $keys)] = $id_temp;
+        $keys[array_search($id, $keys)] = $id_sani;
         $measurements = array_combine($keys, $measurements);
         unset($keys);
         
         //code green! [removed illegal characters]
-        echo "          <td style='background-color: green;'><div tooltip='Automatically removed illegal characters'>".$id_temp."</div></td>\n";
+        echo "          <td style='background-color: green;'><div tooltip='Automatically removed illegal characters'>".$id_sani."</div></td>\n";
         $a++;
       }
       else echo "          <td>".$id."</td>\n";      
@@ -441,18 +429,19 @@
       {
         $tt = array();
         $col = "";       
+        $param_sani = sanitizeStr($param, "", "-+^", True);
         
-        switch ($param)
+        switch ($param_sani)
         {
           case "jcamptemplate":
             // autocorrect filename
-            $temp = corrFilename($value);
-            if ($temp != $value)
+            $val_sani = sanitizeStr($value);
+            if ($val_sani != $value)
             {
               $a++;
               $col = "green";
               array_push($tt, "[NOTE] Automatically removed illegal characters");
-              $measurements[$id][$param] = $value = $temp;
+              $measurements[$id][$param] = $value = $val_sani;
             }
             
             if (empty($value) and (   in_array("dx", $libs[$_REQUEST["lib"]]["allowformat"]) 
@@ -471,17 +460,16 @@
             break;
           case "type":
             //check if type is set and exists in specformat.json!!
-            $temp = strtolower($value);
-            $temp = str_replace(array(" ", "_", "-", "/"), "", $temp);
-            if (isset($types[$temp]))
+            $val_sani = sanitizeStr($value, "", "-+:^", True);
+            if (isset($types_sani[$val_sani]))
             {
               //if the value in the CSV is not identical to the one in specformat, autocorrect
-              if ($value != $types[$temp]) 
+              if ($value != $types_sani[$val_sani]) 
               {
                 $a++;
                 $col = "green";
                 array_push($tt, "[NOTE] Automatically corrected type");
-                $measurements[$id][$param] = $value = $temp;
+                $measurements[$id][$param] = $value = $types_sani[$val_sani];
               }
             }
             else // type in CSV does not exist!
@@ -491,57 +479,57 @@
               array_push($tt, "[ERROR] Undefined data type");
             }
           default:
-            $temp = trim($value);
-            if ($temp != $value)
+            $val_sani = trim($value);
+            if ($val_sani != $value)
             {
               $a++;
               $col = "green";
               array_push($tt, "[NOTE] Automatically removed trailing spaces");
-              $measurements[$id][$param] = $value = $temp;
+              $measurements[$id][$param] = $value = $val_sani;
             }
             
             // check for fields required by LIBS.JSON
-            if (empty($value) and in_array($value, $libs[$_REQUEST["lib"]]["columns"]))
-            {
-              $b++;
-              $col = "orange";
-              array_push($tt, "[WARNING] Empty while required in the library settings");
-            }
+            // NOTE: disabled because not equaly sanitized, and not taking into combined(+) and notations(^)
+            //if (empty($value) and in_array($value, $libs[$_REQUEST["lib"]]["columns"]))  //
+            //{
+            //  $b++;
+            //  $col = "orange";
+            //  array_push($tt, "[WARNING] Empty while required in the library settings");
+            //}
             
             // check for nonempty fields with nonempty subfields
             if (!empty($value))
             {
-              $temp = false;
+              $val_sani = false;
               foreach ($fields as $field)
               {
-                if (!empty(trim($measurement[$field])) and strstr($field, $param . ":"))
-                  $temp = true;
+                if (!empty(trim($measurement[$field])) and strstr($field, $param_sani . ":"))
+                  $val_sani = true;
               }
-              if ($temp)
+              if ($val_sani)
               {
                 $c++;
                 $col = "red";
-                array_push($tt, "[ERROR] Empty while required in the library settings");
+                array_push($tt, "[ERROR] Nonempty field with nonempty subfield");
               }
             }
             break;
         }
         
         // also check data types defined in dataset:*:meta:type
-        if ((substr($param, 0, 8 ) === "dataset:") and (substr($param, -10 ) === ":meta:type"))
+        if ((substr($param_sani, 0, 8 ) === "dataset:") and (substr($param_sani, -10 ) === ":meta:type"))
         {
           //check if type is set and exists in specformat.json!!
-          $temp = strtolower($value);
-          $temp = str_replace(array(" ", "_", "-", "/"), "", $temp);
-          if (isset($types[$temp]))
+          $val_sani = sanitizeStr($value, "", "-+:^", True);
+          if (isset($types_sani[$val_sani]))
           {
             //if the value in the CSV is not identical to the one in specformat, autocorrect
-            if ($value != $types[$temp]) 
+            if ($value != $types_sani[$val_sani]) 
             {
               $a++;
               $col = "green";
               array_push($tt, "[NOTE] Automatically corrected type");
-              $measurements[$id][$param] = $value = $temp;
+              $measurements[$id][$param] = $value = $types_sani[$val_sani];
             }
           }
           else // type in CSV does not exist!
@@ -648,7 +636,7 @@
           $list[$id][$column] = getMeta($measurement, $column, "; ", false);
       }
           
-      //save list.json
+      //save list
       $error = writeJSONfile($opdir . "_4_operation.json", $list);
       if ($error) throw new RuntimeException($error);
       

@@ -252,8 +252,12 @@
             $newlib["ref"][$i++] = $item;
       
       foreach (array("columns", "allowformat") as $item)
-        if (isset($_REQUEST[$item]) and ($_REQUEST[$item] != "")) 
-          $newlib[$item] = explode("|", str_replace(" ", "", $_REQUEST[$item]));
+        if (isset($_REQUEST[$item]) and ($_REQUEST[$item] != ""))
+        {
+          $arr = explode("|", str_replace(" ", "_", strtolower($_REQUEST[$item])));
+          foreach ($arr as $i => $val)
+            $newlib[$item][$i] = sanitizeStr($val, "_", False, False);
+        }
       
       //prepare file contents
       $libs[$id] = $newlib;
