@@ -35,8 +35,8 @@
     // longdescription
     if (!empty($libs[$showlib]["longdescription"])) 
       echo "        <div class='nonboxed'>\n",
-           "          <h3>About the library</h3>\n",
-           "            ".$libs[$showlib]["longdescription"]."\n",
+           "          <h3>About " . ($showlib == "_landingpage")?$libs[$showlib]["name"]:"the library" . "</h3>\n",
+           "          ".$libs[$showlib]["longdescription"]."\n",
            "        </div>\n";
     
     // news   
@@ -72,25 +72,26 @@
          "        </div>\n";
   }
 
-
-  /* ******************
-      spectra list
-     ****************** */   
-
-  // 1. which columns to show
   
-  // the columns to show can be defined in libraries.json, otherwise take defaults
-  if (!empty($libs[$showlib]["columns"]))
-    $columns = $libs[$showlib]["columns"];
-  else  //just take the columns that are certainly available in measurements.json
-    $columns = array("id", "type");
+/* ******************
+    measurement list
+   ****************** */  
   
-  // column names to be displayed
-  foreach ($columns as $i => $column)
-    $columnnames[$i] = nameMeta($column);
+  if ($showlib != "_landingpage") //normal library
+  {
+    // 1. which columns to show
     
-?>
-
+    // the columns to show can be defined in libraries.json, otherwise take defaults
+    if (!empty($libs[$showlib]["columns"]))
+      $columns = $libs[$showlib]["columns"];
+    else  //just take the columns that are certainly available in measurements.json
+      $columns = array("id", "type");
+    
+    // column names to be displayed
+    foreach ($columns as $i => $column)
+      $columnnames[$i] = nameMeta($column);
+      
+    ?>
         <script type="text/javascript" charset="utf-8">
           $(document).ready(function() {
             var oTable = $('#datatable').dataTable( {
@@ -102,44 +103,73 @@
             new FixedHeader( oTable );
           } );
         </script>
-        
+          
         <div class='fullwidth'>
           <h3>Spectral library contents</h3>
           <table id="datatable" width="100%">
             <thead>
               <tr>
                 <th> </th>
-<?php 
-  foreach ($columnnames as $name) 
-    echo "                <th>" . $name . "</th>\n"; 
-?>
+    <?php 
+    
+    foreach ($columnnames as $name) 
+      echo "                <th>" . $name . "</th>\n"; 
+    
+    ?>
               </tr>
             </thead>
             <tbody>
-<?php
+    <?php
 
-  // 2. read measurements.json
-  
-  foreach ($measurements as $id => $m) 
-  {   
-    echo "              <tr>\n";
-    // first column: link to open
-    echo '                <td><a href="./index.php?lib=' . $showlib . '&id=' . $id . '"><img src="./images/freecons/06.png" alt="[open]"></a></td>' . "\n";
-    foreach ($columns as $column)
-    {
-      if (strtolower($column) == "id")
-        echo "                <td>" . $id . "</td>\n";
-      else
-        echo "                <td>" . $m[$column] . "</td>\n";
+    // 2. read measurements.json
+    
+    foreach ($measurements as $id => $m) 
+    {   
+      echo "              <tr>\n";
+      // first column: link to open
+      echo '                <td><a href="./index.php?lib=' . $showlib . '&id=' . $id . '"><img src="./images/freecons/06.png" alt="[open]"></a></td>' . "\n";
+      foreach ($columns as $column)
+      {
+        if (strtolower($column) == "id")
+          echo "                <td>" . $id . "</td>\n";
+        else
+          echo "                <td>" . $m[$column] . "</td>\n";
+      }
+      echo "              </tr>\n";
     }
-    echo "              </tr>\n";
-  }
 
-?>
+    ?>
             </tbody>
           </table>
         </div>
-<?php
+    <?php    
+  }
+  
+/* ******************
+      library list
+   ****************** */   
+  
+  else //$showlib == "_landingpage"
+  {
+    echo "        <div class=\"fullwidth\">\n",
+         "          <h3>Available libraries</h3>\n";
+       
+    foreach ($libs as $libid => $lib)
+    {
+      if ($libid != "_landingpage")
+      {
+        if ((strtolower($lib["view"]) == "public") or calcPermLib($user["permissions"], "view", $libid))
+          echo "          <div class=\"boxed\" id=\"libbox\">\n",
+              "            <h4>".$lib["name"]."</h4>\n",
+              "            <p>".$lib["shortdescription"]."</p>\n",
+              "            <a class=\"libboxlink\" href=\"./index.php?lib=" . $libid . "\">>> visit library</a>\n",
+              "          </div>\n";
+      }
+    }
+    echo "        </div>\n";
+  }
+  
+  
 
 FOOTER:
   // FOOTER

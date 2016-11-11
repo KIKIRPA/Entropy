@@ -1,4 +1,19 @@
 {
+    "_landingpage": {
+        "name": "start",
+        "menu": "start",
+        "header": "start",
+        "view": "public",
+        "colour": "#ff0000",
+        "longdescription": "test",
+        "contact": "test",
+        "news": [
+            "test"
+        ],
+        "ref": [
+            "test"
+        ]
+    },
     "test": {
         "name": "test library",
         "menu": "test library",

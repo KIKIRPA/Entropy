@@ -51,7 +51,8 @@
                         "peaksearch" => array("Peaksearch tool", false),
                         "dllog"      => array("View download log", false)
                       );
-  $modules_adm = array( "libmgmt"    => array("Library management", true),
+  $modules_adm = array( "landingpage" => array("Modify landing page", true),
+                        "libmgmt"    => array("Library management", true),
                         "libmk"      => array("Create library", false),
                         "usermgmt"   => array("User management", true),
                         "log"        => array("Log tool", false),

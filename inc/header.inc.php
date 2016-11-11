@@ -49,7 +49,7 @@
     <div class="wrapper">
       <div class="header">
         <div id="logo">
-          <img src="./images/specliblogo.png" title="SpecLib" alt="SpecLib" />
+          <img src="./images/specliblogo.png" title="Entropy" alt="Entropy">
         </div>
         <div id="title">
           <h1><?php echo $pagetitle; ?></h1>
@@ -59,57 +59,62 @@
     
       <nav id="menu">
         <ul> 
-          <li>
-            <a href='./'>About SpecLib</a>
-          </li>
 <?php        
+  // landing page
+  if (isset($libs["_landingpage"]))
+    if (strtolower($libs["_landingpage"]["view"]) == "public")
+      echo "          <li>\n"
+         . "            <a href='./'>" . $libs["_landingpage"]["menu"] . "</a>\n"
+         . "          </li>\n";
+  
   // lib menu entries
   foreach ($libs as $libid => $lib)
-  {
-    $perm = false;
-    
-    if ($is_logged_in) 
+    if (strtolower($libid) != "_landingpage")
     {
-      $perm = calcPermMod($user["permissions"], $libid);
+      $perm = false;
       
-      if (is_array($perm)) $perm = array_intersect($perm, array_keys($menuitems_lib));
-      elseif ($perm)       $perm = array_keys($menuitems_lib);
-      // else: $perm==false => do nothing ($perm remains false)
-    }
-      
-    if (!$perm)
-    {
-      if ($lib["view"] == "public")
-        echo "          <li><a href=\"./index.php?lib=" . $libid . "\">" . $lib["menu"] . "</a></li>\n";
-      elseif (($lib["view"] == "hidden") and ($_REQUEST["lib"] == $libid))
-        echo "          <li><a href=\"./index.php?lib=" . $libid . "\">" . $lib["menu"] . "&nbsp<img src='./images/freecons/70_white.png' height='10'></a></li>\n";
-    }
-    elseif (is_array($perm))
-    {
-      if     ($lib["view"] == "hidden") $note = "&nbsp<img src='./images/freecons/70_white.png' height='10'>";
-      elseif ($lib["view"] == "public") $note = "";
-      else                              $note = "&nbsp<img src='./images/freecons/32_white.png' height='10'>";
-      
-      if ((count($perm) == 1) and ($perm[0] == "view"))
-        echo "          <li><a href=\"./index.php?lib=" . $libid . "\">" . $lib["menu"] . $note . "</a></li>\n";
-      else 
+      if ($is_logged_in) 
       {
-        echo "          <li><a href=\"#\">" . $lib["menu"] . $note . "</a>\n";
-        echo "            <ul>\n";
-        echo "              <li><a href=\"./index.php?lib=" . $libid . "\"> View</a></li>\n";
-        foreach ($perm as $item)
-        {
-          ///////////////////////////////////////////////////
-          // TODO REMARK tools.php?mod=view == index.php //
-          ///////////////////////////////////////////////////
-          if ($item != "view")
-            echo "              <li><a href=\"./tools.php?mod=" . $item . "&lib=" . $libid . "\">" . $menuitems_lib[$item] . "</a></li>\n";
-        }
-        echo "            </ul>\n";
-        echo "          </li>\n";
+        $perm = calcPermMod($user["permissions"], $libid);
+        
+        if (is_array($perm)) $perm = array_intersect($perm, array_keys($menuitems_lib));
+        elseif ($perm)       $perm = array_keys($menuitems_lib);
+        // else: $perm==false => do nothing ($perm remains false)
       }
-    }   
-  }
+        
+      if (!$perm)
+      {
+        if (strtolower($lib["view"]) == "public")
+          echo "          <li><a href=\"./index.php?lib=" . $libid . "\">" . $lib["menu"] . "</a></li>\n";
+        elseif ((strtolower($lib["view"]) == "hidden") and ($_REQUEST["lib"] == $libid))
+          echo "          <li><a href=\"./index.php?lib=" . $libid . "\">" . $lib["menu"] . "&nbsp<img src='./images/freecons/70_white.png' height='10'></a></li>\n";
+      }
+      elseif (is_array($perm))
+      {
+        if     (strtolower($lib["view"]) == "hidden") $note = "&nbsp<img src='./images/freecons/70_white.png' height='10'>";
+        elseif (strtolower($lib["view"]) == "public") $note = "";
+        else                              $note = "&nbsp<img src='./images/freecons/32_white.png' height='10'>";
+        
+        if ((count($perm) == 1) and ($perm[0] == "view"))
+          echo "          <li><a href=\"./index.php?lib=" . $libid . "\">" . $lib["menu"] . $note . "</a></li>\n";
+        else 
+        {
+          echo "          <li><a href=\"#\">" . $lib["menu"] . $note . "</a>\n";
+          echo "            <ul>\n";
+          echo "              <li><a href=\"./index.php?lib=" . $libid . "\"> View</a></li>\n";
+          foreach ($perm as $item)
+          {
+            ///////////////////////////////////////////////////
+            // TODO REMARK tools.php?mod=view == index.php //
+            ///////////////////////////////////////////////////
+            if ($item != "view")
+              echo "              <li><a href=\"./tools.php?mod=" . $item . "&lib=" . $libid . "\">" . $menuitems_lib[$item] . "</a></li>\n";
+          }
+          echo "            </ul>\n";
+          echo "          </li>\n";
+        }
+      }
+    }
   
   // admin login
   if (IS_HTTPS and !IS_BLACKLISTED)

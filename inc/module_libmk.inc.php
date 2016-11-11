@@ -13,12 +13,11 @@
   
   if (($f == "set") and ($output == false))
   {
-    // give the creator access rights in users.json
-    $users = readJSONfile(USERS_FILE, true);
+    //----------------------------------------------//
+    // give the creator access rights in users.json //
+    //----------------------------------------------//
     
-    echo "<pre>\n";
-    print_r($users[$user]);
-    echo "</pre>\n";
+    $users = readJSONfile(USERS_FILE, true);
     
     if (isset($users[$is_logged_in]) and isset($users[$is_logged_in]["permissions"]))
     {

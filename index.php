@@ -9,7 +9,7 @@
   
 /*
 replacement for index.php
- - without arguments                             --> open start page
+ - without arguments                             --> open list, and will show landingspage or first lib
  - $_REQUEST["lib"]                              --> open list (if lib exists, if we have rights)
  - $_REQUEST["lib"] + ["id"] (+ ["ds"])          --> open data viewer (if lib exists, if we have rights)
  - $_REQUEST["lib"] + ["id"] (+ ["ds"]) + ["dl"] --> open dl (if lib exists, if we have rights)
@@ -28,20 +28,52 @@ replacement for index.php
     
     // library exists?
     if (!isset($libs[$showlib]))
-      $error = "The requested library does not exist";
+      $error = "The requested library does not exist: " . $showlib;
     
     // we have access to this lib?
     if (($libs[$showlib]["view"] == "locked") or !isset($libs[$showlib]["view"]))
     {
       if (!$is_logged_in)
-        $error = "Access to this library is restricted. Please log in";
+        $error = "Access to " . $showlib . " library is restricted. Please log in";
       elseif (!calcPermLib($user["permissions"], "view", $showlib)) 
-        $error = "User " . $is_logged_in . " has no authorisation to access this library.";
+        $error = "User " . $is_logged_in . " has no authorisation to access library " . $showlib;
     }
 
-    if ($error) $mode = "start";
+    if ($error) $mode = "default";
   }
-  else $mode = "start";
+  else $mode = "default";
+  
+  // EVALUATE LANDING PAGE OR FIRST ACCESSIBLE LIBRARY
+  if ($mode == "default")
+  {
+    $showlib = false;
+    // if the special _landingpage "library" is active, show this by default
+    if (isset($libs["_landingpage"]) and strtolower($libs["_landingpage"]["view"]) == "public")
+      $showlib = "_landingpage";
+    else
+    {
+      foreach ($libs as $libid => $lib)
+      {
+        if (strtolower($libid) != "_landingpage")
+
+          if ( ($is_logged_in and calcPermLib($user["permissions"], "view", $libid))
+               or (strtolower($lib["view"]) == "public")
+             )
+            $showlib = $libid;
+        //break from foreach if we found an accessible default library
+        if ($showlib) 
+        {
+          $mode = "list";
+          break;
+        }
+      }
+    }    
+  }
+  
+  // if mode stil is default, this means no landingpage or no accessible library was found!
+  // TODO maybe we should goto the login page instead, hoping there are private libraries??
+  if ($mode == "default")  
+    eventLog("ERROR", "No data to show [index]" , true);
   
   // EVALUATE $_REQUEST["id"]
   if (!$mode)
@@ -126,13 +158,9 @@ replacement for index.php
     case "view":
       require_once('./inc/index_view.inc.php');
       break;
+    default:
     case "list":
       require_once('./inc/index_list.inc.php');
-      break;
-    default:
-    case "start":
-      require_once('./inc/index_start.inc.php');
-      break;
   }
   
 ?>

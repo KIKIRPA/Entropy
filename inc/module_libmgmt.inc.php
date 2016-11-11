@@ -46,26 +46,27 @@
   foreach ($libs as $id => $lib)
   { 
     if (($lib["view"] == "public") or calcPermLib($user["permissions"], "view", $id))
-    {
-      echo "        <tr>\n",
-          "          <td>" . $id . "</td>\n",
-          "          <td>" . $lib["name"] . "</td>\n",
-          "          <td>" . $lib["view"]. "</td>\n",
-          "          <td><span style='color:" . $lib["colour"] . "'>&#9724;</span></td>\n",
-          "          <td>\n";
-      
-      if (calcPermLib($user["permissions"], "libedit", $id))
-        echo "            <a href=\"" . $_SERVER["PHP_SELF"] . "?mod=libedit&lib=" . $id . "\"'>&#9998;</a> \n";
-      
-      if (calcPermLib($user["permissions"], "libperm", $id))
-        echo "            <a href=\"" . $_SERVER["PHP_SELF"] . "?mod=libperm&lib=" . $id . "\"'>&#9786;</a> \n";
+      if ($libid != "_landingpage")
+      {
+        echo "        <tr>\n",
+            "          <td>" . $id . "</td>\n",
+            "          <td>" . $lib["name"] . "</td>\n",
+            "          <td>" . $lib["view"]. "</td>\n",
+            "          <td><span style='color:" . $lib["colour"] . "'>&#9724;</span></td>\n",
+            "          <td>\n";
         
-      if (calcPermLib($user["permissions"], "libdel", $id))
-        echo "            <a href=\"" . $_SERVER["PHP_SELF"] . "?mod=libdel&lib=" . $id . "&del \"' onclick=\"return confirm('Delete this library?')\">&#10006;</a>\n";
-      
-      echo "          </td>\n",
-          "        </tr>\n";
-    }
+        if (calcPermLib($user["permissions"], "libedit", $id))
+          echo "            <a href=\"" . $_SERVER["PHP_SELF"] . "?mod=libedit&lib=" . $id . "\"'>&#9998;</a> \n";
+        
+        if (calcPermLib($user["permissions"], "libperm", $id))
+          echo "            <a href=\"" . $_SERVER["PHP_SELF"] . "?mod=libperm&lib=" . $id . "\"'>&#9786;</a> \n";
+          
+        if (calcPermLib($user["permissions"], "libdel", $id))
+          echo "            <a href=\"" . $_SERVER["PHP_SELF"] . "?mod=libdel&lib=" . $id . "&del \"' onclick=\"return confirm('Delete this library?')\">&#10006;</a>\n";
+        
+        echo "          </td>\n",
+            "        </tr>\n";
+      }
   }
   
 ?>

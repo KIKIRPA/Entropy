@@ -11,7 +11,12 @@
   
   echo "      <h3>Delete library</h3>\n";
    
-  if (!isset($_REQUEST["del"]) and isset($libs[$id]))
+  if ($id == "_landingpage")
+  {
+    // the special 'library' _landingpage cannot be deleted; should be set to invisible instead!
+    echo "      <span style='color:red'>ERROR: cannot remove the landing page!</span><br><br>\n";
+  }
+  elseif (!isset($_REQUEST["del"]) and isset($libs[$id]))
   {
     echo "        <span style='color:red'>This will IRREVOCABLY DELETE LIBRARY " . $id . "!</span><br><br>\n"
        . "        <form name='myform' action='" . $_SERVER["REQUEST_URI"] . "' method='POST'>\n"
@@ -32,7 +37,7 @@
     
     // BACKUP DATA DIR
     if (!backupFile(LIB_DIR, $id))
-      echo "      <span style='color:red'>ERROR: failed to remove the data directory!</span><br><br>\n";;
+      echo "      <span style='color:red'>ERROR: failed to remove the data directory!</span><br><br>\n";
     
   }
   else

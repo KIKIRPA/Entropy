@@ -7,18 +7,24 @@
     exit("Direct access not permitted.");
   }
    
+  //TODO is the library parameter "header" still used somewhere? if not, can it be removed?
+  
   
 /* *********************************************************
     FUNCTION CHOOSER 
    ********************************************************* */ 
   
-  // TODO in libmk the edit-function will be called without $_R[lib]! this might go wrong here
-  $id = str_replace(" ", "", strtolower($_REQUEST["lib"]));
-  $new = !isset($libs[$id]);           // if not in libs.json
   if (!isset($libmk)) $libmk = false;  // in module_libmk.inc.php this is set to true!
+  if (!isset($lp))    $lp = false;     // in module_landingpage this is set to true
   
-  if ($new) echo "      <h3>Create library</h3>\n";
-  else      echo "      <h3>Edit library</h3>\n";
+  if (!$lp) $id = str_replace(" ", "", strtolower($_REQUEST["lib"]));
+  else      $id = "_landingpage";
+  
+  $new = !isset($libs[$id]);           // if not in libs.json
+  
+  if     ($lp)  echo "      <h3>Modify landing page</h3>\n";
+  elseif ($new) echo "      <h3>Create library</h3>\n";
+  else          echo "      <h3>Edit library</h3>\n";
   
   $f="error";
   
@@ -71,14 +77,11 @@
                     "allowformat" => ""
                     );
     
-    //if (isset($libs[$id]))
     if (!$new)
     {
-      
-      //$new = false;
       foreach ($libs[$id] as $i => $item)
         $preset[$i] = $item;
-      if (is_array($preset["columns"])) $preset["columns"] = implode("|", $preset["columns"]);
+      if (is_array($preset["columns"]))     $preset["columns"] = implode("|", $preset["columns"]);
       if (is_array($preset["allowformat"])) $preset["allowformat"] = implode("|", $preset["allowformat"]);
     }
     //else $id = "";
@@ -149,10 +152,12 @@
       <table cellspacing='8' style='width: 100%;'> 
         <tr>
           <td><label accesskey='l' for='lib' class='label'>lib</label><span style='color:red'>*</span></td>
-          <td><?php if ($new) 
-                      echo "<input type='text' id='lib' name='lib' maxlength='8' value='" . $id . "' style='width: 100%;'></td>\n";
+          <td><?php if ($lp)
+                      echo "Landing page" . "<input type='hidden' id='lib' name='lib' value='_landingpage'></td>\n";
+                    elseif ($new) 
+                      echo "<input type='text' id='lib' name='lib' maxlength='12' value='" . $id . "' style='width: 100%;'></td>\n";
                     else 
-                      echo $id . "<input type='hidden' id='lib' name='lib' maxlength='8' value='" . $id . "'></td>\n"; 
+                      echo $id . "<input type='hidden' id='lib' name='lib' value='" . $id . "'></td>\n"; 
                 ?>
         </tr>
         <tr>
@@ -161,10 +166,14 @@
         </tr>
         <tr>
           <td><label accesskey='v' for='view' class='label'>view</label><span style='color:red'>*</span></td>
-          <td>
-            <input type='radio' id='view' name='view' value='locked' <?php if (empty($preset["view"]) or $preset["view"] == "locked") echo "checked"; ?>>Locked (viewing this library requires logging in as a user with viewing rights)<br>
-            <input type='radio' id='view' name='view' value='hidden' <?php if ($preset["view"] == "hidden") echo "checked"; ?>>Hidden (viewing this library is open, but requires a non-disclosed link)<br>
-            <input type='radio' id='view' name='view' value='public' <?php if ($preset["view"] == "public") echo "checked"; ?>>Public (viewing this library is open, with direct access via the menu)
+          <td><?php if (!$lp)
+                      echo "            <input type='radio' id='view' name='view' value='locked'" . (empty($preset["view"]) or $preset["view"] == "locked")?" checked>":">" . "Locked (viewing this library requires logging in as a user with viewing rights)<br>\n"
+                         . "            <input type='radio' id='view' name='view' value='hidden'" . ($preset["view"] == "hidden")?" checked>":">" . "Hidden (viewing this library is open, but requires a non-disclosed link)<br>\n"
+                         . "            <input type='radio' id='view' name='view' value='public'" . ($preset["view"] == "public")?" checked>":">" . "Public (viewing this library is open, with direct access via the menu)\n";
+                    else
+                      echo "            <input type='radio' id='view' name='view' value='hidden'" . (empty($preset["view"]) or $preset["view"] == "hidden")?" checked>":">" . "Hidden<br>\n"
+                         . "            <input type='radio' id='view' name='view' value='public'" . ($preset["view"] == "public")?" checked>":">" . "Public\n";                    
+              ?>
           </td>
         </tr>
         <tr>
@@ -179,10 +188,12 @@
           <td><label accesskey='c' for='colour' class='label'>colour</label></td>
           <td><input type='color' id='colour' name='colour' style='width: 100%;' value='<?php echo $preset["colour"]; ?>'></td>
         </tr>
-        <tr>
-          <td><label accesskey='s' for='shortdescription' class='label'>short description</label></td>
-          <td><textarea id='shortdescription' name='shortdescription' style='width: 100%;'><?php echo $preset["shortdescription"]; ?></textarea></td>
-        </tr>
+        <?php if (!$lp)
+                echo "<tr>\n"
+                   . "          <td><label accesskey='s' for='shortdescription' class='label'>short description</label></td>\n"
+                   . "          <td><textarea id='shortdescription' name='shortdescription' style='width: 100%;'>" . $preset["shortdescription"] . "</textarea></td>\n"
+                   . "        </tr>";
+        ?>
         <tr>
           <td><label accesskey='d' for='longdescription' class='label'>long description</label></td>
           <td><textarea id='longdescription' name='longdescription' style='width: 100%;'><?php echo $preset["longdescription"]; ?></textarea></td>
@@ -199,14 +210,16 @@
           <td><label accesskey='r' for='ref' class='label'>references</label><br><input type="button" value="+" onClick="addRef('dynamicInputRef');"></td>
           <td><div id="dynamicInputRef"><?php foreach ($preset["ref"] as $ref) echo "<textarea id='ref' name='ref[]' style='width: 100%;'>" .$ref. "</textarea><br>"; ?></div></td>
         </tr>
-        <tr>
-          <td><label accesskey='u' for='columns' class='label'>columns</label></td>
-          <td><input type='text' id='columns' name='columns' style='width: 100%;' value='<?php echo $preset["columns"]; ?>'></td>
-        </tr>
-        <tr>
-          <td><label accesskey='a' for='allowformat' class='label'>allow formats</label></td>
-          <td><input type='text' id='allowformat' name='allowformat' style='width: 100%;' value='<?php echo $preset["allowformat"]; ?>'></td>
-        </tr>
+        <?php if (!$lp)
+                echo "<tr>\n"
+                   . "          <td><label accesskey='u' for='columns' class='label'>columns</label></td>\n"
+                   . "          <td><input type='text' id='columns' name='columns' style='width: 100%;' value='" . $preset["columns"] . "'></td>\n"
+                   . "        </tr>\n"
+                   . "        <tr>\n"
+                   . "          <td><label accesskey='a' for='allowformat' class='label'>allow formats</label></td>\n"
+                   . "          <td><input type='text' id='allowformat' name='allowformat' style='width: 100%;' value='" . $preset["allowformat"] . "'></td>\n"
+                   . "        </tr>";
+        ?>
       </table>
     
       <br><br>
@@ -282,7 +295,7 @@
     if (!isset($errormsg)) $errormsg = "unknown error!";
     
     echo "    <span style='color:red'>ERROR: " . $errormsg . "</span><br><br>";
-    // TODO error log
+    eventLog("ERROR", $errormsg . " [module_libedit]", false, false);
   }
   
 ?>
