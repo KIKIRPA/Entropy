@@ -327,7 +327,7 @@
     $existing = readJSONfile(LIB_DIR . $_REQUEST["lib"] . "/measurements.json");  //if file does not exist: empty array
     $existing = array_keys($existing);
     
-    $types = readJSONfile(FORMAT_FILE);
+    $types = readJSONfile(DATAFORMATS_FILE);
     foreach ($types as $type => $tval) $types_sani[sanitizeStr($type, "", "-+:^", True)] = $type;
     
     unset($measurements[""]);   //remove empty rows

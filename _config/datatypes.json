@@ -1,0 +1,124 @@
+{
+    "Raman": {
+        "type": "spectrum",
+        "xy-graph": "line",
+        "x-axis": {
+            "default": {
+                "displayname": "Raman shift (cm<sup>-1<\/sup>)",
+                "names": [
+                    "raman shift (cm-1)",
+                    "raman shift (1/cm)",
+                    "wavenumber (cm-1)",
+                    "wavenumber (1/cm)"
+                ]
+            }
+        },
+        "y-axis": {
+            "default": {
+                "displayname": "Intensity (Arbitrary Units)",
+                "names": [
+                    "intensity (arbitrary units",
+                    "counts"
+                ]
+            }
+        }
+    },
+    "Raman 785nm": {
+        "alias": "Raman"
+    },
+    "Raman 514nm": {
+        "alias": "Raman"
+    },
+    "Raman 532nm": {
+        "alias": "Raman"
+    },
+    "Raman 633nm": {
+        "alias": "Raman"
+    },
+    "Raman 1064nm": {
+        "alias": "Raman"
+    },
+    "FTIR": {
+        "type": "spectrum",
+        "xy-graph": "line",
+        "x-axis": {
+            "default": {
+                "displayname": "Wavenumber (cm<sup>-1<\/sup>)",
+                "names": [
+                    "wavenumber (cm-1)",
+                    "wavenumber (1/cm)"
+                ],
+                "invert": true
+            }
+        },
+        "y-axis": {
+            "default": {
+                "displayname": "Absorbance (Relative intensity)",
+                "names": [
+                    "absorbance (relative intensity)"
+                ]
+            },
+            "transmission": {
+                "displayname": "Transmission (%)",
+                "names": [
+                    "transmission"
+                ]
+            }
+        }
+    },
+    "MS": {
+        "type": "spectrum",
+        "xy-graph": "bar",
+        "x-axis": {
+            "default": {
+                "displayname": "m\/z",
+                "names": [
+                    "m/z"
+                ]
+            }
+        },
+        "y-axis": {
+            "default": {
+                "displayname": "Relative intensity",
+                "names": [
+                    "relative intensity"
+                ]
+            }
+        }
+    },
+    "Mass spectrum": {
+        "alias": "MS"
+    },
+    "chromms": {
+        "type": "chromatograph",
+        "ty-graph": "line",
+        "xy-graph": "bar",
+        "t-axis": {
+            "default": {
+                "displayname": "Time (min)",
+                "names": [
+                    "time (min)"
+                ]
+            }
+        },
+        "x-axis": {
+            "default": {
+                "displayname": "m\/z",
+                "names": [
+                    "m/z"
+                ]
+            }
+        },
+        "y-axis": {
+            "default": {
+                "displayname": "Relative intensity",
+                "names": [
+                    "relative intensity"
+                ]
+            }
+        }
+    },
+    "GC-MS": {
+        "alias": "chromms"
+    }
+}
