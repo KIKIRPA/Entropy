@@ -10,11 +10,11 @@
 
   // HEADER
   
-  //$libs: already loaded
-  $htmltitle = APP_SHORT . ": " . $libs[$showlib]["menu"];
+  //$LIBS: already loaded
+  $htmltitle = APP_SHORT . ": " . $LIBS[$showlib]["menu"];
   $htmlkeywords = APP_KEYWORDS;
   $pagetitle = APP_LONG;
-  $pagesubtitle = $libs[$showlib]["name"];
+  $pagesubtitle = $LIBS[$showlib]["name"];
   $style   = "<link rel='stylesheet' type='text/css' href='./css/jquery.dataTables.css'>\n";
   $scripts = "<!--[if IE]><script type='text/javascript' charset='utf8' src='./javascript/excanvas.compiled.js'></script><![endif]-->\n"
        . "    <script type='text/javascript' charset='utf8' src='./javascript/jquery.dataTables.min.js'></script>\n"
@@ -30,37 +30,37 @@
       details
      ********* */
   
-  if (count($libs[$showlib]) > 0) 
+  if (count($LIBS[$showlib]) > 0) 
   {
     // longdescription
-    if (!empty($libs[$showlib]["longdescription"])) 
+    if (!empty($LIBS[$showlib]["longdescription"])) 
       echo "        <div class='nonboxed'>\n",
-           "          <h3>About " . ($showlib == "_landingpage")?$libs[$showlib]["name"]:"the library" . "</h3>\n",
-           "          ".$libs[$showlib]["longdescription"]."\n",
+           "          <h3>About " . ($showlib == "_landingpage")?$LIBS[$showlib]["name"]:"the library" . "</h3>\n",
+           "          ".$LIBS[$showlib]["longdescription"]."\n",
            "        </div>\n";
     
     // news   
-    if (!empty($libs[$showlib]["news"])) 
-      foreach ($libs[$showlib]["news"] as $news)
+    if (!empty($LIBS[$showlib]["news"])) 
+      foreach ($LIBS[$showlib]["news"] as $news)
         echo "        <div class='boxed' id='greybox'>\n",
              "          <p>$news</p>\n",
              "        </div>\n";
         
     // contacts 
-    if (!empty($libs[$showlib]["contact"]))
+    if (!empty($LIBS[$showlib]["contact"]))
     {
       echo "        <div class='boxed'>\n",
            "          <h3>Contact</h3>\n",
-           "          <p>" . ($is_logged_in ? $libs[$showlib]["contact"] : searchmailhide($libs[$showlib]["contact"])) . "</p>\n",
+           "          <p>" . ($is_logged_in ? $LIBS[$showlib]["contact"] : searchmailhide($LIBS[$showlib]["contact"])) . "</p>\n",
            "        </div>\n";  
     }
     
     // refs
-    if (!empty($libs[$showlib]["ref"])) 
+    if (!empty($LIBS[$showlib]["ref"])) 
     {
       echo "        <div class='boxed'>\n",
            "          <h3>Related literature</h3>\n";
-      foreach ($libs[$showlib]["ref"] as $ref) echo "          <p>$ref</p>\n";
+      foreach ($LIBS[$showlib]["ref"] as $ref) echo "          <p>$ref</p>\n";
       echo "        </div>\n";  
     }
     
@@ -82,8 +82,8 @@
     // 1. which columns to show
     
     // the columns to show can be defined in libraries.json, otherwise take defaults
-    if (!empty($libs[$showlib]["columns"]))
-      $columns = $libs[$showlib]["columns"];
+    if (!empty($LIBS[$showlib]["columns"]))
+      $columns = $LIBS[$showlib]["columns"];
     else  //just take the columns that are certainly available in measurements.json
       $columns = array("id", "type");
     
@@ -154,7 +154,7 @@
     echo "        <div class=\"fullwidth\">\n",
          "          <h3>Available libraries</h3>\n";
        
-    foreach ($libs as $libid => $lib)
+    foreach ($LIBS as $libid => $lib)
     {
       if ($libid != "_landingpage")
       {

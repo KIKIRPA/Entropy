@@ -9,78 +9,7 @@
   }
   
 
-/* *******************************************************************************************************************************
-    COMMON TASKS AND SETTING CONSTANTS
-      - constant IS_HTTPS
-      - constant IS_BLACKLISTED 
-      - constant BLACKLIST_COUNT
-      - SESSION management: start, renew or expire
-      - variable $is_logged_in (username or false) and $is_expired (true or false)
-      - variables $blacklist, $user, $libs
-   *******************************************************************************************************************************/
-    
-  
-  
-  // IS_HTTPS
-
-  define("IS_HTTPS", (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443); 
-                          
-  // IS_BLACKLISTED
-  
-  $blacklist = readJSONfile(BLACKLIST_FILE);
-  $temp = 0;
-  
-  if (isset($blacklist[$_SERVER['REMOTE_ADDR']])) 
-    $temp = count($blacklist[$_SERVER['REMOTE_ADDR']]);
-  
-  define("BLACKLIST_COUNT", $temp);
-  define("IS_BLACKLISTED", ($temp >= MAXTRIES_IP));
-  
-  // SESSION MANAGEMENT
-  
-  $is_logged_in = $is_expired = false;
-  
-  if (IS_HTTPS and !IS_BLACKLISTED)
-  {
-    session_start();
-    
-    if (isset($_SESSION['username']) and $_SESSION['trusted'] and $_SESSION['pwdok'])
-    {
-      $is_logged_in = $_SESSION['username'];
-      
-      //load user data from json and do some sanity checks
-      $user = readJSONfile(USERS_FILE, true);
-      if (isset($user[$is_logged_in])) 
-        $user = $user[$is_logged_in];
-      else //set $user and $is_logged_in to false and log
-        $user = $is_logged_in = eventLog("WARNING", "Non-existant username stored in session: " . $is_logged_in, false, true);
-    }
-    
-    // set or renew session
-    if (!isset($_SESSION['ts']))      // set timestamp to auto-close sessions after a certain time
-      $_SESSION['ts'] = time();
-    elseif (time() - $_SESSION['ts'] < EXPIRE)  //last activity is less than $expire ago: stay logged in
-    {
-      session_regenerate_id(true);    // change session ID for the current session and invalidate old session ID (protects against session fixation attack)
-      $_SESSION['ts'] = time();       // update timestamp
-    }
-    else                              // auto log off
-    {
-      if ($is_logged_in) 
-      {
-        $is_logged_in = false;
-        $is_expired = true;
-      }
-      logout();
-    }
- 
-  }
-  
-  $libs = readJSONfile(LIB_DIR . LIB_FILE, true);
-  
-  
-/* *******************************************************************************************************************************
-    FUNCTIONS
+/* ****************************************************************************************************************************
       
       logout()                              close session
       
@@ -134,7 +63,7 @@
                                              when optional $mail is true it will send an email to the sysadmin; or if set to an valid address to this address
                                              !! returns false (if not fatal)!!
     
-   *******************************************************************************************************************************/
+   **************************************************************************************************************************/
   
   
   function logout()
@@ -232,7 +161,7 @@
     }
     
     if (empty($array) and $dieOnError)
-      eventLog("ERROR", "could not read " . pathinfo($path,  PATHINFO_FILENAME) . " DB", true, true);
+      eventLog("ERROR", "could not read " . pathinfo($path,  PATHINFO_FILENAME) . " file", true, true);
 
     return $array;
   }
@@ -498,7 +427,7 @@
                     "IP"          => $_SERVER['REMOTE_ADDR'] );
     
     // open or create event log file and append line
-    $handle = fopen(LOG_DIR . LOG_EV_FILE, "a");
+    $handle = fopen(LOG_EV_FILE, "a");
     if ($handle) $success = fputcsv($handle, $event);
     else 	 $success = false;
     if ($success) $success = fclose($handle);
@@ -515,7 +444,7 @@
       if (!$success)
       {
         $title .= " - failed to log!";
-        $body .= "FAILED TO WRITE TO " . LOG_DIR . LOG_EV_FILE ."\r\n\r\n";
+        $body .= "FAILED TO WRITE TO " . LOG_EV_FILE ."\r\n\r\n";
       }
       
       foreach ($event as $key => $value) $body .= $key . ": " . $value . "\r\n";

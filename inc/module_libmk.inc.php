@@ -17,23 +17,23 @@
     // give the creator access rights in users.json //
     //----------------------------------------------//
     
-    $users = readJSONfile(USERS_FILE, true);
+    //$USERS = readJSONfile(USERS_FILE, true);  --> already loaded in init.inc.php
     
-    if (isset($users[$is_logged_in]) and isset($users[$is_logged_in]["permissions"]))
+    if (isset($USERS[$is_logged_in]) and isset($USERS[$is_logged_in]["permissions"]))
     {
-      foreach ($modules_lib as $mod => $value)
+      foreach ($MODULES["lib"] as $mod => $value)
       { 
-        if ( isset($users[$is_logged_in]["permissions"][$mod])
-              and !in_array("_ALL", $users[$is_logged_in]["permissions"][$mod])
-              and !in_array("_NONE", $users[$is_logged_in]["permissions"][$mod])
-              and !in_array($id, $users[$is_logged_in]["permissions"][$mod])
+        if ( isset($USERS[$is_logged_in]["permissions"][$mod])
+              and !in_array("_ALL", $USERS[$is_logged_in]["permissions"][$mod])
+              and !in_array("_NONE", $USERS[$is_logged_in]["permissions"][$mod])
+              and !in_array($id, $USERS[$is_logged_in]["permissions"][$mod])
            )
-          array_push($users[$is_logged_in]["permissions"][$mod], $id);
+          array_push($USERS[$is_logged_in]["permissions"][$mod], $id);
         else 
-          $users[$is_logged_in]["permissions"][$mod] = array($id);
+          $USERS[$is_logged_in]["permissions"][$mod] = array($id);
       }
       
-      $error = writeJSONfile(USERS_FILE, $users);      
+      $error = writeJSONfile(USERS_FILE, $USERS);      
 
       if ($error)
       {

@@ -327,8 +327,7 @@
     $existing = readJSONfile(LIB_DIR . $_REQUEST["lib"] . "/measurements.json");  //if file does not exist: empty array
     $existing = array_keys($existing);
     
-    $types = readJSONfile(DATAFORMATS_FILE);
-    foreach ($types as $type => $tval) $types_sani[sanitizeStr($type, "", "-+:^", True)] = $type;
+    foreach ($DATATYPES as $type => $tval) $types_sani[sanitizeStr($type, "", "-+:^", True)] = $type;
     
     unset($measurements[""]);   //remove empty rows
     
@@ -444,8 +443,8 @@
               $measurements[$id][$param] = $value = $val_sani;
             }
             
-            if (empty($value) and (   in_array("dx", $libs[$_REQUEST["lib"]]["allowformat"]) 
-                                   or in_array("jdx", $libs[$_REQUEST["lib"]]["allowformat"])))
+            if (empty($value) and (   in_array("dx", $LIBS[$_REQUEST["lib"]]["allowformat"]) 
+                                   or in_array("jdx", $LIBS[$_REQUEST["lib"]]["allowformat"])))
             {
               $b++;
               $col = "orange";
@@ -490,7 +489,7 @@
             
             // check for fields required by LIBS.JSON
             // NOTE: disabled because not equaly sanitized, and not taking into combined(+) and notations(^)
-            //if (empty($value) and in_array($value, $libs[$_REQUEST["lib"]]["columns"]))  //
+            //if (empty($value) and in_array($value, $LIBS[$_REQUEST["lib"]]["columns"]))  //
             //{
             //  $b++;
             //  $col = "orange";
@@ -627,7 +626,7 @@
       if ($error) throw new RuntimeException($error);
       
       //make $list with keys from $columns and values retrieved from $measurements
-      $columns = $libs[$_REQUEST["lib"]]["columns"];
+      $columns = $LIBS[$_REQUEST["lib"]]["columns"];
       $list =  array();
       foreach ($measurements as $id => $measurement)
       {

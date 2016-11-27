@@ -16,7 +16,7 @@
     // the special 'library' _landingpage cannot be deleted; should be set to invisible instead!
     echo "      <span style='color:red'>ERROR: cannot remove the landing page!</span><br><br>\n";
   }
-  elseif (!isset($_REQUEST["del"]) and isset($libs[$id]))
+  elseif (!isset($_REQUEST["del"]) and isset($LIBS[$id]))
   {
     echo "        <span style='color:red'>This will IRREVOCABLY DELETE LIBRARY " . $id . "!</span><br><br>\n"
        . "        <form name='myform' action='" . $_SERVER["REQUEST_URI"] . "' method='POST'>\n"
@@ -25,11 +25,11 @@
        . "          <a href='.index.php'>Take me out of here!</a>\n"
        . "        </form>\n";
   }
-  elseif (isset($_REQUEST["del"]) and isset($libs[$id]))
+  elseif (isset($_REQUEST["del"]) and isset($LIBS[$id]))
   {
     // UPDATE JSON LIBRARIES FILE
-    unset($libs[$id]);
-    $error = writeJSONfile(LIB_DIR . LIB_FILE, $libs);
+    unset($LIBS[$id]);
+    $error = writeJSONfile(LIB_FILE, $LIBS);
     if (!$error)
       echo "      <span style='color:red'>Deleted library " . $id . "!</span><br><br>\n";
     else

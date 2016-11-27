@@ -43,10 +43,10 @@
   
   // HEADER
   
-  $htmltitle = APP_SHORT . ": " . $libs[$showlib]["menu"];
+  $htmltitle = APP_SHORT . ": " . $LIBS[$showlib]["menu"];
   $htmlkeywords =APP_KEYWORDS;
   $pagetitle = APP_LONG;
-  $pagesubtitle = $libs[$showlib]["name"];
+  $pagesubtitle = $LIBS[$showlib]["name"];
   $style   = "";
   $scripts = "    <script type='text/javascript' charset='utf8' src='./javascript/dygraph-combined.js'></script>\n";
   
@@ -94,7 +94,7 @@
                     downloadbuttons to be displayed
                    ********************************* */  
                 
-                foreach ($libs[$showlib]["allowformat"] as $extension)
+                foreach ($LIBS[$showlib]["allowformat"] as $extension)
                 {
                   $dlcode = $dlbutton = NULL;
                   switch ($extension) 
@@ -135,7 +135,7 @@
                 }             
               ?>
             </div>
-            <p><i>The complete <?php echo $libs[$showlib]["name"]; ?> can be requested by email.</i>
+            <p><i>The complete <?php echo $LIBS[$showlib]["name"]; ?> can be requested by email.</i>
             <p><i>By downloading this file you agree to the terms described in the licence.</i>
           </div>
           

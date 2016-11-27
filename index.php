@@ -2,9 +2,9 @@
   //error_reporting(E_ALL);
   //ini_set('display_errors', '1');
   
-  require_once('./_config/config.inc.php');
+  require_once('./inc//init.inc.php');
+  require_once('./inc/common_basic.inc.php');
   require_once('./inc/common_cookie.inc.php');
-  require_once('./inc/convert_basic.inc.php');
   require_once('./inc/common_mailhide.inc.php');
   
 /*
@@ -27,16 +27,18 @@ replacement for index.php
     $showlib = strtolower($_REQUEST['lib']);
     
     // library exists?
-    if (!isset($libs[$showlib]))
+    if (!isset($LIBS[$showlib]))
       $error = "The requested library does not exist: " . $showlib;
-    
-    // we have access to this lib?
-    if (($libs[$showlib]["view"] == "locked") or !isset($libs[$showlib]["view"]))
+    else 
     {
-      if (!$is_logged_in)
-        $error = "Access to " . $showlib . " library is restricted. Please log in";
-      elseif (!calcPermLib($user["permissions"], "view", $showlib)) 
-        $error = "User " . $is_logged_in . " has no authorisation to access library " . $showlib;
+      // we have access to this lib?
+      if (($LIBS[$showlib]["view"] == "locked") or !isset($LIBS[$showlib]["view"]))
+      {
+        if (!$is_logged_in)
+          $error = "Access to " . $showlib . " library is restricted. Please log in";
+        elseif (!calcPermLib($user["permissions"], "view", $showlib)) 
+          $error = "User " . $is_logged_in . " has no authorisation to access library " . $showlib;
+      } 
     }
 
     if ($error) $mode = "default";
@@ -48,14 +50,16 @@ replacement for index.php
   {
     $showlib = false;
     // if the special _landingpage "library" is active, show this by default
-    if (isset($libs["_landingpage"]) and strtolower($libs["_landingpage"]["view"]) == "public")
+    if (isset($LIBS["_landingpage"]) and strtolower($LIBS["_landingpage"]["view"]) == "public")
+    {
+      $mode = "list";
       $showlib = "_landingpage";
+    }
     else
     {
-      foreach ($libs as $libid => $lib)
+      foreach ($LIBS as $libid => $lib)
       {
         if (strtolower($libid) != "_landingpage")
-
           if ( ($is_logged_in and calcPermLib($user["permissions"], "view", $libid))
                or (strtolower($lib["view"]) == "public")
              )
@@ -67,10 +71,10 @@ replacement for index.php
           break;
         }
       }
-    }    
+    }
   }
   
-  // if mode stil is default, this means no landingpage or no accessible library was found!
+  // if mode still is default, this means no landingpage or no accessible library was found!
   // TODO maybe we should goto the login page instead, hoping there are private libraries??
   if ($mode == "default")  
     eventLog("ERROR", "No data to show [index]" , true);

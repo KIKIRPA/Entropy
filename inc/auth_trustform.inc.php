@@ -12,7 +12,7 @@
 ?>
   <p>This is (likely) the first time you log in from this computer/connection. 
      As an added security measure you have to prove your identity before continuing.  
-     A 4-digit code has been sent to <?php echo $users[$user]['email'];?>.  Please copy this code below. 
+     A 4-digit code has been sent to <?php echo $USERS[$user]['email'];?>.  Please copy this code below. 
      Once the code has been verified, this procedure should not be shown again on this computer.
   </p>
   <form name='trust' action='<?php echo $_SERVER["PHP_SELF"]; ?>' method='post'>

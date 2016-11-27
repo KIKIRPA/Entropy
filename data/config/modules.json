@@ -1,0 +1,116 @@
+{
+    "lib": {
+        "list": {
+            "caption": "List library",
+            "menu": true,
+            "public": true
+        },
+        "view": {
+            "caption": "View library",
+            "menu": false,
+            "public": true
+        },
+        "download": {
+            "caption": "View library",
+            "menu": false,
+            "public": true
+        },
+        "libedit": {
+            "caption": "Edit library",
+            "menu": true,
+            "public": false
+        },
+        "libren": {
+            "caption": "Rename library",
+            "menu": false,
+            "public": false
+        },
+        "libperm": {
+            "caption": "Set library permissions",
+            "menu": false,
+            "public": false
+        },
+        "libdel": {
+            "caption": "Delete library",
+            "menu": false,
+            "public": false
+        },
+        "import": {
+            "caption": "Import data",
+            "menu": true,
+            "public": false
+        },
+        "export": {
+            "caption": "Export data",
+            "menu": false,
+            "public": false
+        },
+        "compare": {
+            "caption": "Compare tool",
+            "menu": false,
+            "public": false
+        },
+        "peaksearch": {
+            "caption": "Peaksearch tool",
+            "menu": false,
+            "public": false
+        },
+        "dllog": {
+            "caption": "View download log",
+            "menu": false,
+            "public": false
+        }
+    },
+    "adm": {
+        "landingpage": {
+            "caption": "Modify landing page",
+            "menu": true,
+            "public": false
+        },
+        "libmgmt": {
+            "caption": "Library management",
+            "menu": true,
+            "public": false
+        },
+        "libmk": {
+            "caption": "Create library",
+            "menu": false,
+            "public": false
+        },
+        "usermgmt": {
+            "caption": "User management",
+            "menu": true,
+            "public": false
+        },
+        "log": {
+            "caption": "Log tool",
+            "menu": false,
+            "public": false
+        },
+        "config": {
+            "caption": "Configuration",
+            "menu": true,
+            "public": false
+        },
+        "specformat": {
+            "caption": "Spectrum format",
+            "menu": false,
+            "public": false
+        },
+        "user": {
+            "caption": "My details",
+            "menu": true,
+            "public": false
+        },
+        "admin": {
+            "caption": "Administration rights",
+            "menu": false,
+            "public": false
+        },
+        "auth": {
+            "caption": "Log out",
+            "menu": false,
+            "public": true
+        }
+    }
+}

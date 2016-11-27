@@ -43,7 +43,7 @@
       <tbody>
 <?php
   
-  foreach ($libs as $id => $lib)
+  foreach ($LIBS as $id => $lib)
   { 
     if (($lib["view"] == "public") or calcPermLib($user["permissions"], "view", $id))
       if ($libid != "_landingpage")

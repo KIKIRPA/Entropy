@@ -2,7 +2,7 @@
   //error_reporting(E_ALL);
   //ini_set('display_errors', '1');
   
-  require_once('./_config/config.inc.php');
+  require_once('./inc//init.inc.php');
   require_once('./inc/common_basic.inc.php');
   require_once('./inc/common_mailhide.inc.php');
   require_once('./inc/common_writefile.inc.php');
@@ -17,14 +17,14 @@
   {
     if (isset($_REQUEST["mod"]))
     {
-      if (isset($modules_adm[$_REQUEST["mod"]]))
+      if (isset($MODULES["adm"][$_REQUEST["mod"]]))
       {
         if (calcPermLib($user["permissions"], $_REQUEST["mod"]))
           $error = false;
         else
           $error = "User " . $is_logged_in . " is not authorised to use module " . $_REQUEST["mod"] . "!";
       }
-      elseif (isset($modules_lib[$_REQUEST["mod"]]))
+      elseif (isset($MODULES["lib"][$_REQUEST["mod"]]))
       {
         if (isset($_REQUEST["lib"]))
         {
@@ -44,7 +44,7 @@
   
    
   //HEADER
-  $libs = json_decode(file_get_contents(LIB_DIR . LIB_FILE), true);
+  $LIBS = json_decode(file_get_contents(LIB_FILE), true);
   $htmltitle = APP_SHORT . ": administration";
   $htmlkeywords = APP_KEYWORDS;
   $pagetitle = APP_LONG;

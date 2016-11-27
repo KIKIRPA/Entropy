@@ -8,12 +8,29 @@
   }
 
   if ($is_logged_in)
-  { // menu items to show = those modules with a non-false description
+  { // menu items to show = those modules with a non-false "menu"
     $menuitems_lib = array();
     $menuitems_adm = array();
     
-    foreach ($modules_lib as $id => $value) if ($value[1]) $menuitems_lib[$id] = $value[0];
-    foreach ($modules_adm as $id => $value) if ($value[1]) $menuitems_adm[$id] = $value[0];
+    foreach ($MODULES["lib"] as $id => $value) if ($value["menu"]) $menuitems_lib[$id] = $value["caption"];
+    foreach ($MODULES["adm"] as $id => $value) if ($value["menu"]) $menuitems_adm[$id] = $value["caption"];
+    
+    /* TODO: the new modules.json has extra features that need to be implemented in the menu: the "public" variable
+             decides what modules should be available to public and hidden libraries for those that are not logged in
+             
+             foreach lib:
+              - if logged in: those modules that are (1) marked public AND library is public/hidden
+                                                  OR (2) to which a user has been granted access
+              - if not logged in: those modules that are marked public AND library is public/hidden
+             for adm: 
+              - if not logged in: those modules marked public
+              - if logged in: those modules marked public OR to which a user has been granted access
+              
+             if for a particular lib or adm there is only a single mod to show: don't draw the submenu
+             
+             the [adm][auth] module may have to be an exception: when logged in, it should have the caption "log out" 
+             and vice versa. 
+      */
   }
   
   
@@ -61,14 +78,14 @@
         <ul> 
 <?php        
   // landing page
-  if (isset($libs["_landingpage"]))
-    if (strtolower($libs["_landingpage"]["view"]) == "public")
+  if (isset($LIBS["_landingpage"]))
+    if (strtolower($LIBS["_landingpage"]["view"]) == "public")
       echo "          <li>\n"
-         . "            <a href='./'>" . $libs["_landingpage"]["menu"] . "</a>\n"
+         . "            <a href='./'>" . $LIBS["_landingpage"]["menu"] . "</a>\n"
          . "          </li>\n";
   
   // lib menu entries
-  foreach ($libs as $libid => $lib)
+  foreach ($LIBS as $libid => $lib)
     if (strtolower($libid) != "_landingpage")
     {
       $perm = false;

@@ -20,7 +20,7 @@
   if (!$lp) $id = str_replace(" ", "", strtolower($_REQUEST["lib"]));
   else      $id = "_landingpage";
   
-  $new = !isset($libs[$id]);           // if not in libs.json
+  $new = !isset($LIBS[$id]);           // if not in libs.json
   
   if     ($lp)  echo "      <h3>Modify landing page</h3>\n";
   elseif ($new) echo "      <h3>Create library</h3>\n";
@@ -79,7 +79,7 @@
     
     if (!$new)
     {
-      foreach ($libs[$id] as $i => $item)
+      foreach ($LIBS[$id] as $i => $item)
         $preset[$i] = $item;
       if (is_array($preset["columns"]))     $preset["columns"] = implode("|", $preset["columns"]);
       if (is_array($preset["allowformat"])) $preset["allowformat"] = implode("|", $preset["allowformat"]);
@@ -273,10 +273,10 @@
         }
       
       //prepare file contents
-      $libs[$id] = $newlib;
+      $LIBS[$id] = $newlib;
       
       //and write file
-      $output = writeJSONfile(LIB_DIR . LIB_FILE, $libs);
+      $output = writeJSONfile(LIB_FILE, $LIBS);
     }
     
     if ($output == false) 
