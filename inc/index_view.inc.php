@@ -47,8 +47,8 @@
   $htmlkeywords =APP_KEYWORDS;
   $pagetitle = APP_LONG;
   $pagesubtitle = $LIBS[$showlib]["name"];
-  $style   = "";
-  $scripts = "    <script type='text/javascript' charset='utf8' src='./javascript/dygraph-combined.js'></script>\n";
+  $style   = "    <link rel='stylesheet' type='text/css' href='./css/dygraph.css'>\n";
+  $scripts = "    <script type='text/javascript' charset='utf8' src='./javascript/dygraph.min.js'></script>\n";
   
   include(HEADER_FILE);  
   
