@@ -49,11 +49,10 @@
     <link rel="shortcut icon" href="./images/specliblogo.png" type="image/x-icon" />
     <link rel='stylesheet' type='text/css' href='./css/general.css'>
     <link rel='stylesheet' type='text/css' href='./css/navigation.css'>
-    <link rel='stylesheet' type='text/css' href='./javascript/datatables/datatables.min.css'>
     <link rel='stylesheet' type='text/css' href='./css/jquery.notifyBar.css'>
     <?php echo $style; ?>
-    <script type='text/javascript' charset='utf8' src='./javascript/datatables/datatables.min.js'></script>
-    <script type='text/javascript' charset='utf8' src='./javascript/jquery.notifyBar.js'></script>
+    <script type='text/javascript' src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous" async></script>
+    <script type='text/javascript' src='./javascript/jquery.notifyBar.js' async></script>
     <?php echo $scripts; ?>
   </head>
   

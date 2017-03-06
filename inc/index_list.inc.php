@@ -15,8 +15,8 @@
   $htmlkeywords = APP_KEYWORDS;
   $pagetitle = APP_LONG;
   $pagesubtitle = $LIBS[$showlib]["name"];
-  $style   = "";
-  $scripts = "<!--[if IE]><script type='text/javascript' charset='utf8' src='./javascript/excanvas.compiled.js'></script><![endif]-->\n";
+  $style   = "    <link rel='stylesheet' type='text/css' href='https://cdn.datatables.net/v/dt/dt-1.10.13/fc-3.2.2/fh-3.1.2/datatables.min.css'>\n";
+  $scripts = "    <script type='text/javascript' src='https://cdn.datatables.net/v/dt/dt-1.10.13/fc-3.2.2/fh-3.1.2/datatables.min.js' async></script>\n";
   
   include(HEADER_FILE); 
   

@@ -47,8 +47,8 @@
   $htmlkeywords =APP_KEYWORDS;
   $pagetitle = APP_LONG;
   $pagesubtitle = $LIBS[$showlib]["name"];
-  $style   = "    <link rel='stylesheet' type='text/css' href='./javascript/dygraphs/dygraph.css'>\n";
-  $scripts = "    <script type='text/javascript' charset='utf8' src='./javascript/dygraphs/dygraph.min.js'></script>\n";
+  $style   = "    <link rel='stylesheet' type='text/css' src='https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.css'>\n";
+  $scripts = "    <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.js' async></script>\n";
   
   include(HEADER_FILE);  
   

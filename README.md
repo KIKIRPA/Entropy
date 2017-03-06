@@ -12,7 +12,6 @@ With the support of:
 Incorporates code from:
 - Dygraphs (MIT license) by Dan Vanderkam, dygraphs.com
 - Notify Bar (MIT license) by Dmitri Smirnov, www.whoop.ee
-- ExCanvas (Apache license v2.0) by Google Inc.
 - DataTables (GPL v2 / BSD) by Allan Jardine, www.datatables.net
 - jQuery (Apache v2.0) by the jQuery Foundation, jquery.com
 - Freecons (Free) by Jiri Silha
