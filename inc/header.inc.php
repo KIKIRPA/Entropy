@@ -43,23 +43,18 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">    
   <head>
     <title><?php echo $htmltitle; ?></title>
-    <!--meta http-equiv="X-UA-Compatible" content="IE=EmulateIE8" -->
-    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7; IE=EmulateIE9"> 
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>		
     <meta http-equiv="Window-target" content="_top" />
     <meta name="keywords" content="<?php echo $htmlkeywords; ?>"/>
     <link rel="shortcut icon" href="./images/specliblogo.png" type="image/x-icon" />
-    <link rel="stylesheet" type="text/css" href="./css/general.css">
-    <link rel="stylesheet" type="text/css" href="./css/navigation.css">
+    <link rel='stylesheet' type='text/css' href='./css/general.css'>
+    <link rel='stylesheet' type='text/css' href='./css/navigation.css'>
+    <link rel='stylesheet' type='text/css' href='./javascript/datatables/datatables.min.css'>
+    <link rel='stylesheet' type='text/css' href='./css/jquery.notifyBar.css'>
     <?php echo $style; ?>
-    <script type='text/javascript' charset='utf8' src='./javascript/jquery.min.js'></script>
+    <script type='text/javascript' charset='utf8' src='./javascript/datatables/datatables.min.js'></script>
+    <script type='text/javascript' charset='utf8' src='./javascript/jquery.notifyBar.js'></script>
     <?php echo $scripts; ?>
-    <?php if ($is_expired)
-          {
-            echo "    <script type='text/javascript' charset='utf8' src='./javascript/jquery.notifyBar.js'></script>\n"
-               . "    <link rel='stylesheet' type='text/css' href='./css/jquery.notifyBar.css'>\n";
-          }  
-    ?>
   </head>
   
   <body>

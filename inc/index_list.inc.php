@@ -15,10 +15,8 @@
   $htmlkeywords = APP_KEYWORDS;
   $pagetitle = APP_LONG;
   $pagesubtitle = $LIBS[$showlib]["name"];
-  $style   = "<link rel='stylesheet' type='text/css' href='./css/jquery.dataTables.css'>\n";
-  $scripts = "<!--[if IE]><script type='text/javascript' charset='utf8' src='./javascript/excanvas.compiled.js'></script><![endif]-->\n"
-       . "    <script type='text/javascript' charset='utf8' src='./javascript/jquery.dataTables.min.js'></script>\n"
-       . "    <script type='text/javascript' charset='utf8' src='./javascript/FixedHeader.js'></script>\n";
+  $style   = "";
+  $scripts = "<!--[if IE]><script type='text/javascript' charset='utf8' src='./javascript/excanvas.compiled.js'></script><![endif]-->\n";
   
   include(HEADER_FILE); 
   

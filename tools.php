@@ -49,13 +49,9 @@
   $htmlkeywords = APP_KEYWORDS;
   $pagetitle = APP_LONG;
   $pagesubtitle = "Library tools";
-  $style   = "    <link rel='stylesheet' type='text/css' href='./css/jquery.dataTables.css'>\n"
-           . "    <link rel='stylesheet' type='text/css' href='./css/dygraph.css'>\n";
+  $style   = "    <link rel='stylesheet' type='text/css' href='./javascript/dygraphs/dygraph.css'>\n";
   $scripts = "    <!--[if IE]><script type='text/javascript' charset='utf8' src='./javascript/excanvas.compiled.js'></script><![endif]-->\n"
-           . "    <script type='text/javascript' charset='utf8' src='./javascript/jquery.js'></script>\n"
-           . "    <script type='text/javascript' charset='utf8' src='./javascript/jquery.dataTables.min.js'></script>\n"
-           . "    <script type='text/javascript' charset='utf8' src='./javascript/FixedHeader.js'></script>\n"
-           . "    <script type='text/javascript' charset='utf8' src='./javascript/dygraph.min.js'></script>\n";
+           . "    <script type='text/javascript' charset='utf8' src='./javascript/dygraphs/dygraph.min.js'></script>\n";
   
   include(HEADER_FILE); 
   if (!$error) include("./inc/module_" . $_REQUEST["mod"] . ".inc.php");
