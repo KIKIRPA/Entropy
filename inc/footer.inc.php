@@ -11,23 +11,23 @@
     $email = "<a href=\"mailto:wim.fremout@kikirpa.be\">Wim Fremout <img src=\"./images/freecons/28_white.png\" alt=\"e-mail\" height=\"11\" width=\"16\"></a>";
   else
     $email = mailhide( "wim.fremout@kikirpa.be",
-                      "Wim Fremout <img src=\"./images/freecons/28_white.png\" alt=\"e-mail\" height=\"11\" width=\"16\">"
-                    );
+                       "Wim Fremout <img src=\"./images/freecons/28_white.png\" alt=\"e-mail\" height=\"11\" width=\"16\">"
+                     );
   
 ?>
     </div><!-- main -->
   </div><!-- wrapper -->
   
   <div class="footer">
-    <div id="logo">
-      <a href="http://www.kikirpa.be">
-        <img src="./images/kikirpalogo.png" width="40" height="40" alt="KIK/IRPA">
-      </a>
-    </div>
     <div id="left">
-      &copy;2012-<?php echo date("Y");?> <a href="http://www.kikirpa.be">Royal Institute for Cultural Heritage (KIK/IRPA)</a>
+      Powered by <a href="https://github.com/KIKIRPA/Entropy">Entropy</a><br>
+      &copy;2012-<?php echo date("Y");?> Wim Fremout <?php echo $email; ?> and contributors 
     </div>
-    <div id="right">Website developed by <?php echo $email; ?></div>
+    <div id="right">
+      Development was supported by 
+      <a href="http://www.kikirpa.be"><img src="./images/kikirpa.png" width="40" height="40"></a>
+      <a href="http://iperion.eu"><img src="./images/iperion.png" width="40" height="40"></a>
+    </div>
   </div>
 </body>
 </html>
