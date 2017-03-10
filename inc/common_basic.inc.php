@@ -14,46 +14,62 @@
       logout()                              close session
       
       sanitizeStr($string, $replaceby = "_", $others = False, $lowercase = False)
-                                            sanitize string, removes all characters, html-tags... that should not be there
-                                             eg. string to be used as a part of a filename, or for loose string comparisons
-                                             $others is other characters to replace, e.g. "-+:^"
+          sanitize string, removes all characters, html-tags... that should not be there
+          eg. string to be used as a part of a filename, or for loose string comparisons
+          $others is other characters to replace, e.g. "-+:^"
       
-      calcPermMod($permtable, [$lib])       returns the allowed modules for a given user. 
-                                             requires a user permissions table (array, part of users.json)
-                                             if a library id is given, it will output only the library-specific modules (array) to which a user has access (for that library)
-                                             if no library is given, it will output only the admin-specific modules (array) to which a user has access
-                                             !! if user is administrator it will return true (=access to all)
-                                             !! if user has no permissions at all (for that library), it will return false
+      calcPermMod($permtable, [$lib])
+          returns the allowed modules for a given user. 
+          requires a user permissions table (array, part of users.json)
+          if a library id is given, it will output only the library-specific modules (array) to which a user has access (for that library)
+          if no library is given, it will output only the admin-specific modules (array) to which a user has access
+          !! if user is administrator it will return true (=access to all)
+          !! if user has no permissions at all (for that library), it will return false
       
-      calcPermLib($permtable, $mod, [$lib]) returns for a given module which libraries are allowed
-                                              requires a user permissions table (array, part of users.json)
-                                              if no library is given: outputs true for all libs, false for no libs or an array with the lib ids
-                                              if a library is given: outputs true or false
+      calcPermLib($permtable, $mod, [$lib]) 
+          returns for a given module which libraries are allowed
+          requires a user permissions table (array, part of users.json)
+          if no library is given: outputs true for all libs, false for no libs or an array with the lib ids
+          if a library is given: outputs true or false
       
-      readJSONfile($path, $dieOnError)      reads json file and outputs as an array
-                                             if something goes wrong (file does not exist, not readable or contains error)
-                                             it will output an empty array (in order to create new file
-                                             optional $dieOnError will in this case stop further code execution
+      readJSONfile($path, $dieOnError)
+          reads json file and outputs as an array
+          if something goes wrong (file does not exist, not readable or contains error)
+          it will output an empty array (in order to create new file
+          optional $dieOnError will in this case stop further code execution
                                              
       inflateArray($array, $mode = -1, $keysep = ":", $fieldsep = "|")
     
       flattenArray($array, $key = false, $mode = -1, $keysep = ":", $fieldsep = "|")
                                              
       getMeta($metadata, $get, $concatenate = "; ", $description = ": ")
-                                            retrieve metadata-item from (inflated) metadata array
-                                             $get is something like "sample:sample name", "samplesource:primary:identifier+source", "measurement:date^long";
-                                             if multiple fields need to be concatenated, the concatenation symbol (default ;) can be supplied
-                                             in the concatenated outputs descriptions can be added if a $description symbol (default :) is supplied
-                                              (if set to false, a short notation will be used without descriptions)
+          retrieve metadata-item from (inflated) metadata array
+          $get is something like "sample:sample name", "samplesource:primary:identifier+source", "measurement:date^long";
+          if multiple fields need to be concatenated, the concatenation symbol (default ;) can be supplied
+          in the concatenated outputs descriptions can be added if a $description symbol (default :) is supplied
+          (if set to false, a short notation will be used without descriptions)
       
-      nameMeta($get)                        get a nice name for a metadata retrieve query string
-                                            if $get is $get is something like "sample:sample name", "samplesource:0:identifier+source", "measurement:date^long"
-                                            output will be resp. "Sample name", "Samplesource 1" and "Date"
+      nameMeta($get)
+          get a nice name for a metadata retrieve query string
+          if $get is $get is something like "sample:sample name", "samplesource:0:identifier+source", "measurement:date^long"
+          output will be resp. "Sample name", "Samplesource 1" and "Date"
       
       overrideMeta($metadata, $dataset = False)
-                                            merge/override directly stored metadata, with metadata stored in
-                                            "meta:", and optionally with metadata specific to a dataset
-                                            returns merged metadata (analytical data is stripped)
+          merge/override directly stored metadata, with metadata stored in
+          "meta:", and optionally with metadata specific to a dataset
+          returns merged metadata (analytical data is stripped)
+
+      datatypeParent($type, $datatypes)
+          if $type is an alias, it recursively looks for the parent (but checks for circular aliassing:
+          e.g. "Raman 785nm" is alias for "Raman", which is an alias for "Raman 785nm"). 
+
+      datatypeUnits($type, $datatypes, $altnameslist = Null)
+          extracts a list of axis units for a given datatype ($type) from the $DATATYPES json resource.
+          Includes searching for parent datatype (using datatypeParent())
+          In absence of $altnameslist, the default (first listed) entries for each axis will be returned.
+          $altnameslist is a list of one alternative name per axis to search for; if found, the function
+          will return the corresponding axis name. If one of the altnames in $altnamelist is Null or 
+          False, it will return the default axis name for that entry. 
       
       mdate($format, $microtime)            outputs timestamp with a optionally supplied $format (default 'Y-m-d H:i:s.u')
                                              optional takes another microtime
@@ -401,6 +417,65 @@
     unset($metadata["meta"], $metadata["dataset"]);
     
     return array_replace_recursive($metadata, $metameta, $dsmeta);
+  }
+
+
+  function datatypeParent($type, $datatypes)
+  {
+    // types can be aliassed against a parent, which can itself be aliassed against another type.
+    // potentially we can end up in a loop, which would cause the recursive parent lookup to end up in an eternal loop.
+    // a list of child types will be made to prevent this from happening.
+    $children = array();
+
+    if (!isset($DATATYPES[$type]))  // should be checked and autocorrected before; just in case
+      eventLog("ERROR", "Unknown data type: " . $type . " [datatypeParent()]", True);
+
+    // recursively find parent datatype
+    while (1)
+    {
+      if (isset($DATATYPES[$type]["alias"]))
+      {
+        if (!in_array($type))
+        {
+          $children[] = $type;
+          $type = $DATATYPES[$type]["alias"];
+        }
+        else
+          eventLog("ERROR", "Circular aliassing detected in the Datatypes settings: " . $type . " [datatypeParent()]", True);
+      }
+      else
+        return $type;
+    }
+  }
+  
+
+  function datatypeUnits($type, $datatypes, $altnameslist = Null)
+  {
+    // find parent type:
+    $type = datatypeParent($type, $datatypes);
+
+    // find axis names
+    $results = array()
+    $i = 0
+    foreach ($DATATYPES[$type]["axis"] as $axid => $axis)
+    {
+      if (is_array($altnameslist))
+        if (!empty($altnameslist[$i])
+          foreach ($axis as $axname => $axvalues)
+            if ((strtolower($axname) == strtolower($altnameslist[$i])) or in_array(strtolower($altnameslist[$i]), $axvalues["altnames"]))
+            {
+              $results[$i] = $axname;
+              break;
+            }
+      
+      if (!isset($results[$i])) // if no altname is supplied for this axis, or altname was not found; take the first axis (first is default)
+      {
+        reset($axis);
+        $results[$i] = key($axis);
+      }
+    }
+
+    return $results
   }
   
   

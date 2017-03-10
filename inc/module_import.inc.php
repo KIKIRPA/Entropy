@@ -458,11 +458,11 @@
             }
             break;
           case "type":
-            //check if type is set and exists in specformat.json!!
+            //check if type is set and exists in dataformat.json!!
             $val_sani = sanitizeStr($value, "", "-+:^", True);
             if (isset($types_sani[$val_sani]))
             {
-              //if the value in the CSV is not identical to the one in specformat, autocorrect
+              //if the value in the CSV is not identical to the one in dataformat.json, autocorrect
               if ($value != $types_sani[$val_sani]) 
               {
                 $a++;
@@ -518,11 +518,11 @@
         // also check data types defined in dataset:*:meta:type
         if ((substr($param_sani, 0, 8 ) === "dataset:") and (substr($param_sani, -10 ) === ":meta:type"))
         {
-          //check if type is set and exists in specformat.json!!
+          //check if type is set and exists in datatypes.json!!
           $val_sani = sanitizeStr($value, "", "-+:^", True);
           if (isset($types_sani[$val_sani]))
           {
-            //if the value in the CSV is not identical to the one in specformat, autocorrect
+            //if the value in the CSV is not identical to the one in datatypes.json, autocorrect
             if ($value != $types_sani[$val_sani]) 
             {
               $a++;
@@ -598,7 +598,8 @@
     // If a dataset-field is missing, we need to add at least a "default" dataset
     //            dataset:default:meta (to contain dataset-specific metadata)
     //                NOTE any dataset-specific metadata will overrule the common metadata (array_replace|merge_recursive?)
-    //                     when displayed on the website or exported to JCAMP-DX 
+    //                     when displayed on the website or exported to JCAMP-DX
+    //            dataset:default:units 
     //            dataset:default:data
     //            dataset:default:annotations
     
@@ -922,12 +923,18 @@
           $data = importfilter($opdir . $fn . $ext);
           if (!$data) throw new RuntimeException('Failed to convert ' . $fn . $ext . '.');
           
-          // merge with metadata, updatd original $measurements and set $build
+          // merge with metadata, update original $measurements and set $build
           if (!is_array($json["dataset"][$ds])) $json["dataset"][$ds] = array();
           $json["dataset"][$ds]["data"] = $data;
           if (!is_array($measurements[$_REQUEST["id"]]["dataset"][$ds])) $measurements[$_REQUEST["id"]]["dataset"][$ds] = array();
           $measurements[$_REQUEST["id"]]["dataset"][$ds]["_data"] = $_FILES["dataUp" . $key]['name'];
           $build = true;
+
+          // set units (if not set e.g. via CSV)
+          // TODO: create a way to read those from the uploaded data (via the importfilters)
+          // TODO: create a way to change them in the data upload form
+          if (!isset($json["dataset"][$ds]["units"]))
+            $json["dataset"][$ds]["units"] = datatypeUnits($measurements[$_REQUEST["id"]], $DATATYPES);
         }
         
         // 2.2 process annotations

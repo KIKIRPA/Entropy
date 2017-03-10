@@ -47,93 +47,88 @@
   $htmlkeywords =APP_KEYWORDS;
   $pagetitle = APP_LONG;
   $pagesubtitle = $LIBS[$showlib]["name"];
-  $style   = "    <link rel='stylesheet' type='text/css' src='https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.css'>\n";
-  $scripts = "    <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.js' async></script>\n";
+  $style   = ""; //"    <link rel='stylesheet' type='text/css' src='https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.css'>\n";
+  $scripts = ""; //"    <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.js' async></script>\n";
   
   include(HEADER_FILE);  
   
   // MAIN
   
-  $idbox = $measurements;
-  $idbox_head = array_shift($idbox);
-  unset($idbox["_operation"]);
-  
-  //TODO dataset!! type of data!!
-  $meta = overrideMeta($data);
-  $graph = json_encode($data["dataset"]["default"]["data"]);
-  
+  // data from the measurement json file
+  $idbox_head = array_shift($measurement);
+  $operation = $measurement["_operation"];
+  unset($measurement["_operation"]);
+
+
 ?>
         <div class='fullwidth'>
           <div class='boxed' id='redbox'>
             <h3><?php echo $idbox_head; ?></h3>
-            <?php foreach ($idbox as $a) echo "<p>" . $a . "\n"; ?>
-          </div>  
-    
-          <div id="graphdiv" class="nonboxed" style="height:400px; float: left;"></div>
-          <script type="text/javascript">
-            g2 = new Dygraph(
-              document.getElementById("graphdiv"),
-              <?php echo $graph; ?>,
-              { 
-                labels: ["???","<?php echo $idbox_head; ?>"],
-                xlabel: "Raman shift (cm<sup>-1</sup>)<!--?php echo $xaxis; ?-->", 
-                ylabel: "Intensity (arbitrary units)<!--?php echo $yaxis; ?-->",
-                //drawYAxis: false,
-                axisLabelFontSize: 10,
-                yAxisLabelWidth: 70,
-                colors: ["red", "black", "blue", "green"],
-              }
-            );
-          </script>   
-    
-          <div class='boxed'>
-            <h3>Download</h3>
-            <div style="text-align:center">
-              <?php 
-                /* *********************************
-                    downloadbuttons to be displayed
-                   ********************************* */  
+            <?php foreach ($measurement as $a) echo "<p>" . $a . "\n"; ?>
+          </div>
+<?php
+
+
+  // metadata can be saved on different levels, override lesser priority metadata
+  $meta = overrideMeta($data, $ds);
+
+  // determine datatype and call the correct viewer module
+  $parenttype = datatypeParent($measurement["type"], $DATATYPES);
+  switch (strtolower($DATATYPES[$parenttype]["type"])
+  {
+    case "spectrum":
+    case "xy":
+      require_once('./inc/viewer_xy.inc.php');
+      break;
+  }
+
+  // downloadbuttons
+  echo "          <div class='boxed'>\n"
+     . "            <h3>Download</h3>\n"
+     . "            <div style="text-align:center">\n";
                 
-                foreach ($LIBS[$showlib]["allowformat"] as $extension)
-                {
-                  $dlcode = $dlbutton = NULL;
-                  switch ($extension) 
-                  {
-                    case "dx":
-                    case "jdx":
-                      if (isset($meta["jcamptemplate"]) AND file_exists(LIB_DIR . $showlib . "/templates/" . $meta["jcamptemplate"]))
-                      {
-                        $dlbutton = "JCAMP-DX";
-                        $dlcode = "DX";
-                      }
-                      break;
-                    case "txt": //ascii data (may need to be converted)
-                      $dlbutton = strtoupper($extension);
-                      $dlcode = "ASCII";
-                      break;
-                    default:    //binary
-                      // check if the binary file exists!
-                      // TODO I guess there will be problems when the file extension has uppercase symbols...
-                      if (file_exists(LIB_DIR . $showlib . "/" . $measurements["_operation"] . "/" . $showid . "." . $extension))
-                      {
-                        $dlbutton = strtoupper($extension);
-                        $dlcode = "BIN";
-                      }
-                      break;
-                  }
-                  
-                  if ($dlcode != NULL)
-                  {
-                    $dlcode = encode($dlcode . "||" . $showid . "||" . $extension, CRYPT_KEY);
-                    
-                    // if cookie exists and is valid: open popup; else direct download
-                    if ($cookie)
-                      echo "              <button class=\"button\" type=\"button\" value=\"javascript:void(0)\" onclick=\"window.location.href='".$_SERVER["PHP_SELF"]."?lib=".$showlib."&show=".$showspectrum."&dl=".$dlcode."'\">".$dlbutton."</button>\n";
-                    else
-                      echo "              <button class=\"button\" type=\"button\" value=\"javascript:void(0)\" onclick=\"$('form input[name=dl]').val('".$dlcode."');document.getElementById('light').style.display='block';document.getElementById('fade').style.display='block'\">".$dlbutton."</button>\n";
-                  }
-                }             
-              ?>
+  foreach ($LIBS[$showlib]["allowformat"] as $extension)
+  {
+    $dlcode = $dlbutton = NULL;
+    switch ($extension) 
+    {
+      case "dx":
+      case "jdx":
+        if (isset($meta["jcamptemplate"]) AND file_exists(LIB_DIR . $showlib . "/templates/" . $meta["jcamptemplate"]))
+        {
+          $dlbutton = "JCAMP-DX";
+          $dlcode = "DX";
+        }
+        break;
+      case "txt": //ascii data (may need to be converted)
+        $dlbutton = strtoupper($extension);
+        $dlcode = "ASCII";
+        break;
+      default:    //binary
+        // check if the binary file exists!
+        // TODO I guess there will be problems when the file extension has uppercase symbols...
+        if (file_exists(LIB_DIR . $showlib . "/" . $operation . "/" . $showid . "." . $extension))
+        {
+          $dlbutton = strtoupper($extension);
+          $dlcode = "BIN";
+        }
+        break;
+    }
+    
+    if ($dlcode != NULL)
+    {
+      $dlcode = encode($dlcode . "||" . $showid . "||" . $extension, CRYPT_KEY);
+      
+      // if cookie exists and is valid: open popup; else direct download
+      if ($cookie)
+        echo "              <button class=\"button\" type=\"button\" value=\"javascript:void(0)\" onclick=\"window.location.href='".$_SERVER["PHP_SELF"]."?lib=".$showlib."&show=".$showspectrum."&dl=".$dlcode."'\">".$dlbutton."</button>\n";
+      else
+        echo "              <button class=\"button\" type=\"button\" value=\"javascript:void(0)\" onclick=\"$('form input[name=dl]').val('".$dlcode."');document.getElementById('light').style.display='block';document.getElementById('fade').style.display='block'\">".$dlbutton."</button>\n";
+    }
+  }
+
+
+?>
             </div>
             <p><i>The complete <?php echo $LIBS[$showlib]["name"]; ?> can be requested by email.</i>
             <p><i>By downloading this file you agree to the terms described in the licence.</i>

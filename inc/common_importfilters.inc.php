@@ -82,8 +82,8 @@
   function importfilter_anno($filepath, $datatype = null)
   {
     // annotations should be supplied in the form of ascii files with per line an "x" value,
-    // shortText and text (cf. documentation dygraphs) separated with whitespaces
-    // --> safe in json format: array of array('x'=>, 'shortText'=>, 'text'=>)
+    // shortText and (optionally) text (cf. documentation dygraphs) separated with whitespaces
+    // --> save as array of array('x'=>, 'shortText'=>, 'text'=>)
     // $datatype is not used at the moment; only X
     
     $lines = file($filepath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES); 

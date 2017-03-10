@@ -117,23 +117,31 @@ replacement for index.php
   if (!$mode)
   {
     // reduce $measurements to just the measurement we need
-    $measurements = $measurements[$showid];
+    $measurement = $measurements[$showid];
+    unset($measurements)
     
     if (isset($_REQUEST["ds"]))
     {
-      if (isset($measurements["dataset"][$_REQUEST["ds"]])) 
+      if (isset($measurement["dataset"][$_REQUEST["ds"]])) 
         $showds = $_REQUEST["ds"];
       else 
       {
         $error = "The requested dataset does not exist";
         $mode = "view";
-        $ds = "default";
       }
     }
     else 
-    {
       $mode = "view";
-      $ds = "default";
+
+    if (!isset($ds))  //if at this point no dataset is set, either choose 'default', or the first
+    {
+      if (isset($measurement["dataset"]["default"]))
+        $ds = "default";
+      else
+      {
+        reset($measurement["dataset"])
+        $ds = key($measurement["dataset"])
+      }
     }
   }
   

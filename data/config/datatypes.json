@@ -1,25 +1,29 @@
 {
     "Raman": {
-        "type": "spectrum",
-        "xy-graph": "line",
-        "x-axis": {
-            "default": {
-                "displayname": "Raman shift (cm<sup>-1<\/sup>)",
-                "names": [
-                    "raman shift (cm-1)",
-                    "raman shift (1/cm)",
-                    "wavenumber (cm-1)",
-                    "wavenumber (1/cm)"
-                ]
-            }
+        "type": "xy",
+        "graph": {
+            "xy": "line"
         },
-        "y-axis": {
-            "default": {
-                "displayname": "Intensity (Arbitrary Units)",
-                "names": [
-                    "intensity (arbitrary units)",
-                    "counts"
-                ]
+        "axis": {
+            "x": {
+                "Raman shift (cm-1)": {
+                    "viewername": "Raman shift (cm<sup>-1<\/sup>)",
+                    "altnames": [
+                        "raman shift (cm-1)",
+                        "raman shift (1/cm)",
+                        "wavenumber (cm-1)",
+                        "wavenumber (1/cm)"
+                    ]
+                }
+            },
+            "y": {
+                "Intensity (Arbitrary Units)": {
+                    "viewername": "Intensity (Arbitrary Units)",
+                    "altnames": [
+                        "intensity (arbitrary units)",
+                        "counts"
+                    ]
+                }
             }
         }
     },
@@ -39,50 +43,58 @@
         "alias": "Raman"
     },
     "FTIR": {
-        "type": "spectrum",
-        "xy-graph": "line",
-        "x-axis": {
-            "default": {
-                "displayname": "Wavenumber (cm<sup>-1<\/sup>)",
-                "names": [
-                    "wavenumber (cm-1)",
-                    "wavenumber (1/cm)"
-                ],
-                "invert": true
-            }
+        "type": "xy",
+        "graph": {
+            "xy": "line"
         },
-        "y-axis": {
-            "default": {
-                "displayname": "Absorbance (Relative intensity)",
-                "names": [
-                    "absorbance (relative intensity)"
-                ]
+        "axis": {
+            "x": {
+                "Wavenumber (cm-1)": {
+                    "viewername": "Wavenumber (cm<sup>-1<\/sup>)",
+                    "altnames": [
+                        "wavenumber (cm-1)",
+                        "wavenumber (1/cm)"
+                    ],
+                    "invert": true
+                }
             },
-            "transmission": {
-                "displayname": "Transmission (%)",
-                "names": [
-                    "transmission"
-                ]
+            "y": {
+                "Absorbance (Relative intensity)": {
+                    "viewername": "Absorbance (Relative intensity)",
+                    "altnames": [
+                        "absorbance (relative intensity)"
+                    ]
+                },
+                "Transmission (%)": {
+                    "viewername": "Transmission (%)",
+                    "altnames": [
+                        "transmission"
+                    ]
+                }
             }
         }
     },
     "MS": {
-        "type": "spectrum",
-        "xy-graph": "bar",
-        "x-axis": {
-            "default": {
-                "displayname": "m\/z",
-                "names": [
-                    "m/z"
-                ]
-            }
+        "type": "xy",
+        "graph": {
+            "xy": "bar"
         },
-        "y-axis": {
-            "default": {
-                "displayname": "Relative intensity",
-                "names": [
-                    "relative intensity"
-                ]
+        "axis": {
+            "x": {
+                "m/z": {
+                    "viewername": "m\/z",
+                    "altnames": [
+                        "m/z"
+                    ]
+                }
+            },
+            "y": {
+                "relative intensity": {
+                    "viewername": "Relative intensity",
+                    "altnames": [
+                        "relative intensity"
+                    ]
+                }
             }
         }
     },
@@ -90,31 +102,35 @@
         "alias": "MS"
     },
     "chromms": {
-        "type": "chromatograph",
-        "ty-graph": "line",
-        "xy-graph": "bar",
-        "t-axis": {
-            "default": {
-                "displayname": "Time (min)",
-                "names": [
-                    "time (min)"
-                ]
-            }
+        "type": "txy",
+        "graph": {
+            "ty": "line",
+            "xy": "bar"
         },
-        "x-axis": {
-            "default": {
-                "displayname": "m\/z",
-                "names": [
-                    "m/z"
-                ]
-            }
-        },
-        "y-axis": {
-            "default": {
-                "displayname": "Relative intensity",
-                "names": [
-                    "relative intensity"
-                ]
+        "axis": {
+            "t": {
+                "Time (min)": {
+                    "viewername": "Time (min)",
+                    "altnames": [
+                        "time (min)"
+                    ]
+                }
+            },
+            "x": {
+                "m/z": {
+                    "viewername": "m\/z",
+                    "altnames": [
+                        "m/z"
+                    ]
+                }
+            },
+            "y": {
+                "Relative intensity": {
+                    "viewername": "Relative intensity",
+                    "altnames": [
+                        "relative intensity"
+                    ]
+                }
             }
         }
     },
