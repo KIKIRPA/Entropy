@@ -455,12 +455,12 @@
     $type = datatypeParent($type, $datatypes);
 
     // find axis names
-    $results = array()
-    $i = 0
+    $results = array();
+    $i = 0;
     foreach ($DATATYPES[$type]["axis"] as $axid => $axis)
     {
       if (is_array($altnameslist))
-        if (!empty($altnameslist[$i])
+        if (!empty($altnameslist[$i]))
           foreach ($axis as $axname => $axvalues)
             if ((strtolower($axname) == strtolower($altnameslist[$i])) or in_array(strtolower($altnameslist[$i]), $axvalues["altnames"]))
             {
@@ -475,7 +475,7 @@
       }
     }
 
-    return $results
+    return $results;
   }
   
   

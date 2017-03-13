@@ -118,7 +118,7 @@ replacement for index.php
   {
     // reduce $measurements to just the measurement we need
     $measurement = $measurements[$showid];
-    unset($measurements)
+    unset($measurements);
     
     if (isset($_REQUEST["ds"]))
     {
@@ -139,8 +139,8 @@ replacement for index.php
         $ds = "default";
       else
       {
-        reset($measurement["dataset"])
-        $ds = key($measurement["dataset"])
+        reset($measurement["dataset"]);
+        $ds = key($measurement["dataset"]);
       }
     }
   }

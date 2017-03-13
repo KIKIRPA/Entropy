@@ -74,7 +74,7 @@
 
   // determine datatype and call the correct viewer module
   $parenttype = datatypeParent($measurement["type"], $DATATYPES);
-  switch (strtolower($DATATYPES[$parenttype]["type"])
+  switch (strtolower($DATATYPES[$parenttype]["type"]))
   {
     case "spectrum":
     case "xy":
@@ -85,7 +85,7 @@
   // downloadbuttons
   echo "          <div class='boxed'>\n"
      . "            <h3>Download</h3>\n"
-     . "            <div style="text-align:center">\n";
+     . "            <div style='text-align:center'>\n";
                 
   foreach ($LIBS[$showlib]["allowformat"] as $extension)
   {
