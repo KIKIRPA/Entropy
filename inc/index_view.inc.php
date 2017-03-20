@@ -78,7 +78,7 @@
   {
     case "spectrum":
     case "xy":
-      require_once('./inc/viewer_xy.inc.php');
+      require_once(ENTROPY_PATH . 'inc/viewer_xy.inc.php');
       break;
   }
 
@@ -180,9 +180,6 @@
         </div>
 
 <?php
-  
-  // DOWNLOAD POPUP
-  if (!$cookie) include './inc/spectrum_popup.inc.php';
 
   // FOOTER
   include(FOOTER_FILE);

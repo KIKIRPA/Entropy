@@ -50,10 +50,7 @@
             $number = string representing a floatval
             returns the number of decimals
   */
-  
-  
-  require_once('./inc/common_basic.inc.php');      //error handling!
-  
+    
   
   function importfilter($filepath, $datatype = null)
   {

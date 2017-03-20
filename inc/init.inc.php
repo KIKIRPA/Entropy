@@ -7,9 +7,6 @@
     header("Status: 404 Not Found");
     exit("Direct access not permitted.");
   }
-   
-  require_once('./data/config/config.inc.php');
-  require_once('./inc/common_basic.inc.php');
   
   /***********************************************************************************
     1. READ CONFIGURATION FILES

@@ -9,15 +9,13 @@
 
   $libmk = true;
   
-  include('./inc/module_libedit.inc.php');
+  include(ENTROPY_PATH . 'inc/module_libedit.inc.php');
   
   if (($f == "set") and ($output == false))
   {
     //----------------------------------------------//
     // give the creator access rights in users.json //
     //----------------------------------------------//
-    
-    //$USERS = readJSONfile(USERS_FILE, true);  --> already loaded in init.inc.php
     
     if (isset($USERS[$is_logged_in]) and isset($USERS[$is_logged_in]["permissions"]))
     {

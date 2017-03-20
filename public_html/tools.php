@@ -1,17 +1,24 @@
 <?php
-  //error_reporting(E_ALL);
-  //ini_set('display_errors', '1');
-  
-  require_once('./inc//init.inc.php');
-  require_once('./inc/common_basic.inc.php');
-  require_once('./inc/common_mailhide.inc.php');
-  require_once('./inc/common_writefile.inc.php');
+  require_once('../entropy.conf.inc.php');
+  require_once(ENTROPY_PATH . 'inc/init.inc.php');
+  require_once(ENTROPY_PATH . 'inc/common_basic.inc.php');
+  require_once(ENTROPY_PATH . 'inc/common_mailhide.inc.php');
+  require_once(ENTROPY_PATH . 'inc/common_writefile.inc.php');
   
   
   // security measures!
    
-  if (!IS_HTTPS or IS_BLACKLISTED)
-    include("./inc/error_404.inc.php");
+  if (!IS_HTTPS)
+  {
+    $module = "empty";
+    $msg = "A https connection is required for this page.";
+  }
+  
+  if (IS_BLACKLISTED)
+  {
+    $module = "empty";
+    $msg = "This IP has been blacklisted due to too many failed login attempts. Please contact the system administrator.";
+  }
   
   if ($is_logged_in)
   {
@@ -55,7 +62,7 @@
            . "    <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.js' async></script>\n";
   
   include(HEADER_FILE); 
-  if (!$error) include("./inc/module_" . $_REQUEST["mod"] . ".inc.php");
+  if (!$error) include(ENTROPY_PATH . 'inc/module_' . $_REQUEST["mod"] . '.inc.php');
   else         echo $error;
   include(FOOTER_FILE);
   

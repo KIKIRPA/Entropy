@@ -46,13 +46,13 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>		
     <meta http-equiv="Window-target" content="_top" />
     <meta name="keywords" content="<?php echo $htmlkeywords; ?>"/>
-    <link rel="shortcut icon" href="./images/specliblogo.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="./img/specliblogo.png" type="image/x-icon" />
     <link rel='stylesheet' type='text/css' href='./css/general.css'>
     <link rel='stylesheet' type='text/css' href='./css/navigation.css'>
     <link rel='stylesheet' type='text/css' href='./css/jquery.notifyBar.css'>
     <?php echo $style; ?>
     <script type='text/javascript' src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous" async></script>
-    <script type='text/javascript' src='./javascript/jquery.notifyBar.js' async></script>
+    <script type='text/javascript' src='./js/jquery.notifyBar.js' async></script>
     <?php echo $scripts; ?>
   </head>
   
@@ -60,7 +60,7 @@
     <div class="wrapper">
       <div class="header">
         <div id="logo">
-          <img src="./images/specliblogo.png" title="Entropy" alt="Entropy">
+          <img src="./img/specliblogo.png" title="Entropy" alt="Entropy">
         </div>
         <div id="title">
           <h1><?php echo $pagetitle; ?></h1>
@@ -98,13 +98,13 @@
         if (strtolower($lib["view"]) == "public")
           echo "          <li><a href=\"./index.php?lib=" . $libid . "\">" . $lib["menu"] . "</a></li>\n";
         elseif ((strtolower($lib["view"]) == "hidden") and ($_REQUEST["lib"] == $libid))
-          echo "          <li><a href=\"./index.php?lib=" . $libid . "\">" . $lib["menu"] . "&nbsp<img src='./images/freecons/70_white.png' height='10'></a></li>\n";
+          echo "          <li><a href=\"./index.php?lib=" . $libid . "\">" . $lib["menu"] . "&nbsp<img src='./img/freecons/70_white.png' height='10'></a></li>\n";
       }
       elseif (is_array($perm))
       {
-        if     (strtolower($lib["view"]) == "hidden") $note = "&nbsp<img src='./images/freecons/70_white.png' height='10'>";
+        if     (strtolower($lib["view"]) == "hidden") $note = "&nbsp<img src='./img/freecons/70_white.png' height='10'>";
         elseif (strtolower($lib["view"]) == "public") $note = "";
-        else                              $note = "&nbsp<img src='./images/freecons/32_white.png' height='10'>";
+        else                              $note = "&nbsp<img src='./img/freecons/32_white.png' height='10'>";
         
         if ((count($perm) == 1) and ($perm[0] == "view"))
           echo "          <li><a href=\"./index.php?lib=" . $libid . "\">" . $lib["menu"] . $note . "</a></li>\n";
@@ -138,7 +138,7 @@
       elseif ($perm)       $perm = array_keys($menuitems_adm);
       // else: $perm==false => do nothing ($perm remains false)
       
-      echo "          <li><a href=\"#\"><img src='./images/freecons/71_white.png' height='14' width='14'>&nbsp;" . $_SESSION['username'] . "</a>\n";
+      echo "          <li><a href=\"#\"><img src='./img/freecons/71_white.png' height='14' width='14'>&nbsp;" . $_SESSION['username'] . "</a>\n";
       echo "            <ul>\n";
       foreach ($perm as $item)
         echo "              <li><a href=\"./tools.php?mod=" . $item . "\">" . $menuitems_adm[$item] . "</a></li>\n";
@@ -147,7 +147,7 @@
       echo "          </li>\n";
     }
     else
-      echo "          <li><a href=\"./auth.php\"><img src='./images/freecons/71_white.png' height='14' width='14'></a></li>\n";
+      echo "          <li><a href=\"./auth.php\"><img src='./img/freecons/71_white.png' height='14' width='14'></a></li>\n";
   }
             
 ?>          

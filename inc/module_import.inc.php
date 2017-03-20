@@ -7,8 +7,8 @@
     exit("Direct access not permitted.");
   }
 
-  require_once('./inc/common_upload.inc.php');
-  require_once('./inc/common_importfilters.inc.php');
+  require_once(ENTROPY_PATH . 'inc/common_upload.inc.php');
+  require_once(ENTROPY_PATH . 'inc/common_importfilters.inc.php');
  
 
 /****************************

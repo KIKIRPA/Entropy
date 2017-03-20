@@ -25,8 +25,6 @@
       decode($string,$key)
    ************************************************************************************************************************* */
 
-  //require_once('./inc/common_xml.inc.php');              //error handling! --> now in common_basic
-
    
   function verifycookie($name, $institution = NULL, $email = NULL)
   {

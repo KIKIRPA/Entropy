@@ -8,10 +8,10 @@
   }
   
   if ($is_logged_in)
-    $email = "<a href=\"mailto:wim.fremout@kikirpa.be\">Wim Fremout <img src=\"./images/freecons/28_white.png\" alt=\"e-mail\" height=\"11\" width=\"16\"></a>";
+    $email = '<a href="mailto:wim.fremout@kikirpa.be">Wim Fremout <img src="./img/freecons/28_white.png" alt="e-mail" height="11" width="16"></a>';
   else
-    $email = mailhide( "wim.fremout@kikirpa.be",
-                       "Wim Fremout <img src=\"./images/freecons/28_white.png\" alt=\"e-mail\" height=\"11\" width=\"16\">"
+    $email = mailhide( 'wim.fremout@kikirpa.be',
+                       'Wim Fremout <img src="./img/freecons/28_white.png" alt="e-mail" height="11" width="16">'
                      );
   
 ?>
@@ -25,8 +25,8 @@
     </div>
     <div id="right">
       Development was supported by 
-      <a href="http://www.kikirpa.be"><img src="./images/kikirpa.png" width="40" height="40"></a>
-      <a href="http://iperion.eu"><img src="./images/iperion.png" width="40" height="40"></a>
+      <a href="http://www.kikirpa.be"><img src="./img/kikirpa.png" width="40" height="40"></a>
+      <a href="http://iperionch.eu"><img src="./img/iperion.png" width="40" height="40"></a>
     </div>
   </div>
 </body>
