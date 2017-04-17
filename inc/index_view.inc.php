@@ -78,7 +78,7 @@
   {
     case "spectrum":
     case "xy":
-      require_once(ENTROPY_PATH . 'inc/viewer_xy.inc.php');
+      require_once(INC_PATH . 'viewer_xy.inc.php');
       break;
   }
 

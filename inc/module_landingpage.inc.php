@@ -8,7 +8,7 @@
   }
 
   $lp = true;  // let module_libedit know which data it should expect
-  include(ENTROPY_PATH . 'inc/module_libedit.inc.php');
+  include(INC_PATH . 'module_libedit.inc.php');
 ?>
 
   

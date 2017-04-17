@@ -1,9 +1,10 @@
 <?php
-  require_once('../entropy.conf.inc.php');
-  require_once(ENTROPY_PATH . 'inc/init.inc.php');
-  require_once(ENTROPY_PATH . 'inc/common_basic.inc.php');
-  require_once(ENTROPY_PATH . 'inc/common_mailhide.inc.php');
-  require_once(ENTROPY_PATH . 'inc/common_writefile.inc.php');
+  require_once('install.conf.php');
+  require_once(PRIVPATH . 'entropy.conf.php');
+  require_once(INC_PATH . 'init.inc.php');
+  require_once(INC_PATH . 'common_basic.inc.php');
+  require_once(INC_PATH . 'common_mailhide.inc.php');
+  require_once(INC_PATH . 'common_writefile.inc.php');
   
   
   // security measures!
@@ -62,7 +63,7 @@
            . "    <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.js' async></script>\n";
   
   include(HEADER_FILE); 
-  if (!$error) include(ENTROPY_PATH . 'inc/module_' . $_REQUEST["mod"] . '.inc.php');
+  if (!$error) include(INC_PATH . 'module_' . $_REQUEST["mod"] . '.inc.php');
   else         echo $error;
   include(FOOTER_FILE);
   

@@ -7,6 +7,8 @@
     header("Status: 404 Not Found");
     exit("Direct access not permitted.");
   }
+
+  require_once(INC_PATH . 'common_basic.inc.php');
   
   /***********************************************************************************
     1. READ CONFIGURATION FILES

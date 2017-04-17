@@ -9,7 +9,7 @@
 
   $libmk = true;
   
-  include(ENTROPY_PATH . 'inc/module_libedit.inc.php');
+  include(INC_PATH . 'module_libedit.inc.php');
   
   if (($f == "set") and ($output == false))
   {

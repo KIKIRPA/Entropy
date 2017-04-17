@@ -1,0 +1,9 @@
+{
+  "update":        "y",
+  "privpath":      "/opt/entropy/",
+  "pubpath":       "/srv/http/",
+  "htgroup":       "http",
+  "mail_admin":    "",
+  "mailhide_pub":  "",
+  "mailhide_priv": ""
+}

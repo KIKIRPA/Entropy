@@ -6,7 +6,7 @@
   //   DEFAULT CONFIG     //
   //----------------------//
 
-  $cfg = Array( "update"        => "y",
+  $cfg = Array( "forceinstall"  => "n",
                 "privpath"      => "/var/www/entropy/",
                 "pubpath"       => "/var/www/entropy/public_html/",
                 "htgroup"       => "www-data",
@@ -15,7 +15,7 @@
                 "mailhide_priv" => ""
               );
 
-  $hlp = Array( "update"        => "If a previous installation is found, keep all data and settings, only update new source files.",
+  $hlp = Array( "forceinstall"  => "Force a clean install, even if a previous installation is found. This removes all data and settings.",
                 "privpath"      => "Main installation path outside webroot (where files will be stored that should remain inaccessible from the web). Paths require a trailing slash '/'.",
                 "pubpath"       => "Webroot path (accessible for the web server). Paths require a trailing slash '/'.",
                 "htgroup"       => "Group name of the Web server",
@@ -29,23 +29,29 @@
   //   COMMAND LINE OPTIONS   //
   //--------------------------//
 
-  $short = "uidc:";
-  $long  = Array("update", "cleaninstall", "defaults", "config:");
+  $short = "huidc:";
+  $long  = Array("help", "update", "install", "defaults", "config:");
   $options = getopt($short, $long);
+
+  echo "ENTROPY installation and update script\n";
+  if (isset($options["h"]) or isset($options["help"]))
+  {
+    echo "\nUsage: setup.php [options]\n"
+       . "Options:\n"
+       . "  -u       --update       Update Entropy. Preserves configuration files and data. (default)\n"
+       . "  -i       --install      Force clean install. REMOVES/RESETS CONFIGURATION FILES AND DATA!\n"
+       . "  -d       --defaults     Non-interactive mode; use the default values.\n"
+       . "  -c FILE  --config FILE  Use configuration file (JSON format).\n"
+       . "  -h       --help         Shows this help message.\n\n";
+    exit(0);
+  }
 
   // invalid option combinations
   if (     (isset($options["u"]) or isset($options["update"])) 
-       and (isset($options["i"]) or isset($options["cleaninstall"])) )
+       and (isset($options["i"]) or isset($options["install"])) )
   {
     echo "\nERROR: contradicting options: clean install vs update only. Aborting...\n";
     exit(1);
-  }
-
-  if (     (isset($options["d"]) or isset($options["defaults"])) 
-       and (isset($options["c"]) or isset($options["config"])) )
-  {
-    echo "\nERROR: contradicting options: use configuration file vs use default values. Aborting...\n";
-    exit(2);
   }
 
   // config file
@@ -55,9 +61,9 @@
   if (isset($cfgfile))
   {
     // read file
-    if (file_exists($path))
+    if (file_exists($cfgfile))
     {
-      $cfgfile = file_get_contents($path);
+      $cfgfile = file_get_contents($cfgfile);
       $cfgfile = json_decode($cfgfile, true);
     }
     else
@@ -78,18 +84,18 @@
   }
   
   // override $cfg (and $cfgfile) when -i or -u are given
-  if (isset($options["u"]) or isset($options["update"]))       $cfg["update"] = "y";
-  if (isset($options["i"]) or isset($options["cleaninstall"])) $cfg["update"] = "n";
+  if (isset($options["u"]) or isset($options["update"]))   $cfg["forceinstall"] = "n";
+  if (isset($options["i"]) or isset($options["install"]))  $cfg["forceinstall"] = "y";
 
   // interactive mode
-  if ( !isset($options["d"]) and !isset($options["defaults"]) and !isset($options["c"]) and !isset($options["config"]) )
+  if ( !isset($options["d"]) and !isset($options["defaults"]) )
   {
     foreach ($hlp as $id => $value)
     {
-      echo $value;
-      echo "Enter value or accept default [" . (isset($cfg[$id]) ? $cfg[$id] : "") . "]";
-      $line = trim(fget(STDIN));
-      if (!empty(line)) $cfg[$id] = trim($line);
+      echo "\n" . $value;
+      echo "\nEnter value or accept default [" . (isset($cfg[$id]) ? $cfg[$id] : "") . "]: \n";
+      $line = trim(fgets(STDIN));
+      if (!empty($line)) $cfg[$id] = trim($line);
     }
   }
 
@@ -99,18 +105,33 @@
   //----------------------//
 
   // determine if we do a clean install or an update
-  if (!file_exists($cfg["privpath"] . "entropy.conf.php") or strtolower($cfg["update"][0]) == "y")
+  if (!file_exists($cfg["privpath"] . "entropy.conf.php") or strtolower($cfg["forceinstall"][0]) == "y")
+  {
     $cleaninstall = True;
+    echo "Clean installation...\n\n";
+  }
   else
+  {
     $cleaninstall = False;
-
+    echo "Update...\n\n";
+  }
 
   // get current username
   $currentUser = posix_getpwuid(posix_geteuid());
   $currentUser = $currentUser['name'];
 
-
   // common tasks for both clean install and update
+  echo "Copying files.\n\n";
+  if (!file_exists($cfg["privpath"])) 
+  {
+    mkdir($cfg["privpath"], 0750, true);
+    chgrp($cfg["privpath"], $cfg["htgroup"]);
+  }
+  if (!file_exists($cfg["pubpath"]))
+  {
+    mkdir($cfg["pubpath"], 0750, true);
+    chgrp($cfg["pubpath"], $cfg["htgroup"]);
+  }
   rcopy("./inc/", $cfg["privpath"] . "inc/", $cfg["htgroup"]);
   rcopy("./LICENSE", $cfg["privpath"] . "LICENSE", $cfg["htgroup"]);
   rcopy("./README.md", $cfg["privpath"] . "README.md", $cfg["htgroup"]);
@@ -123,15 +144,19 @@
     rcopy("./data/", $cfg["privpath"] . "data/", $cfg["htgroup"], True);
 
     // build entropy.conf.php
+    echo "Build configuration file: entropy.conf.php\n";
     $in = fopen("./entropy.conf.php", "r");
     $out = fopen($cfg["privpath"] . "entropy.conf.php", "w");
     mkconf($in, $out, $cfg);
 
     // build install.conf.php
+    echo "Build configuration file: install.conf.php\n";
     $in = fopen("./public_html/install.conf.php", "r");
     $out = fopen($cfg["pubpath"] . "install.conf.php", "w");
     mkconf($in, $out, $cfg);
   }
+
+  echo "\nFinished.\n\n";
 
 
 
@@ -170,7 +195,7 @@
       $files = scandir($src);
       foreach ($files as $file)
         if ($file != "." && $file != "..")
-          rcopy("$src/$file", "$dst/$file");
+          rcopy("$src/$file", "$dst/$file", $group, $writable);
     }
     else
       if (file_exists($src))
@@ -187,19 +212,21 @@
     {
       while (($line = fgets($in)) !== false) 
       {
-        $lineparts = explode("//", $line, 1);  // only consider the part of the line before eventual comments
+        $lineparts = explode("//", trim($line), 2);  // only consider the part of the line before eventual comments
 
-        if (strpos($lineparts[0], 'const') !== false)
+        if (substr(strtolower($lineparts[0]), 0, 5) == 'const')
         {
-          $lineparts[0] = explode("=", $lineparts[0], 1);  // only consider the part before "="
+          $static = explode('=', $lineparts[0], 2)[0];  // only consider the part before "="
+          $static = trim(str_replace("CONST", "", strtoupper($static)));
           
           foreach ($cfg as $item => $value)
           {
-            if (strpos($lineparts[0][0], strtoupper($item)))   // found cfg-item in line -> replace it
+            if ($static == strtoupper($item))   // found cfg-item in line -> replace it
             {
               if (is_string($value)) $lineparts[0] = '  const ' . strtoupper($item) . ' = "' . $value . '"; ';
               else                   $lineparts[0] = '  const ' . strtoupper($item) . ' = ' . $value . '; ';
-              $line = implode(" //", $lineparts);
+              $line = implode(" //", $lineparts) . "\n";
+              echo "  - set " . strtoupper($item) . " -> " . $value . "\n";
             }
           }
         }
