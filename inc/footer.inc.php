@@ -21,7 +21,7 @@
   <div class="footer">
     <div id="left">
       Powered by <a href="https://github.com/KIKIRPA/Entropy">Entropy</a><br>
-      &copy;2012-<?php echo date("Y");?> Wim Fremout <?php echo $email; ?> and contributors 
+      &copy;2012-<?php echo date("Y") . " " . $email; ?> and contributors 
     </div>
     <div id="right">
       Development was supported by 

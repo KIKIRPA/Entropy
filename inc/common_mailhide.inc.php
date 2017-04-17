@@ -14,6 +14,10 @@
   function mailhide($email, $show = null, $hoover = "e-mail") 
   {
     //global $pubkey, $privkey;
+
+    //if MAILHIDE_PUB, MAILHIDE_PRIV not set: don't use mailhide
+    if (empty(MAILHIDE_PUB) or empty(MAILHIDE_PRIV))
+      return "<a href='mailto:" . $email . "'  title=\"" . $hoover . "\">" . (is_null($show) ? $email : $show) . "</a>";
     
     $emailparts = _recaptcha_mailhide_email_parts($email);
     $url = recaptcha_mailhide_url(MAILHIDE_PUB, MAILHIDE_PRIV, $email);
