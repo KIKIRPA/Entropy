@@ -1,9 +1,1 @@
 deny from all
-
-<Files "_setup.php">
-  allow from all
-  AuthType basic
-  AuthName "SpecLib setup"
-  AuthUserFile .htpasswd
-  Require valid-user
-</Files>

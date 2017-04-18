@@ -46,7 +46,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>		
     <meta http-equiv="Window-target" content="_top" />
     <meta name="keywords" content="<?php echo $htmlkeywords; ?>"/>
-    <link rel="shortcut icon" href="./img/specliblogo.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="./img/entropy.png" type="image/x-icon" />
     <link rel='stylesheet' type='text/css' href='./css/general.css'>
     <link rel='stylesheet' type='text/css' href='./css/navigation.css'>
     <link rel='stylesheet' type='text/css' href='./css/jquery.notifyBar.css'>
@@ -60,7 +60,7 @@
     <div class="wrapper">
       <div class="header">
         <div id="logo">
-          <img src="./img/specliblogo.png" title="Entropy" alt="Entropy">
+          <img src="./img/entropy.png" title="Entropy" alt="Entropy">
         </div>
         <div id="title">
           <h1><?php echo $pagetitle; ?></h1>

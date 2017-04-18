@@ -510,10 +510,10 @@
     // mail: if asked ($mail=true), and if failed to write log ($success=false)
     if ($mail or !$success)
     {
-      $title = "SpecLib event " . $cat;
-      $body = "Automated mail from speclib.kikirpa.be:\r\n\r\n";
-      $headers = "From: noreply@kikirpa.be" . "\r\n" 
-               . "Reply-To: noreply@kikirpa.be" . "\r\n" 
+      $title = APP_SHORT . " event " . $cat;
+      $body = "Automated mail from " . gethostname() . ":\r\n\r\n";
+      $headers = "From: " . MAIL_ADMIN . "\r\n" 
+               . "Reply-To: " . MAIL_ADMIN . "\r\n" 
                . "X-Mailer: PHP/" . phpversion();
       
       if (!$success)

@@ -159,9 +159,9 @@
     {
       $_SESSION['trustcode'] = sprintf("%04d", mt_rand(0 , 9999));
       mail( $USERS[$user]['email'], 
-            "SpecLib authorisation code", 
-            "Automated mail from speclib.kikirpa.be, do not reply.\r\n\r\nAuthorisation code : <b>" . $_SESSION['trustcode'] . "</b>\r\n\r\nCopy this code in the designated code box on speclib.kikirpa.be.\r\nThe code is time-limited and will expire after a given time.\r\n",
-            "From: noreply@kikirpa.be\r\nReply-To: noreply@kikirpa.be\r\nX-Mailer: PHP/" . phpversion()
+            APP_SHORT . " authorisation code", 
+            "Automated mail from " . gethostname() . ", do not reply.\r\n\r\nAuthorisation code : <b>" . $_SESSION['trustcode'] . "</b>\r\n\r\nCopy this code in the designated code box on " . gethostname() . ".\r\nThe code is time-limited and will expire after a given time.\r\n",
+            "From:  " . MAIL_ADMIN . "\r\nReply-To:  " . MAIL_ADMIN . "\r\nX-Mailer: PHP/" . phpversion()
           );
       $module = "trustform";
       unset($msg);
