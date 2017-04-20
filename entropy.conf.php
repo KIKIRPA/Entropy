@@ -39,6 +39,7 @@
   const EXPIRE         = 7200;           //keep session opened for xxx seconds after last activity
   const MAXTRIES_PW    = 3;              //# of consecutive tries for a given username: disable account
   const MAXTRIES_IP    = 8;              //# of tries within a session: blacklist
+  const TWOPASS_ENABLE = False;          //enable the use of twopass verification (e-mail trustcodes to unkown IPs)
   
   // cookie properties
   const COOKIE_NAME    = "rememberme";   //cookie name.  Warning: changing this will void all existing cookies! 

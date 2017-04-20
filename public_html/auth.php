@@ -149,41 +149,46 @@
    *************************************** */
   
   //if (empty($module) and !in_array($ip, $USERS[$user]['trusted']))  //isset($_SESSION('untrusted'))
-  if (!$_SESSION['trusted'] 
-        and !isset($module)
-        and isset($_SESSION['username'])
-     )
+  if (TWOPASS_ENABLE)
   {
-    // if no trustcode is given (POST): create one and show form
-    if (empty($_POST['trustcode']))
+    if (!$_SESSION['trusted'] 
+          and !isset($module)
+          and isset($_SESSION['username'])
+      )
     {
-      $_SESSION['trustcode'] = sprintf("%04d", mt_rand(0 , 9999));
-      mail( $USERS[$user]['email'], 
-            APP_SHORT . " authorisation code", 
-            "Automated mail from " . gethostname() . ", do not reply.\r\n\r\nAuthorisation code : <b>" . $_SESSION['trustcode'] . "</b>\r\n\r\nCopy this code in the designated code box on " . gethostname() . ".\r\nThe code is time-limited and will expire after a given time.\r\n",
-            "From:  " . MAIL_ADMIN . "\r\nReply-To:  " . MAIL_ADMIN . "\r\nX-Mailer: PHP/" . phpversion()
-          );
-      $module = "trustform";
-      unset($msg);
-    }
-    // if trustcode is given (POST): evaluate
-    else
-    {
-      if ($_POST['trustcode'] == $_SESSION['trustcode'])
-      { //correct
-        $_SESSION['trusted'] = true;
-        array_push($USERS[$user]['trusted'], $ip);
-        unset($module, $msg);       // let $module be set later
-        $BLACKLIST[$ip] = array();  //reset blacklist
-      }
-      else 
-      { //incorrect
-        $BLACKLIST[$ip][$ts] = $user . ": wrong trustcode";  // IP blacklisting
+      // if no trustcode is given (POST): create one and show form
+      if (empty($_POST['trustcode']))
+      {
+        $_SESSION['trustcode'] = sprintf("%04d", mt_rand(0 , 9999));
+        mail( $USERS[$user]['email'], 
+              APP_SHORT . " authorisation code", 
+              "Automated mail from " . gethostname() . ", do not reply.\r\n\r\nAuthorisation code : <b>" . $_SESSION['trustcode'] . "</b>\r\n\r\nCopy this code in the designated code box on " . gethostname() . ".\r\nThe code is time-limited and will expire after a given time.\r\n",
+              "From:  " . MAIL_ADMIN . "\r\nReply-To:  " . MAIL_ADMIN . "\r\nX-Mailer: PHP/" . phpversion()
+            );
         $module = "trustform";
-        $msg = "Try again!";
+        unset($msg);
       }
-    }   
+      // if trustcode is given (POST): evaluate
+      else
+      {
+        if ($_POST['trustcode'] == $_SESSION['trustcode'])
+        { //correct
+          $_SESSION['trusted'] = true;
+          array_push($USERS[$user]['trusted'], $ip);
+          unset($module, $msg);       // let $module be set later
+          $BLACKLIST[$ip] = array();  //reset blacklist
+        }
+        else 
+        { //incorrect
+          $BLACKLIST[$ip][$ts] = $user . ": wrong trustcode";  // IP blacklisting
+          $module = "trustform";
+          $msg = "Try again!";
+        }
+      }   
+    }
   }
+  else
+    $_SESSION['trusted'] = True;
 
   
 /* **************** 
