@@ -19,8 +19,8 @@
   
   echo "      <h3>Library upload tool</h3>\n";
   
-  # check if the operation already exists and set $op and $action 
-  # also check if the user has permission to this operation
+  # check if the transaction already exists and set $tr and $action 
+  # also check if the user has permission to this transaction
   
   $action = false;
   
@@ -31,55 +31,55 @@
       eventLog("ERROR", "Could not make library directory for: " .$id . " [module_import]", true, false);
     }
   
-  if (file_exists(LIB_DIR . $_REQUEST["lib"] . "/openops.json"))
-    $operations = readJSONfile(LIB_DIR . $_REQUEST["lib"] . "/openops.json", false);
+  if (file_exists(LIB_DIR . $_REQUEST["lib"] . "/transactions_open.json"))
+    $transactions = readJSONfile(LIB_DIR . $_REQUEST["lib"] . "/transactions_open.json", false);
   else
-    $operations = array();
+    $transactions = array();
   
   try 
   {
-    if (isset($_REQUEST["op"])) // open an existing operation
+    if (isset($_REQUEST["op"])) // open an existing transaction
     {
       // check if it exists
-      if (isset($operations[$_REQUEST["op"]]))
-        $op = $_REQUEST["op"];
+      if (isset($transactions[$_REQUEST["op"]]))
+        $tr = $_REQUEST["op"];
       else
-        throw new RuntimeException('Invalid operation ID ' . $op);
+        throw new RuntimeException('Invalid transaction ID ' . $tr);
       
       // check if this user permission
-      if (!$user["permissions"]["admin"] and ($operations[$op]["user"] != $is_logged_in))
-        throw new RuntimeException('Unauthorised access to operation ' . $op);
+      if (!$user["permissions"]["admin"] and ($transactions[$tr]["user"] != $is_logged_in))
+        throw new RuntimeException('Unauthorised access to transaction ' . $tr);
       
-      // check if the operation dir exists
-      $opdir = LIB_DIR . $_REQUEST["lib"] . "/" . $op . "/";
-      if (!file_exists($opdir))
-        throw new RuntimeException('Upload directory was not found for '. $op);
+      // check if the transaction dir exists
+      $trdir = LIB_DIR . $_REQUEST["lib"] . "/" . $tr . "/";
+      if (!file_exists($trdir))
+        throw new RuntimeException('Upload directory was not found for '. $tr);
         
       // delete
       if (isset($_REQUEST["del"]))
       {
-        rmdir2($opdir);
-        unset($operations[$op]);
-        $error = writeJSONfile(LIB_DIR . $_REQUEST["lib"] . "/openops.json", $operations);
+        rmdir2($trdir);
+        unset($transactions[$tr]);
+        $error = writeJSONfile(LIB_DIR . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
         if ($error) throw new RuntimeException($error);
         goto STEP1;
       }
       
       // set $action
-      if (in_array($operations[$op]["action"], array("append", "update", "replace")))
-        $action = $operations[$op]["action"];
-      else throw new RuntimeException('No valid action for operation ' . $op);
+      if (in_array($transactions[$tr]["action"], array("append", "update", "replace")))
+        $action = $transactions[$tr]["action"];
+      else throw new RuntimeException('No valid action for transaction ' . $tr);
     }
     else
     {
-      // create a new operation
-      $op = date("YmdHis");
-      $operations[$op] = array("user"   => $is_logged_in,
+      // create a new transaction
+      $tr = date("YmdHis");
+      $transactions[$tr] = array("user"   => $is_logged_in,
                                "action" => "none",
                                "step"   => 1
                               );
-      $opdir = LIB_DIR . $_REQUEST["lib"] . "/" . $op . "/";
-      //don't write openops.json at this time, it will create an empty operation each
+      $trdir = LIB_DIR . $_REQUEST["lib"] . "/" . $tr . "/";
+      //don't write transactions_open.json at this time, it will create an empty transaction each
       //time STEP1 is opened
     }
   }
@@ -107,20 +107,20 @@
 
   if (isset($_REQUEST["step"]))
   {
-    if     (($operations[$op]["step"] == 1) and ($_REQUEST["step"] > 2)) $step = 1;
-    elseif (($operations[$op]["step"] == 3) and ($_REQUEST["step"] > 4)) $step = 3;
-    elseif (($operations[$op]["step"] == 5) and ($_REQUEST["step"] > 9)) $step = 5;
-    elseif  ($operations[$op]["step"] == 10)                             $step = 10;
+    if     (($transactions[$tr]["step"] == 1) and ($_REQUEST["step"] > 2)) $step = 1;
+    elseif (($transactions[$tr]["step"] == 3) and ($_REQUEST["step"] > 4)) $step = 3;
+    elseif (($transactions[$tr]["step"] == 5) and ($_REQUEST["step"] > 9)) $step = 5;
+    elseif  ($transactions[$tr]["step"] == 10)                             $step = 10;
     else                                                                $step = $_REQUEST["step"];
   }
-  else $step = $operations[$op]["step"];     // fallback to the last reached milestone step (1,3,5,10)
+  else $step = $transactions[$tr]["step"];     // fallback to the last reached milestone step (1,3,5,10)
   
         
   // read the right measurements file _2_flat.json or _inflated.json
   if     ($step <= 2) $measurements = array();
-  elseif ($step <= 4) $measurements = readJSONfile($opdir . "_2_flat.json", false);
-  elseif ($step <= 8) $measurements = readJSONfile($opdir . "_3_inflated.json", false);
-  elseif ($step == 9) $measurements = readJSONfile($opdir . "_4_operation.json", false);
+  elseif ($step <= 4) $measurements = readJSONfile($trdir . "_2_flat.json", false);
+  elseif ($step <= 8) $measurements = readJSONfile($trdir . "_3_inflated.json", false);
+  elseif ($step == 9) $measurements = readJSONfile($trdir . "_4_transaction.json", false);
   //echo "DEBUG step: " . $step . "<br>";
   
   switch ($step)
@@ -180,7 +180,7 @@
           <li>Each measurement is written on a new line.</li>
           <li>There are two required columns: "<strong>id</strong>", a unique identifier for each measurement, and "<strong>type</strong>", defining the (supported) data type. If multiple datasets are contained within a single measurements, this column must be the data type of the primary dataset. Other datasets can have different data types, but will only be displayed when specifically asked by the user.</li>
           <li>If you want to enable downloading the files in JCAMP-DX format, a "<strong>jcamptemplate</strong>" column has to be present pointing to the uploaded dxt file.</li>
-          <li>Not a strict requirement, but it is recommended to use the main column headers "<strong>meta:sample</strong>", "<strong>meta:samplesource</strong>", "<strong>meta:instrument</strong>", "<strong>meta:parameters</strong>", "<strong>meta:measurement</strong>" and "<strong>meta:contributor</strong>". The "meta"-prefix is optional, but advised. These and other fields can be recursively subdivided as required using a semicolon as separator, e.g. "meta:sample:CI number", "meta:samplesource:0:sample identifier". If a field is subdivided in subfields, the parent field should not be used (or: you can't have data in a "meta:sample" and a "meta:sample:CI name" column for a given measurement; and it is not advised to use both in the same operation).</li>
+          <li>Not a strict requirement, but it is recommended to use the main column headers "<strong>meta:sample</strong>", "<strong>meta:samplesource</strong>", "<strong>meta:instrument</strong>", "<strong>meta:parameters</strong>", "<strong>meta:measurement</strong>" and "<strong>meta:contributor</strong>". The "meta"-prefix is optional, but advised. These and other fields can be recursively subdivided as required using a semicolon as separator, e.g. "meta:sample:CI number", "meta:samplesource:0:sample identifier". If a field is subdivided in subfields, the parent field should not be used (or: you can't have data in a "meta:sample" and a "meta:sample:CI name" column for a given measurement; and it is not advised to use both in the same transaction).</li>
           <li>If each measurement only contains a single dataset, the system will create a "default" dataset. You can overrule this behaviour by defining an empty column e.g. "dataset:baseline corrected".</li>
           <li>If all or some measurements contain multiple datasets, the CSV table has to contain multiple datasets, e.g. "dataset:baseline corrected" and "dataset:original data". Dataset-specific metadata can be supplied as subfields of "dataset:original data:meta" and will overrule common metadata. It is advised to store common metadata as subfield of "meta", e.g. "meta:sample:CI number". Metadata in "dataset:x:meta" will overrule those in "meta:", which will in turn overrule those defined directly.</li>
         </ul>
@@ -196,7 +196,7 @@
       
       <br><br>
       <div  style="border:1px dotted black;">
-        <h4>Continue an unfinished operation</h4>
+        <h4>Continue an unfinished transaction</h4>
         <script type="text/javascript" charset="utf-8">
           $(document).ready(function() {
             var oTable = $('#datatable').dataTable( {
@@ -220,15 +220,15 @@
             <?php
                 $n = 0;
                 
-                foreach ($operations as $id => $operation)
+                foreach ($transactions as $id => $transaction)
                 {
-                  //test if the logged in user has made this operation or is admin
-                  if (($operation["user"] == $is_logged_in) or $user["permissions"]["admin"])
+                  //test if the logged in user has made this transaction or is admin
+                  if (($transaction["user"] == $is_logged_in) or $user["permissions"]["admin"])
                   {
-                    if (in_array($operation["action"], array("append", "update", "replace")))
+                    if (in_array($transaction["action"], array("append", "update", "replace")))
                     {                    
-                      $a = $operation["action"];
-                      $u = $operation["user"];
+                      $a = $transaction["action"];
+                      $u = $transaction["user"];
                       $d = substr($id, 0, 4) . "/" . substr($id, 4, 2) . "/" . substr($id, 6, 2) . " "
                         . substr($id, 8, 2) . ":" . substr($id, 10, 2) . ":" . substr($id, 12, 2);
                       $bg = ( $n++ & 1 ? "#eee" : "#fff" );                  
@@ -238,10 +238,10 @@
                       echo "                <td style='background: $bg; padding: 5px;'>$u</td>\n";
                       echo "                <td style='background: $bg; padding: 5px;'>$a</td>\n";
                       echo "                <td style='background: $bg; padding: 5px;'>";
-                      if ($operations[$op]["step"] != 10)
+                      if ($transactions[$tr]["step"] != 10)
                         echo "<a href='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $id. "'>&#9998;</a> ";
-                      if ($operations[$op]["step"] != 10)
-                        echo "<a href='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $id. "&del' onclick=\"return confirm('Delete this unfinished operation?')\">&#10006;</a></td>\n";
+                      if ($transactions[$tr]["step"] != 10)
+                        echo "<a href='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $id. "&del' onclick=\"return confirm('Delete this unfinished transaction?')\">&#10006;</a></td>\n";
                       echo "              </tr>\n";
                     }
                   }
@@ -271,12 +271,12 @@
       $action = $_REQUEST["action"];
       
       // check and move uploaded file
-      $error = checkUpload('upfile', $opdir, "_1_" . $action . ".csv");
+      $error = checkUpload('upfile', $trdir, "_1_" . $action . ".csv");
       if ($error) 
         throw new RuntimeException($error);
       
       // reread CSV file
-      if (($handle = fopen($opdir . "_1_" . $action . ".csv", "r")) == false)
+      if (($handle = fopen($trdir . "_1_" . $action . ".csv", "r")) == false)
         throw new RuntimeException('Could not open the CSV file.');
       
       // Convert to array
@@ -286,13 +286,13 @@
         throw new RuntimeException($measurements);      
       
       // Save .json
-      $error = writeJSONfile($opdir . "_2_flat.json", $measurements);
+      $error = writeJSONfile($trdir . "_2_flat.json", $measurements);
       if ($error) throw new RuntimeException($error);
       
-      // Update openops.json
-      $operations[$op]["action"] = $action;
-      $operations[$op]["step"] = 3;
-      $error = writeJSONfile(LIB_DIR . $_REQUEST["lib"] . "/openops.json", $operations);
+      // Update transactions_open.json
+      $transactions[$tr]["action"] = $action;
+      $transactions[$tr]["step"] = 3;
+      $error = writeJSONfile(LIB_DIR . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
       if ($error) throw new RuntimeException($error);
     }
     catch (RuntimeException $e) 
@@ -311,8 +311,8 @@
 *                           *
 ****************************/ 
   // two ways to reach step 3: 
-  //  - following step 2 (processing)  -> $op, $action, $measurements set during step 2
-  //  - opening a saved operation         -> $op, $action, $measurements set in the common tasks (derived from $_REQUEST["op"])
+  //  - following step 2 (processing)  -> $tr, $action, $measurements set during step 2
+  //  - opening a saved transaction         -> $tr, $action, $measurements set in the common tasks (derived from $_REQUEST["op"])
   
   STEP3:
   { 
@@ -342,7 +342,7 @@
     
     echo "    <strong><br>\n"   
        . "      library: " . $_REQUEST["lib"] . "<br>\n"
-       . "      operation: " . $op . "<br>\n"
+       . "      transaction: " . $tr . "<br>\n"
        . "      action: " . $action . "\n"
        . "    </strong><br><br>\n";
     
@@ -565,12 +565,12 @@
     
     <?php
     
-    $error = writeJSONfile($opdir . "_2_flat.json", $measurements);
+    $error = writeJSONfile($trdir . "_2_flat.json", $measurements);
     if ($error) eventLog("ERROR", "could not save autocorrected json [module_import: STEP3]");
         
     // CONTINUE BUTTON
     if ($c == 0)
-      echo "        <form action='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $op . "&step=4" . "' method='POST'>\n"
+      echo "        <form action='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $tr . "&step=4" . "' method='POST'>\n"
          . "          <input type='submit' value='Next >' />\n"
          . "        </form>\n";
     else 
@@ -623,7 +623,7 @@
     try 
     {
       // Save inflated $measurements as .json
-      $error = writeJSONfile($opdir . "_3_inflated.json", $measurements);
+      $error = writeJSONfile($trdir . "_3_inflated.json", $measurements);
       if ($error) throw new RuntimeException($error);
       
       //make $list with keys from $columns and values retrieved from $measurements
@@ -637,12 +637,12 @@
       }
           
       //save list
-      $error = writeJSONfile($opdir . "_4_operation.json", $list);
+      $error = writeJSONfile($trdir . "_4_transaction.json", $list);
       if ($error) throw new RuntimeException($error);
       
-      // Update openops.json
-      $operations[$op]["step"] = 5;
-      $error = writeJSONfile(LIB_DIR . $_REQUEST["lib"] . "/openops.json", $operations);
+      // Update transactions_open.json
+      $transactions[$tr]["step"] = 5;
+      $error = writeJSONfile(LIB_DIR . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
       if ($error) throw new RuntimeException($error);
     }
     catch (RuntimeException $e) 
@@ -671,7 +671,7 @@
     
     echo "    <strong><br>\n"   
        . "      library: " . $_REQUEST["lib"] . "<br>\n"
-       . "      operation: " . $op . "<br>\n"
+       . "      transaction: " . $tr . "<br>\n"
        . "      action: " . $action . "\n"
        . "    </strong><br><br>\n";
     
@@ -737,7 +737,7 @@
         }
       }
       
-      $link = "<a href='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $op . "&step=6&id=" . $id . "'>";
+      $link = "<a href='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $tr . "&step=6&id=" . $id . "'>";
       echo "          <td>" 
          . (isset($measurement["_built"])?"Yes ".$link."[change]":"No ".$link."[upload]")
          . "</a></td>\n"
@@ -751,7 +751,7 @@
     if ($needdata == 0)
     {
       echo "    <div>All required data files have been uploaded. You can still upload optional data or replace data.<br>When finished, we are ready to publish (" . $action . ") this data to " . $_REQUEST["lib"] . ".</div><br><br>\n"
-         . "    <form action='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $op . "&step=9' method='POST'>\n"
+         . "    <form action='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $tr . "&step=9' method='POST'>\n"
          . "      <input type='submit' value='Publish >' />\n"
          . "    </form>\n";
     }
@@ -774,12 +774,12 @@
     
     echo "    <strong><br>\n"   
        . "      library: " . $_REQUEST["lib"] . "<br>\n"
-       . "      operation: " . $op . "<br>\n"
+       . "      transaction: " . $tr . "<br>\n"
        . "      action: " . $action . "<br>\n"
        . "      measurement: " . $_REQUEST["id"] . "\n"
        . "    </strong><br><br>\n\n";
     
-    echo "    <form enctype='multipart/form-data' action='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $op . "&step=7&id=" . $_REQUEST["id"] . "' method='POST'>\n"
+    echo "    <form enctype='multipart/form-data' action='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $tr . "&step=7&id=" . $_REQUEST["id"] . "' method='POST'>\n"
        . "      <input type='hidden' name='MAX_FILE_SIZE' value='2000000'>\n";
        
     $i = 0; //an index for datasets, which we can add to the POST parameters
@@ -842,7 +842,7 @@
                 if ($hasBin)
                   foreach ($ds["_bin"] as $binfile)
                   {
-                    $link = "<a href='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $op . "&step=8&id=" . $id . "&ds=" . $dsid . "&del=" . $binfile . "'>";
+                    $link = "<a href='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $tr . "&step=8&id=" . $id . "&ds=" . $dsid . "&del=" . $binfile . "'>";
                     echo "<em>" . $binfile . "</em> " . $link . "[X]</a><br>";
                   }
               ?>
@@ -857,7 +857,7 @@
       $i++;
     }
     ?>
-        <?php echo '<a href="' . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $op . "&step=6" . '">< Overview</a>'; ?>
+        <?php echo '<a href="' . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $tr . "&step=6" . '">< Overview</a>'; ?>
         <input type="submit" value="Update >" />
       </form>
     <?php
@@ -900,10 +900,10 @@
       else 
       { // 1.2 UPDATE EXISTING
         // open JSON data file
-        if (!file_exists($opdir . $_REQUEST["id"] . ".json"))
+        if (!file_exists($trdir . $_REQUEST["id"] . ".json"))
           throw new RuntimeException('JSON data file not found.');
         else
-          $json = readJSONfile($opdir . $_REQUEST["id"] . ".json", false);
+          $json = readJSONfile($trdir . $_REQUEST["id"] . ".json", false);
       }
       
       // 2. process uploaded files
@@ -916,11 +916,11 @@
         {
           // check and copy file
           $ext = "." . strtolower(pathinfo($_FILES["dataUp" . $key]['name'],PATHINFO_EXTENSION));
-          $error = checkUpload("dataUp" . $key, $opdir, $fn . $ext);
+          $error = checkUpload("dataUp" . $key, $trdir, $fn . $ext);
           if ($error) throw new RuntimeException($error);
           
           // convert file
-          $data = importfilter($opdir . $fn . $ext);
+          $data = importfilter($trdir . $fn . $ext);
           if (!$data) throw new RuntimeException('Failed to convert ' . $fn . $ext . '.');
           
           // merge with metadata, update original $measurements and set $build
@@ -942,11 +942,11 @@
         {
           // check and copy file
           $ext = ".anno";
-          $error = checkUpload("annoUp" . $key, $opdir, $fn . $ext);
+          $error = checkUpload("annoUp" . $key, $trdir, $fn . $ext);
           if ($error) throw new RuntimeException($error);
           
           // read file
-          $data =  importfilter_anno($opdir . $fn . $ext);
+          $data =  importfilter_anno($trdir . $fn . $ext);
           if (!$data) throw new RuntimeException('Failed to convert ' . $fn . $ext . '.');
           
           // merge with metadata, $measurements and set $build
@@ -956,7 +956,7 @@
         }
         elseif ($_REQUEST["annoUpRadio" . $key] == "del")
         {
-          unlink($opdir . $fn . ".anno");
+          unlink($trdir . $fn . ".anno");
           unset($json["dataset"]["ds"]["anno"],
                 $measurements[$_REQUEST["id"]]["dataset"][$ds]["_anno"]);
           $build = True;
@@ -975,8 +975,8 @@
               throw new RuntimeException($ext . ' files cannot be uploaded as binary files.');
           }
           
-          // copy files to our operation data directory
-          $error = checkMultiUpload("binUp" . $key, $opdir, $fn . "__");
+          // copy files to our transaction data directory
+          $error = checkMultiUpload("binUp" . $key, $trdir, $fn . "__");
           if (!$error)  // update $measurements...[_bin]
           {
             foreach ($_FILES["binUp" . $key]['name'] as $file)
@@ -997,7 +997,7 @@
       if ($build)
       {
         // build JSON data file
-        $error = writeJSONfile($opdir . $_REQUEST["id"] . ".json", $json);
+        $error = writeJSONfile($trdir . $_REQUEST["id"] . ".json", $json);
         if ($error) throw new RuntimeException($error);
         
         // set _built field in $measurements
@@ -1005,7 +1005,7 @@
         else $measurements[$_REQUEST["id"]]["_built"] = 1;
         
         // rebuild JSON measurements_inflated file
-        $error = writeJSONfile($opdir . "_3_inflated.json", $measurements);
+        $error = writeJSONfile($trdir . "_3_inflated.json", $measurements);
         if ($error) throw new RuntimeException($error);
       }
       
@@ -1038,12 +1038,12 @@
       {
         // delete file
         $fn = $_REQUEST["id"] . (($ds == 'default')?"":"__".$ds) . "__" . $_REQUEST["f"];
-        $success = unlink($opdir . $fn);
+        $success = unlink($trdir . $fn);
         if (!$success) throw new RuntimeException("Could not remove " . $_REQUEST["f"]);
         
         // log in inflated json
         unset($measurements[$_REQUEST["id"]]["dataset"][$ds]["_bin"][$i]);
-        $error = writeJSONfile($opdir . "_3_inflated.json", $measurements);
+        $error = writeJSONfile($trdir . "_3_inflated.json", $measurements);
         if ($error) throw new RuntimeException($error);
       }
       goto STEP6;
@@ -1070,7 +1070,7 @@
     
     echo "    <strong><br>\n"   
        . "      library: " . $_REQUEST["lib"] . "<br>\n"
-       . "      operation: " . $op . "<br>\n"
+       . "      transaction: " . $tr . "<br>\n"
        . "      action: " . $action . "<br>\n"
        . "    </strong><br><br>\n\n";
     
@@ -1084,7 +1084,7 @@
       elseif ($action == "replace")
         $result = array();
       else 
-        throw new RuntimeException("Unknown action " . $action . " in operation " . $op);
+        throw new RuntimeException("Unknown action " . $action . " in transaction " . $tr);
       
       // walk through our measurements that need to be added or updated
       unset($measurements["_datasets"]);
@@ -1095,13 +1095,13 @@
         else
         {
           $result[$id] = $measurement;
-          $result[$id]["_operation"] = $op;
+          $result[$id]["_transaction"] = $tr;
           echo "<strong>Merged</strong> " . $id . ".<br>\n";
         }
       }
       
-      // make the resulting measurements in the operation directory and make hardlink into the library directory (= publish it)
-      $path = $opdir . "_5_result_" . date("YmdHis") . ".json";
+      // make the resulting measurements in the transaction directory and make hardlink into the library directory (= publish it)
+      $path = $trdir . "_5_result_" . date("YmdHis") . ".json";
       $error = writeJSONfile($path, $result);
       if ($error) throw new RuntimeException($error);
       unlink($libdir . "measurements.json");
@@ -1109,13 +1109,13 @@
       if ($success) echo "<strong>Published</strong> library file<br><br>\n";
       else          throw new RuntimeException("Could not publish the data into the library!");
       
-      // some administration in openops and closedops.json
-      $closedops = readJSONfile($libdir . "closedops.json", false);
-      $closedops[$op] = $operations[$op];
-      $closedops[$op]["timestamp"] = mdate();
-      unset($operations[$op]);
-      writeJSONfile($libdir . "closedops.json", $closedops);
-      writeJSONfile($libdir . "openops.json", $operations);
+      // some administration in transactions_open and transactions_closed.json
+      $transactions_closed = readJSONfile($libdir . "transactions_closed.json", false);
+      $transactions_closed[$tr] = $transactions[$tr];
+      $transactions_closed[$tr]["timestamp"] = mdate();
+      unset($transactions[$tr]);
+      writeJSONfile($libdir . "transactions_closed.json", $transactions_closed);
+      writeJSONfile($libdir . "transactions_open.json", $transactions);
       
       echo "      <span style='color:red'>Data successfully merged into library ". $_REQUEST["lib"] ."</span><br>\n";
     }
@@ -1126,9 +1126,9 @@
       eventLog("ERROR", $errormsg  . " [module_import: STEP9]", false, true);  //don't exit, but send alertmail
       echo "    <span style='color:red'>ERROR: " . $errormsg ."</span><br><br>";
       
-      // Update openops.json
-      $operations[$op]["step"] = 10;  // lock this operation, so that a sysadmin can look into it
-      $error = writeJSONfile(LIB_DIR . $_REQUEST["lib"] . "/openops.json", $operations);
+      // Update transactions_open.json
+      $transactions[$tr]["step"] = 10;  // lock this transaction, so that a sysadmin can look into it
+      $error = writeJSONfile(LIB_DIR . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
     }
   }
 

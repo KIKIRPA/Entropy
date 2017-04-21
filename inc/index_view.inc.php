@@ -56,8 +56,8 @@
   
   // data from the measurement json file
   $idbox_head = array_shift($measurement);
-  $operation = $measurement["_operation"];
-  unset($measurement["_operation"]);
+  $transaction = $measurement["_transaction"];
+  unset($measurement["_transaction"]);
 
 
 ?>
@@ -76,7 +76,6 @@
   $parenttype = datatypeParent($measurement["type"], $DATATYPES);
   switch (strtolower($DATATYPES[$parenttype]["type"]))
   {
-    case "spectrum":
     case "xy":
       require_once(INC_PATH . 'viewer_xy.inc.php');
       break;
@@ -107,7 +106,7 @@
       default:    //binary
         // check if the binary file exists!
         // TODO I guess there will be problems when the file extension has uppercase symbols...
-        if (file_exists(LIB_DIR . $showlib . "/" . $operation . "/" . $showid . "." . $extension))
+        if (file_exists(LIB_DIR . $showlib . "/" . $transaction . "/" . $showid . "." . $extension))
         {
           $dlbutton = strtoupper($extension);
           $dlcode = "BIN";

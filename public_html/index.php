@@ -92,13 +92,13 @@ replacement for index.php
       if (!isset($measurements[$showid]))
         $error = "The requested measurement does not exist";
       
-      // does the measurment have an _operation field?
-      if (isset($measurements[$showid]["_operation"]))
-       $datapath = LIB_DIR . $showlib . "/" . $measurements[$showid]["_operation"] . "/" . $showid;
+      // does the measurment have an _transaction field?
+      if (isset($measurements[$showid]["_transaction"]))
+       $datapath = LIB_DIR . $showlib . "/" . $measurements[$showid]["_transaction"] . "/" . $showid;
       else
-        $error = "The requested measurement has no operation id";
+        $error = "The requested measurement has no transaction id";
       
-      // find the data file in the operation LIB_DIR
+      // find the data file in the transaction LIB_DIR
       $data = readJSONfile($datapath . ".json", True);
       if (count($data) == 0)
         $error = "The requested measurement was not found or was empty";
