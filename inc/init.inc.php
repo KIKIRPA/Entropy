@@ -70,7 +70,7 @@
       
       //set $user
       if (isset($USERS[$is_logged_in])) 
-        $user = $user[$is_logged_in];
+        $user = $USERS[$is_logged_in];
       else //set $user and $is_logged_in to false and log
         $user = $is_logged_in = eventLog("WARNING", "Non-existant username stored in session: " . $is_logged_in, false, true);
     }
