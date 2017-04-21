@@ -8,8 +8,8 @@
 
   // default values
   $cfg = Array( "forceinstall"   => False,
-                "privpath"       => "/var/www/entropy/",
-                "pubpath"        => "/var/www/entropy/public_html/",
+                "privpath"       => "/usr/local/share/entropy/",
+                "pubpath"        => "/var/www/html/",
                 "htgroup"        => "www-data",
                 "app_short"      => "Entropy",
                 "app_long"       => "Entropy repository for analytical data",
