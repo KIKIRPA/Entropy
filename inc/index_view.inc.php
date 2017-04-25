@@ -64,13 +64,27 @@
         <div class='fullwidth'>
           <div class='boxed' id='redbox'>
             <h3><?php echo $idbox_head; ?></h3>
-            <?php foreach ($measurement as $a) echo "<p>" . $a . "\n"; ?>
+            <?php 
+              foreach ($measurement as $a) echo "<p>" . $a . "\n";
+            ?>
           </div>
 <?php
 
+  // dataset selection box
+  if (count($measurement["dataset"]) > 1)
+  {
+    echo "          <div class='boxed' id='greybox'>\n";
+    echo "            <h3>Datasets</h3>";
+    foreach ($measurement["dataset"] as $dsid => $dsval)
+    {
+      if ($dsid == $showds) echo "<p><strong>" . $showds . "</strong>\n";
+      else                  echo "<p><a href='" . $_SERVER["PHP_SELF"] . "?lib=" . $showlib . "&show=" . $showspectrum . "&ds=" . $dsid . "'>" . $dsid . "</a>\n";
+    }
+    echo "          </div>\n";
+  }
 
   // metadata can be saved on different levels, override lesser priority metadata
-  $meta = overrideMeta($data, $ds);
+  $meta = overrideMeta($data, $showds);
 
   // determine datatype and call the correct viewer module
   $parenttype = datatypeParent($measurement["type"], $DATATYPES);

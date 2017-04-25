@@ -132,14 +132,14 @@ replacement for index.php
     else 
       $mode = "view";
 
-    if (!isset($ds))  //if at this point no dataset is set, either choose 'default', or the first
+    if (!isset($showds))  //if at this point no dataset is set, either choose 'default', or the first
     {
       if (isset($measurement["dataset"]["default"]))
-        $ds = "default";
+        $showds = "default";
       else
       {
         reset($measurement["dataset"]);
-        $ds = key($measurement["dataset"]);
+        $showds = key($measurement["dataset"]);
       }
     }
   }
