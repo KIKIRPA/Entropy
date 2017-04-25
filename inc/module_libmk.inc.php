@@ -47,7 +47,7 @@
     }
     
     // create directory?
-    if (!mkdir2(LIB_DIR . $id . "/"))
+    if (!mkdir2(LIB_PATH . $id . "/"))
     {
       echo "<span style='color:red'>ERROR: could not create directory.</span><br><br>\n";
       eventLog("ERROR", "Could not create directory. [module_libmk]", false, true);

@@ -36,7 +36,7 @@
       echo "      <span style='color:red'>ERROR: " . $error . "!</span><br><br>\n";
     
     // BACKUP DATA DIR
-    if (!backupFile(LIB_DIR, $id))
+    if (!backupFile(LIB_PATH, $id))
       echo "      <span style='color:red'>ERROR: failed to remove the data directory!</span><br><br>\n";
     
   }

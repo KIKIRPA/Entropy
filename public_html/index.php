@@ -82,7 +82,7 @@ replacement for index.php
   if (!$mode)
   {
     // read measurements list file
-    $measurements = readJSONfile(LIB_DIR . $showlib . "/measurements.json", False);
+    $measurements = readJSONfile(LIB_PATH . $showlib . "/measurements.json", False);
     
     if (isset($_REQUEST["id"]))
     {
@@ -94,11 +94,11 @@ replacement for index.php
       
       // does the measurment have an _transaction field?
       if (isset($measurements[$showid]["_transaction"]))
-       $datapath = LIB_DIR . $showlib . "/" . $measurements[$showid]["_transaction"] . "/" . $showid;
+       $datapath = LIB_PATH . $showlib . "/" . $measurements[$showid]["_transaction"] . "/" . $showid;
       else
         $error = "The requested measurement has no transaction id";
       
-      // find the data file in the transaction LIB_DIR
+      // find the data file in the transaction LIB_PATH
       $data = readJSONfile($datapath . ".json", True);
       if (count($data) == 0)
         $error = "The requested measurement was not found or was empty";

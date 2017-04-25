@@ -107,7 +107,7 @@
     {
       case "dx":
       case "jdx":
-        if (isset($meta["jcamptemplate"]) AND file_exists(LIB_DIR . $showlib . "/templates/" . $meta["jcamptemplate"]))
+        if (isset($meta["jcamptemplate"]) AND file_exists(LIB_PATH . $showlib . "/templates/" . $meta["jcamptemplate"]))
         {
           $dlbutton = "JCAMP-DX";
           $dlcode = "DX";
@@ -120,7 +120,7 @@
       default:    //binary
         // check if the binary file exists!
         // TODO I guess there will be problems when the file extension has uppercase symbols...
-        if (file_exists(LIB_DIR . $showlib . "/" . $transaction . "/" . $showid . "." . $extension))
+        if (file_exists(LIB_PATH . $showlib . "/" . $transaction . "/" . $showid . "." . $extension))
         {
           $dlbutton = strtoupper($extension);
           $dlcode = "BIN";

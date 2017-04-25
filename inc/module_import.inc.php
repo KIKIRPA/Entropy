@@ -24,15 +24,15 @@
   
   $action = false;
   
-  if (!file_exists(LIB_DIR . $_REQUEST["lib"]))
-    if (!mkdir2(LIB_DIR . $_REQUEST["lib"] . "/"))
+  if (!file_exists(LIB_PATH . $_REQUEST["lib"]))
+    if (!mkdir2(LIB_PATH . $_REQUEST["lib"] . "/"))
     {
       echo "<span style='color:red'>ERROR: Could not make library directory for: " . $id . "!</span><br><br>\n";
       eventLog("ERROR", "Could not make library directory for: " .$id . " [module_import]", true, false);
     }
   
-  if (file_exists(LIB_DIR . $_REQUEST["lib"] . "/transactions_open.json"))
-    $transactions = readJSONfile(LIB_DIR . $_REQUEST["lib"] . "/transactions_open.json", false);
+  if (file_exists(LIB_PATH . $_REQUEST["lib"] . "/transactions_open.json"))
+    $transactions = readJSONfile(LIB_PATH . $_REQUEST["lib"] . "/transactions_open.json", false);
   else
     $transactions = array();
   
@@ -51,7 +51,7 @@
         throw new RuntimeException('Unauthorised access to transaction ' . $tr);
       
       // check if the transaction dir exists
-      $trdir = LIB_DIR . $_REQUEST["lib"] . "/" . $tr . "/";
+      $trdir = LIB_PATH . $_REQUEST["lib"] . "/" . $tr . "/";
       if (!file_exists($trdir))
         throw new RuntimeException('Upload directory was not found for '. $tr);
         
@@ -60,7 +60,7 @@
       {
         rmdir2($trdir);
         unset($transactions[$tr]);
-        $error = writeJSONfile(LIB_DIR . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
+        $error = writeJSONfile(LIB_PATH . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
         if ($error) throw new RuntimeException($error);
         goto STEP1;
       }
@@ -78,7 +78,7 @@
                                "action" => "none",
                                "step"   => 1
                               );
-      $trdir = LIB_DIR . $_REQUEST["lib"] . "/" . $tr . "/";
+      $trdir = LIB_PATH . $_REQUEST["lib"] . "/" . $tr . "/";
       //don't write transactions_open.json at this time, it will create an empty transaction each
       //time STEP1 is opened
     }
@@ -292,7 +292,7 @@
       // Update transactions_open.json
       $transactions[$tr]["action"] = $action;
       $transactions[$tr]["step"] = 3;
-      $error = writeJSONfile(LIB_DIR . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
+      $error = writeJSONfile(LIB_PATH . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
       if ($error) throw new RuntimeException($error);
     }
     catch (RuntimeException $e) 
@@ -324,7 +324,7 @@
       - empty fields (warnings)
     */
 
-    $existing = readJSONfile(LIB_DIR . $_REQUEST["lib"] . "/measurements.json");  //if file does not exist: empty array
+    $existing = readJSONfile(LIB_PATH . $_REQUEST["lib"] . "/measurements.json");  //if file does not exist: empty array
     $existing = array_keys($existing);
     
     foreach ($DATATYPES as $type => $tval) $types_sani[sanitizeStr($type, "", "-+:^", True)] = $type;
@@ -450,7 +450,7 @@
               $col = "orange";
               array_push($tt, "[WARNING] Empty: downloading JCAMP-DX will not be possible"); 
             }
-            elseif (!file_exists(LIB_DIR . $_REQUEST["lib"] . "/jcamptemplates/" . $value))
+            elseif (!file_exists(LIB_PATH . $_REQUEST["lib"] . "/jcamptemplates/" . $value))
             {
               $b++;
               $col = "orange";
@@ -642,7 +642,7 @@
       
       // Update transactions_open.json
       $transactions[$tr]["step"] = 5;
-      $error = writeJSONfile(LIB_DIR . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
+      $error = writeJSONfile(LIB_PATH . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
       if ($error) throw new RuntimeException($error);
     }
     catch (RuntimeException $e) 
@@ -1074,7 +1074,7 @@
        . "      action: " . $action . "<br>\n"
        . "    </strong><br><br>\n\n";
     
-    $libdir = LIB_DIR . $_REQUEST["lib"] . "/";
+    $libdir = LIB_PATH . $_REQUEST["lib"] . "/";
     
     try 
     {
@@ -1128,7 +1128,7 @@
       
       // Update transactions_open.json
       $transactions[$tr]["step"] = 10;  // lock this transaction, so that a sysadmin can look into it
-      $error = writeJSONfile(LIB_DIR . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
+      $error = writeJSONfile(LIB_PATH . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
     }
   }
 
