@@ -167,12 +167,12 @@
         <tr>
           <td><label accesskey='v' for='view' class='label'>view</label><span style='color:red'>*</span></td>
           <td><?php if (!$lp)
-                      echo "            <input type='radio' id='view' name='view' value='locked'" . (empty($preset["view"]) or $preset["view"] == "locked")?" checked>":">" . "Locked (viewing this library requires logging in as a user with viewing rights)<br>\n"
-                         . "            <input type='radio' id='view' name='view' value='hidden'" . ($preset["view"] == "hidden")?" checked>":">" . "Hidden (viewing this library is open, but requires a non-disclosed link)<br>\n"
-                         . "            <input type='radio' id='view' name='view' value='public'" . ($preset["view"] == "public")?" checked>":">" . "Public (viewing this library is open, with direct access via the menu)\n";
+                      echo "            <input type='radio' id='view' name='view' value='locked'" . ((empty($preset["view"]) or $preset["view"] == "locked") ? " checked>" : ">") . "Locked (viewing this library requires logging in as a user with viewing rights)<br>\n"
+                         . "            <input type='radio' id='view' name='view' value='hidden'" . (($preset["view"] == "hidden") ? " checked>" : ">") . "Hidden (viewing this library is open, but requires a non-disclosed link)<br>\n"
+                         . "            <input type='radio' id='view' name='view' value='public'" . (($preset["view"] == "public") ? " checked>" : ">") . "Public (viewing this library is open, with direct access via the menu)\n";
                     else
-                      echo "            <input type='radio' id='view' name='view' value='hidden'" . (empty($preset["view"]) or $preset["view"] == "hidden")?" checked>":">" . "Hidden<br>\n"
-                         . "            <input type='radio' id='view' name='view' value='public'" . ($preset["view"] == "public")?" checked>":">" . "Public\n";                    
+                      echo "            <input type='radio' id='view' name='view' value='hidden'" . ((empty($preset["view"]) or $preset["view"] == "hidden") ? " checked>" : ">") . "Hidden<br>\n"
+                         . "            <input type='radio' id='view' name='view' value='public'" . (($preset["view"] == "public") ? " checked>" : ">") . "Public\n";                    
               ?>
           </td>
         </tr>
