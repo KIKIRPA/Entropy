@@ -96,56 +96,60 @@
   }
 
   // downloadbuttons
-  echo "          <div class='boxed'>\n"
-     . "            <h3>Download</h3>\n"
-     . "            <div style='text-align:center'>\n";
-                
-  foreach ($LIBS[$showlib]["allowformat"] as $extension)
+  $dlList = array();
+
+  // 1. convert from json data files
+  //    TODO: integrate convert-framework (check if we are able to convert to $format, preferably replacing the switch by a function)
+  foreach ($LIBS[$showlib]["allowformat"] as $format)
   {
-    $dlcode = $dlbutton = NULL;
-    switch ($extension) 
+    switch ($format) 
     {
       case "dx":
       case "jdx":
         if (isset($meta["jcamptemplate"]) AND file_exists(LIB_PATH . $showlib . "/templates/" . $meta["jcamptemplate"]))
-        {
-          $dlbutton = "JCAMP-DX";
-          $dlcode = "DX";
-        }
+          $dlList["JCAMP-DX"] = "conv=jcampdx";
         break;
-      case "txt": //ascii data (may need to be converted)
-        $dlbutton = strtoupper($extension);
-        $dlcode = "ASCII";
+      case "txt":
+        $dlList["TXT"] = "conv=ascii";
         break;
-      default:    //binary
-        // check if the binary file exists!
-        // TODO I guess there will be problems when the file extension has uppercase symbols...
-        if (file_exists(LIB_PATH . $showlib . "/" . $transaction . "/" . $showid . "." . $extension))
-        {
-          $dlbutton = strtoupper($extension);
-          $dlcode = "BIN";
-        }
-        break;
-    }
-    
-    if ($dlcode != NULL)
-    {
-      $dlcode = encode($dlcode . "||" . $showid . "||" . $extension, CRYPT_KEY);
-      
-      // if cookie exists and is valid: open popup; else direct download
-      if ($cookie)
-        echo "              <button class=\"button\" type=\"button\" value=\"javascript:void(0)\" onclick=\"window.location.href='".$_SERVER["PHP_SELF"]."?lib=".$showlib."&show=".$showspectrum."&dl=".$dlcode."'\">".$dlbutton."</button>\n";
-      else
-        echo "              <button class=\"button\" type=\"button\" value=\"javascript:void(0)\" onclick=\"$('form input[name=dl]').val('".$dlcode."');document.getElementById('light').style.display='block';document.getElementById('fade').style.display='block'\">".$dlbutton."</button>\n";
     }
   }
 
+  // 2. binary uploaded files
+  $prefix = LIB_PATH . $showlib . "/" . $transaction . "/" . $showid . (($showds == 'default')?"":"__".$showds); 
+  $binfiles = glob($prefix . "__*");  //by using "__*" we exclude the original (converted) data files, json data files and annotations
+  foreach ($binfiles as $f)
+  {
+    // button caption = EXT (ORIG BIN FILENAME)
+    $button = strtolower(pathinfo($f, PATHINFO_EXTENSION));
+    $button .= "(" . str_replace("_", " ", pathinfo(str_replace($prefix, '', $f), PATHINFO_FILENAME)) . ")";
+    $dlList[$button] = "bin=" . $f;
+  }
+
+  // 3. create html
+  if (!empty($dlList))
+  {
+    echo "          <div class='boxed'>\n"
+       . "            <h3>Download</h3>\n"
+       . "            <div style='text-align:center'>\n";
+
+    foreach($dlList as $code => $caption)
+    {
+      $code = encode($code, CRYPT_KEY);
+      // if cookie exists and is valid: open popup; else direct download
+      if ($cookie)
+        echo "              <button class=\"button\" type=\"button\" value=\"javascript:void(0)\" onclick=\"window.location.href='" . $_SERVER["PHP_SELF"] . "?lib=" . $showlib . "&show=" . $showspectrum . "&dl=" . $code . "'\">" . $caption . "</button>\n";
+      else
+        echo "              <button class=\"button\" type=\"button\" value=\"javascript:void(0)\" onclick=\"$('form input[name=dl]').val('" . $code . "');document.getElementById('light').style.display='block';document.getElementById('fade').style.display='block'\">" . $caption . "</button>\n";
+    }
+  
+    echo "            </div>\n"
+       . "            <p><i>The complete " . $LIBS[$showlib]["name"] . " can be requested by email.</i>\n"
+       . "            <p><i>By downloading this file you agree to the terms described in the licence.</i>\n"
+       . "          </div>\n";  
+  }
 
 ?>
-            </div>
-            <p><i>The complete <?php echo $LIBS[$showlib]["name"]; ?> can be requested by email.</i>
-            <p><i>By downloading this file you agree to the terms described in the licence.</i>
-          </div>
           
           <div class='boxed'>
             <div style="width: 50%; float: left;"><h3>Licence</h3></div>
