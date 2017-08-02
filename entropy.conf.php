@@ -42,7 +42,8 @@
   const TWOPASS_ENABLE = False;          //enable the use of twopass verification (e-mail trustcodes to unkown IPs)
   
   // cookie properties
-  const COOKIE_NAME    = "rememberme";   //cookie name.  Warning: changing this will void all existing cookies! 
+  const LOG_DL         = True;           //log downloads (if true, downloads require name/institution/e-mail via form, downloadcookie or login)
+  const COOKIE_NAME    = "downloadid";   //cookie name.  Warning: changing this will void all existing cookies! 
   const COOKIE_EXPIRE  = 31536000;       //60*60*24*365.  use time() + COOKIE_EXPIRE
   const CRYPT_KEY      = "Tqh1QXGc";     //key to encode "dl" and "cookie".  Warning: changing this will void all existing cookies!
 

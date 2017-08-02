@@ -7,31 +7,12 @@
     exit("Direct access not permitted.");
   }
 
-
-  $units = datatypeUnits($parenttype, $DATATYPES, $data["dataset"][$ds]["units"]);
-
-  if (isset($data["dataset"][$ds]["anno"]))
-  {
-    if (is_array($data["dataset"][$ds]["anno"]))
-    {
-      $anno = array();
-      foreach ($data["dataset"][$ds]["anno"] as $i => $a)
-      {
-        $anno[$i] = array();
-        $anno[$i]["series"] = $idbox_head;
-        $anno[$i] = array_merge($anno[$i], $a);
-      }
-    }
-  }
-
   //TEST: possible to move the <script src=...datatables.js> from the header to here (so it only gets loaded when necessary?
 
 ?>
 
-          <div id="graphdiv" class="nonboxed" style="height:400px; float: left;"></div>
-          
+          <div id="graphdiv" class="nonboxed" style="height:400px; float: left;"></div>          
           <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.js' async></script>
-
           <script type="text/javascript">
             g = new Dygraph(
                               document.getElementById("graphdiv"),
@@ -48,7 +29,6 @@
                             );
 
           <?php if (isset($anno)) echo "g.ready(function() { g.setAnnotations(" . json_encode($anno) . "); });"; ?>
-
           </script>
 <?php
             

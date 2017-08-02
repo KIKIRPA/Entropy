@@ -49,13 +49,9 @@
                              'institution' => $institution,
                              'email'       => $email );
     
-    // check if name and institution are not empty
-    if (($cookiearray['name'] == '') or ($cookiearray['institution'] == ''))
-      return eventLog("WARNING", "cookie data is incomplete [tools_cookie.verifycookie]", false); 
-      
-    // check email and fiels; security for scripts?
-    if (!filter_var($cookiearray['email'], FILTER_VALIDATE_EMAIL))
-      return eventLog("WARNING", "cookie: invalid email [tools_cookie.verifycookie]", false); 
+    // check if name and institution are not empty and email is a valid
+    if (($cookiearray['name'] == '') or ($cookiearray['institution'] == '') or !filter_var($cookiearray['email'], FILTER_VALIDATE_EMAIL))
+      return false; 
       
     return $cookiearray;
   }
@@ -79,10 +75,11 @@
     
     unset($_COOKIE[COOKIE_NAME]);
     setcookie(COOKIE_NAME, '', time() - 3600, $cpath); // empty value and expire time at a past time
+    return True;
   }
   
   
-  function encode($string,$key)
+  function encode($string, $key = CRYPT_KEY))
   {
     $j = 0;
     $hash = "";
@@ -102,7 +99,7 @@
   }
 
   
-  function decode($string,$key)
+  function decode($string, $key = CRYPT_KEY))
   {
     $j = 0;
     $hash = "";
