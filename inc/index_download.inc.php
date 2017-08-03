@@ -8,32 +8,112 @@
   }
 
 
-// dump old code from index_view
+/* ***************
+    I. conditions
+   *************** 
+   
+   1. evaluate $_REQUEST
+   2. evaluate download code 
+   3. evaluate download logging (via login, cookie or form)
+   => if conditions are not met, fallback to view module, with error notification
+*/
 
-// cookie stuff
-  // option 1: cookie exists and is valid   --> $cookie = array(name, inst, email) + update cookie
-  // option 2: cookie exists but is invalid --> $cookie = False
-  // option 3: no cookie, but cookie form field is checked and data is valid 
-  //                                        --> $cookie = array(name, inst, email) + make cookie
-  // option 4: no cookie, and cookie form field is unchecked or data invalid
-  //                                        --> $cookie = False
- 
-  if (isset($_COOKIE[COOKIE_NAME])) 
+  try
   {
-    $cookie = verifycookie($_COOKIE[COOKIE_NAME]);   // in case of false data, this will output False
-    if ($cookie) $cookie = makecookie($cookie);      // if not false: update cookie; will output True
-    else removecookie();                             // remove invalid cookie TODO: invalid cookie notification!
-  }
-  elseif (isset($_REQUEST["cookie"])
+    // 2. evaluate download code
+    $code = decode($_REQUEST["dl"]);
+    if ($code == "") throw new Exception("Download failed: nothing to download");
+  
+    $code = explode("=", $code);
+    if (count($code) != 2) throw new Exception("Download failed: error in download code");
+
+    if ($code[0] == "bin")
+    { // search the binary file
+      if (!file_exists($code[1])) throw new Exception("Download failed: binary file not found.");
+    }
+    elseif ($code[0] == "conv")
+    { // is conversion allowed in library file?  TODO: is allowed in conversion settings json?
+      if (!in_array($code[1], $LIBS[$showlib]["allowformat"])) throw new Exception("Download failed: conversion not allowed.");
+    }
+    else throw new Exception("Error in download code"); 
+
+    // 3. evaluate download logging (via login, cookie or form)
+    if (LOG_DL)
+    {
+      if (isset($_COOKIE[COOKIE_NAME]))
+      {
+        if (!verifycookie($_COOKIE[COOKIE_NAME]))
+        {
+          removecookie();   // remove invalid cookie
+          throw new Exception("Download failed: invalid cookie.");
+        }
+      }
+      elseif (    isset($_REQUEST["cookie"])
               and isset($_REQUEST["name"]) 
               and isset($_REQUEST["institution"]) 
-              and isset($_REQUEST["email"])
-          )
-  { 
-    $cookie = verifycookie($_REQUEST["name"], $_REQUEST["institution"], $_REQUEST["email"]);
-    if ($cookie) $cookie = makecookie($cookie);
+              and isset($_REQUEST["email"]) )
+      {
+        $cookie = verifycookie($_REQUEST["name"], $_REQUEST["institution"], $_REQUEST["email"]);
+        if ($cookie)
+        {
+          if (isset($_REQUEST["cookie"])) $cookie = makecookie($cookie); // set cookie, if the user checked the checkbox
+        }
+        else throw new Exception("Download failed: invalid name, institution or e-mail address.");
+      }
+      elseif (!$is_logged_in)                         
+        throw new Exception("Download failed: no identification.");
+    }
   }
-  else 
-    $cookie = false;     // if false: show dl form
+  catch (Exception $e)
+  {
+    $errormsg = $e->getMessage();
+    eventLog("WARNING", $errormsg  . " [download]");
+    
+    // FALLBACK TO VIEW MODULE
+    require_once(INC_PATH . 'index_view.inc.php');
+  }
+
+
+  try 
+  {
+   
+  }
+  catch (Exception $e)
+  {
+    $errormsg = $e->getMessage();
+    eventLog("WARNING", $errormsg  . " [index]");
+    echo "    <span style='color:red'>WARNING: " . $errormsg . "</span><br><br>";
+    $mode = "view";
+  }
+
+
+
+
+
+
+
+
+
+/* ******************
+    II. calculations
+   ****************** */
+
+   if ($code[1] == "conv")
+   {
+
+   }
+   elseif ($code[1] == "bin")
+   {
+
+   }
+
+
+/* *************
+    III. output
+   ************* */
+
+
+
+
 
 ?>

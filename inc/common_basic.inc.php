@@ -74,10 +74,11 @@
       mdate($format, $microtime)            outputs timestamp with a optionally supplied $format (default 'Y-m-d H:i:s.u')
                                              optional takes another microtime
       
-      eventLog($cat, $msg, $fatal, $mail)   writes an eventmessage ($msg) of category ($cat, eg ERROR, WARNING, ...) to the event log file
-                                             when optional $fatal is true it will stop all further code execution.
-                                             when optional $mail is true it will send an email to the sysadmin; or if set to an valid address to this address
-                                             !! returns false (if not fatal)!!
+      eventLog($cat, $msg, $fatal = false, $mail = false)   
+          writes an eventmessage ($msg) of category ($cat, eg ERROR, WARNING, ...) to the event log file
+          when optional $fatal is true it will stop all further code execution.
+          when optional $mail is true it will send an email to the sysadmin; or if set to an valid address to this address
+          !! returns false (if not fatal)!!
     
    **************************************************************************************************************************/
   

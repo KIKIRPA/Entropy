@@ -147,16 +147,8 @@ replacement for index.php
   // EVALUATE $_REQUEST["dl"]
   if (!$mode)
   {
-    if (isset($_REQUEST["dl"]))
-    {
-      //TODO if we can convert it                 --> $mode = "dl";
-      //TODO elseif it is an existing binary file --> $mode = "dl";
-      //TODO else                                 --> error + $mode = "view";
-      //TODO it may be better to split "dl" up into "convert" and "bin"; 
-      //     we don't want to check this 3times (on view page, here and in dl page)
-      $mode = "dl";
-    }
-    else $mode = "view";
+    if (isset($_REQUEST["dl"])) $mode = "dl";
+    else                        $mode = "view";
   }
   
   

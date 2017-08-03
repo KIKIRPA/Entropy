@@ -28,9 +28,6 @@
    
   function verifycookie($name, $institution = NULL, $email = NULL)
   {
-    //global $cryptkey;
-    
-    // TODO: if false data is supplied: log to errorlog!! 
     if (($institution == NULL) and ($email == NULL))
     {
       $cookiearray = explode("||", decode($name, CRYPT_KEY));
@@ -49,8 +46,10 @@
                              'institution' => $institution,
                              'email'       => $email );
     
-    // check if name and institution are not empty and email is a valid
-    if (($cookiearray['name'] == '') or ($cookiearray['institution'] == '') or !filter_var($cookiearray['email'], FILTER_VALIDATE_EMAIL))
+    // check if name and institution are at least 2 chars and email is a valid
+    if (   (strlen($cookiearray['name']) < 2)  
+        or (strlen($cookiearray['institution']) < 2) 
+        or !filter_var($cookiearray['email'], FILTER_VALIDATE_EMAIL) )
       return false; 
       
     return $cookiearray;
@@ -59,9 +58,6 @@
   
   function makecookie($cookiearray, $cpath = './')
   {
-    // NOTE: we expect the cookiearray to be in the correct array-format and verified (using readcookie())
-    
-    //global $cryptkey, $cname, $cexpire;
     $cvalue =  encode(implode("||", $cookiearray), CRYPT_KEY);   
     
     setcookie(COOKIE_NAME, $cvalue, time() + COOKIE_EXPIRE, $cpath);
@@ -71,15 +67,13 @@
    
   function removecookie($cpath = './')
   {
-    //global $cname;
-    
     unset($_COOKIE[COOKIE_NAME]);
     setcookie(COOKIE_NAME, '', time() - 3600, $cpath); // empty value and expire time at a past time
     return True;
   }
   
   
-  function encode($string, $key = CRYPT_KEY))
+  function encode($string, $key = CRYPT_KEY)
   {
     $j = 0;
     $hash = "";
@@ -99,7 +93,7 @@
   }
 
   
-  function decode($string, $key = CRYPT_KEY))
+  function decode($string, $key = CRYPT_KEY)
   {
     $j = 0;
     $hash = "";
