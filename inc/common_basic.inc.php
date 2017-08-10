@@ -105,6 +105,29 @@
     
     return filter_var($string, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
   }
+
+
+  function detect_bom_encoding($str)
+  {
+    if ($str[0] == chr(0xEF) && $str[1] == chr(0xBB) && $str[2] == chr(0xBF)) 
+      return array(substr($str, 3), 'UTF-8');
+    elseif ($str[0] == chr(0x00) && $str[1] == chr(0x00) && $str[2] == chr(0xFE) && $str[3] == chr(0xFF))
+      return array(substr($str, 4), 'UTF-32BE');
+    elseif ($str[0] == chr(0xFF) && $str[1] == chr(0xFE)) 
+    {
+      if ($str[2] == chr(0x00) && $str[3] == chr(0x00))
+        return array(substr($str, 4), 'UTF-32LE');
+      return array(substr($str, 2), 'UTF-16LE');
+    }
+    elseif ($str[0] == chr(0xFE) && $str[1] == chr(0xFF))
+      return array(substr($str, 2), 'UTF-16BE');
+    else
+    {
+      $enc = mb_detect_encoding($str, 'auto', true);
+      if ($enc) return array($str, $enc);
+      else return array($str, 'Windows-1252'); //fall-back
+    }
+  }
   
   
   function calcPermMod($permtable, $lib = false)
@@ -165,8 +188,6 @@
     // if we are not returned allready, do it now (with no permissions)
     return false;
   }
-  
-  
   
   
   function readJSONfile($path, $dieOnError = false)

@@ -21,10 +21,10 @@
     if (is_array($content))
     {
       $content = json_encode($content, JSON_PRETTY_PRINT);
-      if (is_null($content)) 
+      if (empty($content)) 
         return "could not make json";
     }
-    
+
     //backup old file (if it exists)
     if (backupFile(pathinfo($file, PATHINFO_DIRNAME) . "/", pathinfo($file, PATHINFO_BASENAME)))
     {
@@ -34,8 +34,6 @@
     }
     else return "failed to make backup";
   }
-  
-
   
   
   function backupFile($dir, $old, $new = false)

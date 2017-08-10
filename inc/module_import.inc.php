@@ -282,16 +282,17 @@
         throw new RuntimeException('Could not open the CSV file.');
       
       // interpret CSV header
-      $headers = fgets($handle);
+      $line = fgets($handle);
+      list($line, $enc) = detect_bom_encoding($line);     // detect encoding using the UTF byte order mark, and return string without encoding
+      $line = mb_convert_encoding($line, "UTF-8", $enc);  // convert to UTF-8
       $delimiter = FALSE;
-      $delimiters = array(',', ';', '\t', '|');
+      $delimiters = array(",", ";", "\t", "|");
       $required = array('id', 'type');    // required field in the header
       foreach ($delimiters as $d)
       {
-        $header = str_getcsv($headers, $d, '"', "\\");
-        $header = array_map('trim', $header);        // trim all items
-        $header = array_map('utf8_encode', $header);
-        $temp = array_map('strtolower', $header);    // lowercase all items
+        $header = str_getcsv($line, $d, '"', "\\");                       // try breaking it down with delimiter $d
+        $header = array_map('trim', $header);                             // trim all items
+        $temp = array_map('strtolower', $header);                         // lowercase all items
         if (count(array_intersect($temp, $required)) == count($required)) // if all required items are in $test
         {
           $delimiter = $d;
@@ -301,14 +302,16 @@
         }
       }
       if (!$delimiter)
-        throw new RuntimeException('Could not interpret the CSV file (could not find all required fields: ' . implode(',', $required) . ').');
+        throw new RuntimeException('Could not interpret the CSV file (could not find all required fields: ' . implode(', ', $required) . ').');
 
       // Read all measurements into an array
       $key = 'id';
       $measurments = array();
-      while ($line = fgetcsv($handle, 0, $delimiter, '"', "\\"))
+      while ($line = fgets($handle))
       {        
-        $line = array_map('utf8_encode', $line);   //excel makes usually iso8859-1 (latin-1), but json nulls all vars with special characters
+        if (substr($enc, 0, 6) == 'UTF-16') $line = substr($line,1);  // fgets is probably confused by UTF-16 when reading newlines; this seems to do the trick
+        $line = mb_convert_encoding($line, "UTF-8", $enc);            // convert to UTF-8
+        $line = str_getcsv($line, $delimiter, '"', "\\");
         $temp = array();
         foreach ($line as $i => $value) 
         {
@@ -325,8 +328,10 @@
         unset($id);           
       }
 
+      if (isset($measurements[""])) unset($measurements[""]);
+
       // close CSV file
-      fclose($handle);      
+      fclose($handle);
       
       // Save .json
       $error = writeJSONfile($trdir . "_2_flat.json", $measurements);
