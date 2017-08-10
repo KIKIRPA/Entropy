@@ -26,7 +26,7 @@ Entropy is under heavy development and may or may not function. Expect it to fai
 - Support for mapping/imaging data
 - Implementation of a CSS framework
 
-### M2
+### M3
 - API
 - Implement database storage (ElasticSearch, MongoDB...)
 - ...
