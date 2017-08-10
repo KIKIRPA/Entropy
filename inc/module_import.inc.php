@@ -176,13 +176,15 @@
         <p>All measurements have to be described (metadata) in a table, saved as comma separated values (CSV). 
         <p>Rules for the CSV-table: <br>
         <ul>
-          <li>The first line contain the column headers.</li>
-          <li>Each measurement is written on a new line.</li>
-          <li>There are two required columns: "<strong>id</strong>", a unique identifier for each measurement, and "<strong>type</strong>", defining the (supported) data type. If multiple datasets are contained within a single measurements, this column must be the data type of the primary dataset. Other datasets can have different data types, but will only be displayed when specifically asked by the user.</li>
-          <li>If you want to enable downloading the files in JCAMP-DX format, a "<strong>jcamptemplate</strong>" column has to be present pointing to the uploaded dxt file.</li>
-          <li>Not a strict requirement, but it is recommended to use the main column headers "<strong>meta:sample</strong>", "<strong>meta:samplesource</strong>", "<strong>meta:instrument</strong>", "<strong>meta:parameters</strong>", "<strong>meta:measurement</strong>" and "<strong>meta:contributor</strong>". The "meta"-prefix is optional, but advised. These and other fields can be recursively subdivided as required using a semicolon as separator, e.g. "meta:sample:CI number", "meta:samplesource:0:sample identifier". If a field is subdivided in subfields, the parent field should not be used (or: you can't have data in a "meta:sample" and a "meta:sample:CI name" column for a given measurement; and it is not advised to use both in the same transaction).</li>
+          <li>CSV files can be generated using Microsoft Excel, LibreOffice, Apache OpenOffice and similar programs. Save the file as CSV or Text format (recognised delimiters are commas, semicolons, tabs and | signs). If your text contains special characters (accents, umlauts...), consider to store the file as 'Unicode Text' in Excel.</li>
+          <li>The first line is the header, defining (sub)field names. Columns without a (sub)field name will be neglected.</li>
+          <li>Each measurement is written on a new line. Lines without (unique) "id" will be neglected.</li>
+          <li>There are two required columns: "<strong>id</strong>", a unique identifier for each measurement, and "<strong>type</strong>", defining the (supported) data type.</li>
+          <li>It is recommended to use the main column headers "<strong>meta:sample</strong>", "<strong>meta:samplesource</strong>", "<strong>meta:instrument</strong>", "<strong>meta:parameters</strong>", "<strong>meta:measurement</strong>" and "<strong>meta:contributor</strong>". The "meta"-prefix is optional, but strongly advised. These and other fields can be recursively subdivided as required using a semicolon as separator, e.g. "meta:sample:CI number", "meta:samplesource:0:sample identifier". If a field is subdivided in subfields, the parent field should not be used (or: you can't have data in a "meta:sample" and a "meta:sample:CI name" column simultaneously for a given measurement; and it is not advised to use both in the same transaction).</li>
           <li>If each measurement only contains a single dataset, the system will create a "default" dataset. You can overrule this behaviour by defining an empty column e.g. "dataset:baseline corrected".</li>
           <li>If all or some measurements contain multiple datasets, the CSV table has to contain multiple datasets, e.g. "dataset:baseline corrected" and "dataset:original data". Dataset-specific metadata can be supplied as subfields of "dataset:original data:meta" and will overrule common metadata. It is advised to store common metadata as subfield of "meta", e.g. "meta:sample:CI number". Metadata in "dataset:x:meta" will overrule those in "meta:", which will in turn overrule those defined directly.</li>
+          <li>In case of multiple datasets within a single measurement, the "type" field must be the data type of the primary (first) dataset. Other datasets can have different data types, defined in "dataset:x:type".</li>
+          <li>If you want to enable downloading the files in JCAMP-DX format, a "<strong>jcampdxtemplate</strong>" column has to be present pointing to the uploaded dxt file. This element can be declared for all datasets, or defined for each dataset separately when used as a subfield "dataset:x:jcampdxtemplate".</li>
         </ul>
         <form enctype="multipart/form-data" action="<?php echo $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&step=2"; ?>" method="POST">
           <input type="hidden" name="MAX_FILE_SIZE" value="2000000">
@@ -275,15 +277,56 @@
       if ($error) 
         throw new RuntimeException($error);
       
-      // reread CSV file
+      // read CSV file
       if (($handle = fopen($trdir . "_1_" . $action . ".csv", "r")) == false)
         throw new RuntimeException('Could not open the CSV file.');
       
-      // Convert to array
-      $measurements = csv2array($handle, "id", true); //outputs flat array or error string, keep emtpy fields
-      fclose($handle);
-      if (!is_array($measurements))
-        throw new RuntimeException($measurements);      
+      // interpret CSV header
+      $headers = fgets($handle);
+      $delimiter = FALSE;
+      $delimiters = array(',', ';', '\t', '|');
+      $required = array('id', 'type');    // required field in the header
+      foreach ($delimiters as $d)
+      {
+        $header = str_getcsv($headers, $d, '"', "\\");
+        $header = array_map('trim', $header);        // trim all items
+        $header = array_map('utf8_encode', $header);
+        $temp = array_map('strtolower', $header);    // lowercase all items
+        if (count(array_intersect($temp, $required)) == count($required)) // if all required items are in $test
+        {
+          $delimiter = $d;
+          foreach ($required as $r)
+            $header[array_search($r, $temp)] = $r;  // make sure the required fields are consequently written (lowercase)
+          break; 
+        }
+      }
+      if (!$delimiter)
+        throw new RuntimeException('Could not interpret the CSV file (could not find all required fields: ' . implode(',', $required) . ').');
+
+      // Read all measurements into an array
+      $key = 'id';
+      $measurments = array();
+      while ($line = fgetcsv($handle, 0, $delimiter, '"', "\\"))
+      {        
+        $line = array_map('utf8_encode', $line);   //excel makes usually iso8859-1 (latin-1), but json nulls all vars with special characters
+        $temp = array();
+        foreach ($line as $i => $value) 
+        {
+          if     ($headings[$i] == $key) $id = $value;
+          elseif (!empty($headings[$i])) $temp[$headings[$i]] = $value; //columns with empty header names (NULL or "") are removed
+        }
+
+        if (!empty($id))  // do not consider lines (rows) with empty id fields: can be an error (measurements without id), or empty lines. Just reject all of these without error msg
+        {
+          if (!isset($measurements[$id]))
+            $measurements[$id] = $temp;   //add this line to the measurements
+          else throw new RuntimeException('Error in the CSV file: ' . $key . ' "' . $id . '" occurs more than once.');
+        }
+        unset($id);           
+      }
+
+      // close CSV file
+      fclose($handle);      
       
       // Save .json
       $error = writeJSONfile($trdir . "_2_flat.json", $measurements);
@@ -312,14 +355,14 @@
 ****************************/ 
   // two ways to reach step 3: 
   //  - following step 2 (processing)  -> $tr, $action, $measurements set during step 2
-  //  - opening a saved transaction         -> $tr, $action, $measurements set in the common tasks (derived from $_REQUEST["op"])
+  //  - opening a saved transaction    -> $tr, $action, $measurements set in the common tasks (derived from $_REQUEST["op"])
   
   STEP3:
   { 
     /* Data verification: warnings and errors (here or in step 3)??        
       - id: present and unique
       - type: present (error) and known (warning)
-      - main metadata categories: sample, samplesource, instrument, parameters, contributor, jcamptemplate, data
+      - main metadata categories: sample, samplesource, instrument, parameters, contributor, jcampdxtemplate, data
       - fields required by libs.json
       - empty fields (warnings)
     */
@@ -329,14 +372,14 @@
     
     foreach ($DATATYPES as $type => $tval) $types_sani[sanitizeStr($type, "", "-+:^", True)] = $type;
     
-    unset($measurements[""]);   //remove empty rows
+    //unset($measurements[""]);   //remove empty rows
     
     $a = 0; // automatically corrected issues (green bg)
     $b = 0; // non-blocking warnings (orange bg)
     $c = 0; // blocking errors (red bg)
     
     $fields = array_keys(current($measurements));
-    $fields = array_filter($fields);  //remove empty fields
+    //$fields = array_filter($fields);  //remove empty fields
     
     echo "    <h4>STEP 2: review the measurement list</h4>\n";
     
@@ -432,7 +475,7 @@
         
         switch ($param_sani)
         {
-          case "jcamptemplate":
+          case "jcampdxtemplate":
             // autocorrect filename
             $val_sani = sanitizeStr($value);
             if ($val_sani != $value)
@@ -450,7 +493,7 @@
               $col = "orange";
               array_push($tt, "[WARNING] Empty: downloading JCAMP-DX will not be possible"); 
             }
-            elseif (!file_exists(LIB_PATH . $_REQUEST["lib"] . "/jcamptemplates/" . $value))
+            elseif (!file_exists(LIB_PATH . $_REQUEST["lib"] . "/dxt/" . $value))
             {
               $b++;
               $col = "orange";
@@ -515,27 +558,58 @@
             break;
         }
         
-        // also check data types defined in dataset:*:meta:type
-        if ((substr($param_sani, 0, 8 ) === "dataset:") and (substr($param_sani, -10 ) === ":meta:type"))
+        // check dataset fields jcampdxtemplate and type
+        if (substr($param_sani, 0, 8 ) === "dataset:")
         {
-          //check if type is set and exists in datatypes.json!!
-          $val_sani = sanitizeStr($value, "", "-+:^", True);
-          if (isset($types_sani[$val_sani]))
+          if (substr($param_sani, -16 ) === ":jcampdxtemplate")
           {
-            //if the value in the CSV is not identical to the one in datatypes.json, autocorrect
-            if ($value != $types_sani[$val_sani]) 
+            // autocorrect filename
+            $val_sani = sanitizeStr($value);
+            if ($val_sani != $value)
             {
               $a++;
               $col = "green";
-              array_push($tt, "[NOTE] Automatically corrected type");
-              $measurements[$id][$param] = $value = $types_sani[$val_sani];
+              array_push($tt, "[NOTE] Automatically removed illegal characters");
+              $measurements[$id][$param] = $value = $val_sani;
             }
+            
+            if (empty($value) and (   in_array("dx", $LIBS[$_REQUEST["lib"]]["allowformat"]) 
+                                   or in_array("jdx", $LIBS[$_REQUEST["lib"]]["allowformat"])))
+            {
+              $b++;
+              $col = "orange";
+              array_push($tt, "[WARNING] Empty: downloading JCAMP-DX will not be possible"); 
+            }
+            elseif (!file_exists(LIB_PATH . $_REQUEST["lib"] . "/dxt/" . $value))
+            {
+              $b++;
+              $col = "orange";
+              array_push($tt, "[WARNING] JCAMP-DX template file not found"); 
+            }
+            break;
           }
-          else // type in CSV does not exist!
+
+          elseif (substr($param_sani, -10 ) === ":meta:type")
           {
-            $c++;
-            $col = "red";
-            array_push($tt, "[ERROR] Undefined data type");
+            //check if type is set and exists in datatypes.json!!
+            $val_sani = sanitizeStr($value, "", "-+:^", True);
+            if (isset($types_sani[$val_sani]))
+            {
+              //if the value in the CSV is not identical to the one in datatypes.json, autocorrect
+              if ($value != $types_sani[$val_sani]) 
+              {
+                $a++;
+                $col = "green";
+                array_push($tt, "[NOTE] Automatically corrected type");
+                $measurements[$id][$param] = $value = $types_sani[$val_sani];
+              }
+            }
+            else // type in CSV does not exist!
+            {
+              $c++;
+              $col = "red";
+              array_push($tt, "[ERROR] Undefined data type");
+            }
           }
         }
         

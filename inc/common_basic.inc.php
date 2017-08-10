@@ -97,7 +97,8 @@
     if ($others) $replace = array_merge($replace, str_split($others));
 
     $string = str_replace($replace, $replaceby, $string);
-    $string = preg_replace('/[' . $replaceby . ']+/', $replaceby, $string);  // replace multiple underscores by a single
+    if ($replaceby <> "")
+      $string = preg_replace('/' . $replaceby . '{2,}/', $replaceby, $string);  // replace multiple underscores by a single
     $string = trim($string, "_");
     
     if ($lowercase) $string = strtolower($string);
