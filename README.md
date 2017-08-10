@@ -8,6 +8,7 @@ Analytical data repository for Cultural Heritage laboratories
 ## Status
 
 EXPERIMENTAL - UNSTABLE
+
 Entropy is under heavy development and may or may not function. Expect it to fail, destroy all your irreplaceable data, vaporize your server, kill your dog and start a world-wide nuclear war. THERE IS NO WARRANTY WHATSOEVER FOR THE PROGRAM. You have been warned!
 
 ## Planned milestones
@@ -40,11 +41,12 @@ Check the [Wiki page](https://github.com/KIKIRPA/Entropy/wiki/Installation-instr
 Development: Wim Fremout
 
 With the support of:
-- [Royal Institute for Cultural Heritage (KIK-IRPA)](http://www.kikirpa.be), Brussels
-- [IPERION CH](http://www.iperionch.eu) (project funded by the European Commission, H2020-INFRAIA-2014-2015)
 
 [![Royal Institute for Cultural Heritage (KIK-IRPA)](https://github.com/KIKIRPA/Entropy/blob/master/public_html/img/kikirpa.png "KIK-IRPA")](http://www.kikirpa.be)
 [![IPERION CH](https://github.com/KIKIRPA/Entropy/blob/master/public_html/img/iperionklein.png "IPERION-CH")](http://www.iperionch.eu)
+
+- [Royal Institute for Cultural Heritage (KIK-IRPA)](http://www.kikirpa.be), Brussels
+- [IPERION CH](http://www.iperionch.eu) (project funded by the European Commission, H2020-INFRAIA-2014-2015)
 
 Incorporates code from:
 - Dygraphs (MIT license) by Dan Vanderkam, dygraphs.com
