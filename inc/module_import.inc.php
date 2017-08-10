@@ -312,8 +312,8 @@
         $temp = array();
         foreach ($line as $i => $value) 
         {
-          if     ($headings[$i] == $key) $id = $value;
-          elseif (!empty($headings[$i])) $temp[$headings[$i]] = $value; //columns with empty header names (NULL or "") are removed
+          if     ($header[$i] == $key) $id = $value;
+          elseif (!empty($header[$i])) $temp[$header[$i]] = $value; //columns with empty header names (NULL or "") are removed
         }
 
         if (!empty($id))  // do not consider lines (rows) with empty id fields: can be an error (measurements without id), or empty lines. Just reject all of these without error msg
