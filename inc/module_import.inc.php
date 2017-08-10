@@ -830,7 +830,7 @@
          . "    </form>\n";
     }
     else 
-     echo "    <div>Data files that need to uploaded: " . $needdata . "</div><br><br>\n";
+     echo "    <div>Data files that need to be uploaded: " . $needdata . "</div><br><br>\n";
     
     return;
   }  
