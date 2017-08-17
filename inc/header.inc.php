@@ -47,13 +47,13 @@
     <meta http-equiv="Window-target" content="_top" />
     <meta name="keywords" content="<?php echo $htmlkeywords; ?>"/>
     <link rel="shortcut icon" href="./img/entropy.png" type="image/x-icon" />
-    <link rel="stylesheet" type='text/css' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'>
-    <link rel="stylesheet" type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.4/css/bulma.min.css'>
+    <link rel="stylesheet" type='text/css' href='<?php echo CSS_FA; ?>'>
+    <link rel="stylesheet" type='text/css' href='<?php echo CSS_BULMA; ?>'>
     <link rel='stylesheet' type='text/css' href='./css/general.css'>
     <link rel='stylesheet' type='text/css' href='./css/navigation.css'>
     <link rel='stylesheet' type='text/css' href='./css/jquery.notifyBar.css'>
     <?php echo $style; ?>
-    <script type='text/javascript' src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous" async></script>
+    <script type='text/javascript' src='<?php echo JS_JQUERY; ?>' async></script>
     <script type='text/javascript' src='./js/jquery.notifyBar.js' async></script>
     <?php echo $scripts; ?>
   </head>

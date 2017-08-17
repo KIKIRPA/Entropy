@@ -12,7 +12,7 @@
 ?>
 
           <div id="graphdiv" class="nonboxed" style="height:400px; float: left;"></div>          
-          <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.js' async></script>
+          <script type='text/javascript' src='<?php echo JS_DYGRAPH; ?>' async></script>
           <script type="text/javascript">
             g = new Dygraph(
                               document.getElementById("graphdiv"),
