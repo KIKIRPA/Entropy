@@ -450,21 +450,21 @@
     // a list of child types will be made to prevent this from happening.
     $children = array();
 
-    if (!isset($DATATYPES[$type]))  // should be checked and autocorrected before; just in case
-      eventLog("ERROR", "Unknown data type: " . $type . " [datatypeParent()]", True);
+    if (!isset($datatypes[$type]))  // should be checked and autocorrected before; just in case
+      eventLog("ERROR", "Unknown data type: " . $type . " [datatypeParent]", True);
 
     // recursively find parent datatype
     while (1)
     {
-      if (isset($DATATYPES[$type]["alias"]))
+      if (isset($datatypes[$type]["alias"]))
       {
         if (!in_array($type))
         {
           $children[] = $type;
-          $type = $DATATYPES[$type]["alias"];
+          $type = $datatypes[$type]["alias"];
         }
         else
-          eventLog("ERROR", "Circular aliassing detected in the Datatypes settings: " . $type . " [datatypeParent()]", True);
+          eventLog("ERROR", "Circular aliassing detected in the Datatypes settings: " . $type . " [datatypeParent]", True);
       }
       else
         return $type;
@@ -480,7 +480,7 @@
     // find axis names
     $results = array();
     $i = 0;
-    foreach ($DATATYPES[$type]["axis"] as $axid => $axis)
+    foreach ($$datatypes[$type]["axis"] as $axid => $axis)
     {
       if (is_array($altnameslist))
         if (!empty($altnameslist[$i]))

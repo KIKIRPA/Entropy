@@ -1013,7 +1013,7 @@
           // TODO: create a way to read those from the uploaded data (via the importfilters)
           // TODO: create a way to change them in the data upload form
           if (!isset($json["dataset"][$ds]["units"]))
-            $json["dataset"][$ds]["units"] = datatypeUnits($measurements[$_REQUEST["id"]], $DATATYPES);
+            $json["dataset"][$ds]["units"] = datatypeUnits($measurements[$_REQUEST["id"]]["type"], $DATATYPES);
         }
         
         // 2.2 process annotations
