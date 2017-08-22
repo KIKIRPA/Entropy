@@ -57,10 +57,9 @@
   $htmlkeywords = APP_KEYWORDS;
   $pagetitle = APP_LONG;
   $pagesubtitle = "Library tools";
-  $style   = "    <link rel='stylesheet' type='text/css' href='https://cdn.datatables.net/v/dt/dt-1.10.13/fc-3.2.2/fh-3.1.2/datatables.min.css'>\n"
-           . "    <link rel='stylesheet' type='text/css' src='https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.css'>\n";
-  $scripts = "    <script type='text/javascript' src='https://cdn.datatables.net/v/dt/dt-1.10.13/fc-3.2.2/fh-3.1.2/datatables.min.js'async></script>\n"
-           . "    <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.js' async></script>\n";
+  $style   = "    <link rel='stylesheet' type='text/css' href='" . CSS_DT_BULMA . "'>\n";
+  $scripts = "    <script type='text/javascript' src='" . JS_DT . "' async></script>\n"
+           . "    <script type='text/javascript' src='" . JS_DT_BULMA . "' async></script>\n";
   
   include(HEADER_FILE); 
   if (!$error) include(INC_PATH . 'module_' . $_REQUEST["mod"] . '.inc.php');

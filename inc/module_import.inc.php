@@ -883,15 +883,8 @@
               <input type='radio' id='showDataUp<?= $i ?>' name='dataUpRadio<?= $i ?>' value='new' <?= $hasData?"":"checked" ?>> Upload new file<br>
               <div id='show1<?= $i ?>' <?= $hasData?"style='display:none'":"" ?>><input name="dataUp<?= $i ?>" type="file"></div>
               <script>
-                $(document).ready(function() {
-                    $('input[type="radio"]').click(function() {
-                        if($(this).attr('id') == 'showDataUp<?= $i ?>') {
-                                $('#show1<?= $i ?>').show();           
-                        }
-                        else {
-                                $('#show1<?= $i ?>').hide();   
-                        }
-                    });
+                $("input[name='dataUpRadio<?= $i ?>']").click(function () {
+                    $('#show1<?= $i ?>').css('display', ($(this).val() === 'new') ? 'block':'none');
                 });
               </script>
             </td>
@@ -899,18 +892,11 @@
               <?php if ($hasAnno) echo "<em>" . $ds["_anno"] . "</em><br><br>"; ?>
               <input type='radio' name='annoUpRadio<?= $i ?>' value='keep' <?= $hasAnno?"checked":"disabled" ?>> Keep existing<br>
               <input type='radio' id='showAnnoUp<?= $i ?>' name='annoUpRadio<?= $i ?>' value='new' <?= $hasAnno?"":"checked" ?>> Upload new file<br>
-              <div id='show2<?= $i ?>' <?= $hasData?"style='display:none'":"" ?>><input name="annoUp<?= $i ?>" type="file"></div>
+              <div id='show2<?= $i ?>' <?= $hasAnno?"style='display:none'":"" ?>><input name="annoUp<?= $i ?>" type="file"></div>
               <input type='radio' name='annoUpRadio<?= $i ?>' value='del' <?= $hasAnno?"":"disabled" ?>> Remove<br>
               <script>
-                $(document).ready(function() {
-                    $('input[type="radio"]').click(function() {
-                        if($(this).attr('id') == 'showAnnoUp<?= $i ?>') {
-                                $('#show2<?= $i ?>').show();           
-                        }
-                        else {
-                                $('#show2<?= $i ?>').hide();   
-                        }
-                    });
+                $("input[name='annoUpRadio<?= $i ?>']").click(function () {
+                    $('#show2<?= $i ?>').css('display', ($(this).val() === 'new') ? 'block':'none');
                 });
               </script>
             </td>

@@ -53,7 +53,7 @@
     <link rel='stylesheet' type='text/css' href='./css/navigation.css'>
     <link rel='stylesheet' type='text/css' href='./css/jquery.notifyBar.css'>
     <?php echo $style; ?>
-    <script type='text/javascript' src='<?php echo JS_JQUERY; ?>' async></script>
+    <script type='text/javascript' src='<?php echo JS_JQUERY; ?>'></script>
     <script type='text/javascript' src='./js/jquery.notifyBar.js' async></script>
     <?php echo $scripts; ?>
   </head>
