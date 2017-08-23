@@ -104,6 +104,7 @@
    ******** */
 
   $parenttype = datatypeParent($measurement["type"], $DATATYPES);
+  $viewer = $DATATYPES[$parenttype]["viewer"];
   $units = datatypeUnits($parenttype, $DATATYPES, $data["dataset"][$ds]["units"]);
 
   if (isset($data["dataset"][$ds]["anno"]))
@@ -149,7 +150,7 @@
           <?php endif; ?>
 
           <!-- viewer box -->
-          <?php require_once(INC_PATH . 'viewer_' .  $parenttype . '.inc.php'); ?>
+          <?php require_once(INC_PATH . 'viewer_' .  $viewer . '.inc.php'); ?>
 
           <?php if ($dl_ShowButtons):?>
           <!-- download box -->

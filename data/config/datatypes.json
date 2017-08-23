@@ -1,6 +1,6 @@
 {
     "Raman": {
-        "type": "xy",
+        "viewer": "xy",
         "graph": {
             "xy": "line"
         },
@@ -43,7 +43,7 @@
         "alias": "Raman"
     },
     "FTIR": {
-        "type": "xy",
+        "viewer": "xy",
         "graph": {
             "xy": "line"
         },
@@ -75,7 +75,7 @@
         }
     },
     "MS": {
-        "type": "xy",
+        "viewer": "xy",
         "graph": {
             "xy": "bar"
         },
@@ -102,7 +102,7 @@
         "alias": "MS"
     },
     "chromms": {
-        "type": "txy",
+        "viewer": "txy",
         "graph": {
             "ty": "line",
             "xy": "bar"
