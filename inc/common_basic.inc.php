@@ -458,13 +458,13 @@
     {
       if (isset($datatypes[$type]["alias"]))
       {
-        if (!in_array($type))
+        if (!in_array($datatypes[$type]["alias"], $children)) // detect circular aliassing
         {
           $children[] = $type;
           $type = $datatypes[$type]["alias"];
         }
         else
-          eventLog("ERROR", "Circular aliassing detected in the Datatypes settings: " . $type . " [datatypeParent]", True);
+          eventLog("ERROR", "Circular aliassing in the Datatypes settings: " . $type . " [datatypeParent]", True);
       }
       else
         return $type;
