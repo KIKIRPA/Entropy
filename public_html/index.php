@@ -118,7 +118,7 @@ if (!$mode) {
     unset($measurements);
     
     if (isset($_REQUEST["ds"])) {
-        if (isset($measurement["dataset"][$_REQUEST["ds"]])) {
+        if (isset($data["dataset"][$_REQUEST["ds"]])) {
             $showds = $_REQUEST["ds"];
         } else {
             $error = "The requested dataset does not exist";
@@ -129,11 +129,11 @@ if (!$mode) {
     }
 
     if (!isset($showds)) {  //if at this point no dataset is set, either choose 'default', or the first
-        if (isset($measurement["dataset"]["default"])) {
+        if (isset($data["dataset"]["default"])) {
             $showds = "default";
         } else {
-            reset($measurement["dataset"]);
-            $showds = key($measurement["dataset"]);
+            reset($data["dataset"]);
+            $showds = key($data["dataset"]);
         }
     }
 }
