@@ -107,12 +107,12 @@ if (LOG_DL) {
 
 $parenttype = datatypeParent($measurement["type"], $DATATYPES);
 $viewer = $DATATYPES[$parenttype]["viewer"];
-$units = datatypeUnits($parenttype, $DATATYPES, $data["dataset"][$ds]["units"]);
+$units = datatypeUnits($parenttype, $DATATYPES, $data["dataset"][$showds]["units"]);
 
-if (isset($data["dataset"][$ds]["anno"])) {
-    if (is_array($data["dataset"][$ds]["anno"])) {
+if (isset($data["dataset"][$showds]["anno"])) {
+    if (is_array($data["dataset"][$showds]["anno"])) {
         $anno = array();
-        foreach ($data["dataset"][$ds]["anno"] as $i => $a) {
+        foreach ($data["dataset"][$showds]["anno"] as $i => $a) {
             $anno[$i] = array();
             $anno[$i]["series"] = $idbox_head;
             $anno[$i] = array_merge($anno[$i], $a);
