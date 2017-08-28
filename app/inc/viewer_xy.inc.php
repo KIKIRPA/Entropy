@@ -6,20 +6,17 @@ if (count(get_included_files()) == 1) {
     exit("Direct access not permitted.");
 }
 
-  //TEST: possible to move the <script src=...datatables.js> from the header to here (so it only gets loaded when necessary?
-
 ?>
 
           <div id="graphdiv" class="nonboxed" style="height:400px; float: left;"></div>          
-          <script type='text/javascript' src='<?= JS_DYGRAPH ?>' async></script>
           <script type="text/javascript">
             g = new Dygraph(
               document.getElementById("graphdiv"),
-              <?= json_encode($data["dataset"][$ds]["data"]) ?>,
+              <?= json_encode($data["dataset"][$showds]["data"]) ?>,
               { 
-                labels: ["<?= $Units[0] ?>","<?= $idbox_head ?>"],
-                xlabel: "<?= $Units[0] ?>", 
-                ylabel: "<?= $Units[1] ?>",
+                labels: ["<?= isset($units[0]) ? $units[0] : "Undefined" ?>","<?= $idbox_head ?>"],
+                xlabel: "<?= isset($units[0]) ? $units[0] : "Undefined" ?>", 
+                ylabel: "<?= isset($units[1]) ? $units[1] : "Undefined" ?>",
                 //drawYAxis: false,
                 axisLabelFontSize: 10,
                 yAxisLabelWidth: 70,

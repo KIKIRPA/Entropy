@@ -14,8 +14,8 @@ $htmltitle = APP_SHORT . ": " . $LIBS[$showlib]["menu"];
 $htmlkeywords = APP_KEYWORDS;
 $pagetitle = APP_LONG;
 $pagesubtitle = $LIBS[$showlib]["name"];
-$style   = ""; //"    <link rel='stylesheet' type='text/css' src='https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.css'>\n";
-$scripts = ""; //"    <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.js' async></script>\n";
+$style   = "<link rel='stylesheet' type='text/css' href='" . CSS_DYGRAPH . "'>";
+$scripts = "<script type='text/javascript' src='" . JS_DYGRAPH  . "'></script>";
 
 include(HEADER_FILE);
 
@@ -136,11 +136,11 @@ if (isset($data["dataset"][$showds]["anno"])) {
             <?php endforeach; ?>
           </div>
 
-          <?php if (count($measurement["dataset"]) > 1): ?>
+          <?php if (count($data["dataset"]) > 1): ?>
           <!-- dataset box -->
           <div class='boxed' id='greybox'>
             <h3>Datasets</h3>
-            <?php foreach ($measurement["dataset"] as $dsid => $dsval): 
+            <?php foreach ($data["dataset"] as $dsid => $dsval): 
                       if ($dsid == $showds): ?>
             <p><strong><?=  $showds ?></strong>
             <?php     else: ?>
