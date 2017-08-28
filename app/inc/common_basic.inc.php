@@ -494,7 +494,7 @@ function datatypeUnits($type, $datatypes, $altnameslist = null)
     // find axis names
     $results = array();
     $i = 0;
-    foreach ($$datatypes[$type]["axis"] as $axid => $axis) {
+    foreach ($datatypes[$type]["axis"] as $axid => $axis) {
         if (is_array($altnameslist)) {
             if (!empty($altnameslist[$i])) {
                 foreach ($axis as $axname => $axvalues) {
