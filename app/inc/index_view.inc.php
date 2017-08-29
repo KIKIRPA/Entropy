@@ -151,7 +151,7 @@ if (isset($data["dataset"][$showds]["anno"])) {
           <?php endif; ?>
 
           <!-- viewer box -->
-          <?php require_once(INC_PATH . 'viewer_' .  $viewer . '.inc.php'); ?>
+          <?php require_once(INC_PATH . 'viewers/' .  $viewer . '/main.php'); ?>
 
           <?php if ($dl_ShowButtons):?>
           <!-- download box -->
