@@ -1,13 +1,12 @@
 <?php
-  // prevent direct access to this file (thus only when included)
-  if (count(get_included_files()) == 1) 
-  {
+// prevent direct access to this file (thus only when included)
+if (count(get_included_files()) == 1) {
     header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
     header("Status: 404 Not Found");
     exit("Direct access not permitted.");
-  }
-  
-  echo "      <h3>Reset password</h3>\n"; 
+}
+
+echo "      <h3>Reset password</h3>\n";
 
 ?>
   <script>
@@ -25,7 +24,7 @@
     }
   </script>
 
-  <form name='resetpwd' action='<?php echo $_SERVER["PHP_SELF"]; ?>' method='post' onsumbit='return validate()'>
+  <form name='resetpwd' action='<?= $_SERVER["PHP_SELF"] ?>' method='post' onsumbit='return validate()'>
     <table cellspacing='8' style='width: 80%;'> 
       <tr>
         <td><label accesskey='o' for='oldpwd' class='label'>old password</label></td>
@@ -42,7 +41,7 @@
     </table>
     
     <br><br>
-    <?php if (isset($msg)) echo "<span style='color:red'>" . $msg . "</span><br>\n"; ?>
+    <?= isset($msg) ? "<span style='color:red'>" . $msg . "</span><br>\n" : "" ?>
     <button type="submit">Verify!</button>
   </form>
   
