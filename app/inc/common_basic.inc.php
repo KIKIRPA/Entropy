@@ -43,7 +43,7 @@ if (count(get_included_files()) == 1) {
 
     getMeta($metadata, $get, $concatenate = "; ", $description = ": ")
         retrieve metadata-item from (inflated) metadata array
-        $get is something like "sample:sample name", "samplesource:primary:identifier+source", "measurement:date^long";
+        $get is something like "sample:sample name", "samplesource:0:identifier+source", "measurement:date^long";
         if multiple fields need to be concatenated, the concatenation symbol (default ;) can be supplied
         in the concatenated outputs descriptions can be added if a $description symbol (default :) is supplied
         (if set to false, a short notation will be used without descriptions)
@@ -411,12 +411,12 @@ function nameMeta($get)
     
     //last item in the tree is the name, except if it contains a "+"
     $name = array_pop($tree);
-    if (strpos($name, "+") !== false) {
+    if (strpos($name, "+")) {
         $name = array_pop($tree);
     }
     
     //remove formatting parts
-    if (strpos("^", $name) === false) {
+    if (strpos($name, "^")) {
         $temp = explode("^", $name);
         $name = $temp[0];
     }
@@ -427,13 +427,27 @@ function nameMeta($get)
         $temp = (int)$name + 1;
         $name = array_pop($tree) . " " . $temp;
     }
-    
-    // some fancier hard-coded names for columns can be defined here
-    $name = str_replace("samplesource", "Sample source", $name);
-    
+
     //make it nice: replace underscores with spaces, first letter uppercase
     $name = str_replace('_', ' ', $name);
-    return ucfirst($name);
+        
+    //by default first letter uppercase, and some fancier hard-coded names
+    $name = str_replace("samplesource", "Sample source", $name);
+    switch (strtolower($name)) {
+        case "cinumber":
+        case "ci number":
+            $name = "CI number";
+            break;
+        case "casnumber":
+        case "cas number":
+            $name = "CAS number";
+            break;
+        default:
+            $name = ucfirst($name);
+            break;
+    }
+
+    return $name;
 }
 
 
