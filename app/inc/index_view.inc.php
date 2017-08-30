@@ -107,7 +107,7 @@ if (LOG_DL) {
 
 $parenttype = datatypeParent($measurement["type"], $DATATYPES);
 $viewer = $DATATYPES[$parenttype]["viewer"];
-$units = datatypeUnits($parenttype, $DATATYPES, $data["dataset"][$showds]["units"]);
+$units = datatypeUnits($parenttype, $DATATYPES, 'html', $data["dataset"][$showds]["units"]);
 
 if (isset($data["dataset"][$showds]["anno"])) {
     if (is_array($data["dataset"][$showds]["anno"])) {

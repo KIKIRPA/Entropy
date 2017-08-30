@@ -14,9 +14,9 @@ if (count(get_included_files()) == 1) {
               document.getElementById("graphdiv"),
               <?= json_encode($data["dataset"][$showds]["data"]) ?>,
               { 
-                labels: ["<?= isset($units[0]) ? $units[0] : "Undefined" ?>","<?= $idbox_head ?>"],
-                xlabel: "<?= isset($units[0]) ? $units[0] : "Undefined" ?>", 
-                ylabel: "<?= isset($units[1]) ? $units[1] : "Undefined" ?>",
+                labels: ["<?= isset($units["x"]) ? $units["x"] : "Undefined" ?>","<?= $idbox_head ?>"],
+                xlabel: "<?= isset($units["x"]) ? $units["x"] : "Undefined" ?>", 
+                ylabel: "<?= isset($units["y"]) ? $units["y"] : "Undefined" ?>",
                 //drawYAxis: false,
                 axisLabelFontSize: 10,
                 yAxisLabelWidth: 70,

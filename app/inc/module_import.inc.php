@@ -1020,12 +1020,14 @@ STEP7:
                 $measurements[$_REQUEST["id"]]["dataset"][$ds]["_data"] = $_FILES["dataUp" . $key]['name'];
                 $build = true;
 
-                // set units (if not set e.g. via CSV)
+                // set units: correct if supplied in csv, or take the default values
                 // TODO: create a way to read those from the uploaded data (via the importfilters)
                 // TODO: create a way to change them in the data upload form
-                if (!isset($json["dataset"][$ds]["units"])) {
-                    $json["dataset"][$ds]["units"] = datatypeUnits($measurements[$_REQUEST["id"]]["type"], $DATATYPES);
-                }
+                $json["dataset"][$ds]["units"] = datatypeUnits( $measurements[$_REQUEST["id"]]["type"], 
+                                                                $DATATYPES, 
+                                                                "json",
+                                                                isset($json["dataset"][$ds]["units"]) ? $json["dataset"][$ds]["units"] : null
+                                                              );
             }
         
             // 2.2 process annotations

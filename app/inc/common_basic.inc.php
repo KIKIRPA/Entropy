@@ -62,11 +62,12 @@ if (count(get_included_files()) == 1) {
         if $type is an alias, it recursively looks for the parent (but checks for circular aliassing:
         e.g. "Raman 785nm" is alias for "Raman", which is an alias for "Raman 785nm").
 
-    datatypeUnits($type, $datatypes, $altnameslist = Null)
-        extracts a list of axis units for a given datatype ($type) from the $DATATYPES json resource.
+    datatypeUnits($type, $datatypes, $key = "json", $search = Null)
+        extracts a list of axis units/names for a given datatype ($type) from the $DATATYPES json resource.
         Includes searching for parent datatype (using datatypeParent())
-        In absence of $altnameslist, the default (first listed) entries for each axis will be returned.
-        $altnameslist is a list of one alternative name per axis to search for; if found, the function
+        By default it returns the json-names, other names (or invert booleans) can be requested with the $key.
+        In absence of $search, the default (first listed) entries for each axis will be returned.
+        $search is a list of one alternative name per axis to search for; if found, the function
         will return the corresponding axis name. If one of the altnames in $altnamelist is Null or
         False, it will return the default axis name for that entry.
 
@@ -486,30 +487,60 @@ function datatypeParent($type, $datatypes)
 }
 
 
-function datatypeUnits($type, $datatypes, $altnameslist = null)
+function datatypeUnits($type, $datatypes, $key = "json", $search = null)
 {
-    // find parent type:
+    $results = array();
+
+    if ($key == "invert") {
+        $defaultkey = false;
+    } else {
+        $defaultkey = "json";  // return json-name if the requested key does not exist.
+    }
+
+    // lowercase search array (keys and values)
+    if (is_array($search)) {
+        $search = array_change_key_case($search);
+        $search = array_map('strtolower', $search);
+    }
+    
+    // find parent type
     $type = datatypeParent($type, $datatypes);
 
-    // find axis names
-    $results = array();
-    $i = 0;
-    foreach ($datatypes[$type]["axis"] as $axid => $axis) {
-        if (is_array($altnameslist)) {
-            if (!empty($altnameslist[$i])) {
-                foreach ($axis as $axname => $axvalues) {
-                    if ((strtolower($axname) == strtolower($altnameslist[$i])) or in_array(strtolower($altnameslist[$i]), $axvalues["altnames"])) {
-                        $results[$i] = $axname;
+    foreach ($datatypes[$type]["axis"] as $i => $axis) {  // iterate over x, y, z, t...
+        $searchresult = false;
+
+        // if a search array is given: search corresponding value for this axis
+        if (is_array($search)) {
+            if (isset($search[$i])) {
+                foreach ($axis as $namelist) {      // iterate over different options for each axis (e.g. absorption, transmission...)
+                    // make a working copy of the namelist, where we can remove "invert" and convert to lowercase
+                    $haystack = $namelist;
+                    if (isset($haystack["invert"])) {
+                        unset($haystack["invert"]);
+                    }
+                    $haystack = array_map('strtolower', $haystack);
+                    // search in namelist
+                    if (in_array($search[$i], $haystack)) {
+                        $searchresult = $namelist;
                         break;
                     }
                 }
             }
         }
-    
-        if (!isset($results[$i])) { // if no altname is supplied for this axis, or altname was not found; take the first axis (first is default)
-            reset($axis);
-            $results[$i] = key($axis);
+
+        // if no search-array was given, or search[$i] was not found: get the name from the first axis option (first namelist)
+        if (!$searchresult) {
+            $namelist = reset($axis);
         }
+
+        // get the key-name if it exists, else the default key-name, or else the first name in the array
+        if (isset($namelist[$key])) {
+            $result[$i] = $namelist[$key];
+        } elseif (isset($namelist[$defaultkey])) {
+            $result[$i] = $namelist[$defaultkey];
+        } else {
+            $return[$i] = reset($namelist);
+        } 
     }
 
     return $results;
