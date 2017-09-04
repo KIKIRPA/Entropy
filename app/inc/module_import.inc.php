@@ -1201,7 +1201,9 @@ STEP9:
         if ($error) {
             throw new RuntimeException($error);
         }
-        unlink($libdir . "measurements.json");
+        if (file_exists($libdir . "measurements.json")) {
+            unlink($libdir . "measurements.json");
+        }
         $success = link($path, $libdir . "measurements.json");
         if ($success) {
             echo "<strong>Published</strong> library file<br><br>\n";
