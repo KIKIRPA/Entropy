@@ -1,9 +1,9 @@
 <?php
 require_once('install.conf.php');
-require_once(PRIVPATH . 'entropy.conf.php');
-require_once(INC_PATH . 'init.inc.php');
-require_once(INC_PATH . 'common_basic.inc.php');
-require_once(INC_PATH . 'common_mailhide.inc.php');
+require_once(PRIVPATH . 'inc/entropy.conf.php');
+require_once(PRIVPATH . 'inc/init.inc.php');
+require_once(PRIVPATH . 'inc/common_basic.inc.php');
+require_once(PRIVPATH . 'inc/common_mailhide.inc.php');
 
 $ts = mdate('Y-m-d H:i:s.u');
 $ip = $_SERVER['REMOTE_ADDR'];
@@ -249,7 +249,7 @@ $scripts = "";
 
 include(HEADER_FILE);
 if ($module != "empty") {
-    include(INC_PATH . "auth_" . $module . ".inc.php");
+    include(PRIVPATH . 'inc/auth_' . $module . '.inc.php');
 } elseif (isset($msg)) {
     echo $msg;
 }

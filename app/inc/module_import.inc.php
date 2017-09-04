@@ -6,8 +6,8 @@ if (count(get_included_files()) == 1) {
     exit("Direct access not permitted.");
 }
 
-require_once(INC_PATH . 'common_upload.inc.php');
-require_once(INC_PATH . 'common_importfilters.inc.php');
+require_once(PRIVPATH . 'inc/common_upload.inc.php');
+require_once(PRIVPATH . 'inc/common_importfilters.inc.php');
 
 
 /****************************

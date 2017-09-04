@@ -7,7 +7,7 @@ if (count(get_included_files()) == 1) {
 }
 
 $lp = true;  // let module_libedit know which data it should expect
-include(INC_PATH . 'module_libedit.inc.php');
+include(PRIVPATH . 'inc/module_libedit.inc.php');
 ?>
 
   

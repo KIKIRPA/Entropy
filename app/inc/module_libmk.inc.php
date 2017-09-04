@@ -8,7 +8,7 @@ if (count(get_included_files()) == 1) {
 
 $libmk = true;
 
-include(INC_PATH . 'module_libedit.inc.php');
+include(PRIVPATH . 'inc/module_libedit.inc.php');
 
 if (($f == "set") and ($output == false)) {
     //----------------------------------------------//
