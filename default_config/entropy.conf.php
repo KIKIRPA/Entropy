@@ -7,7 +7,6 @@ if (count(get_included_files()) == 1) {
 }
 
 // paths
-const INC_PATH       = PRIVPATH . "inc/";
 const CONFIG_PATH    = PRIVPATH . "data/config/";
 const LIB_PATH       = PRIVPATH . "data/libs/";
 const LOG_PATH       = PRIVPATH . "data/logs/";
@@ -16,10 +15,9 @@ const LOG_PATH       = PRIVPATH . "data/logs/";
 const APP_SHORT      = "Entropy";
 const APP_LONG       = "Entropy repository for analytical data";
 const APP_KEYWORDS   = "";
-const HEADER_FILE    = INC_PATH . "header.inc.php";
-const FOOTER_FILE    = INC_PATH . "footer.inc.php";
+const HEADER_FILE    = PRIVPATH . 'inc/header.inc.php';
+const FOOTER_FILE    = PRIVPATH . 'inc/footer.inc.php';
 const MAIL_ADMIN     = "";
-
 
 // json configuration files
 const USERS_FILE     = CONFIG_PATH . "users.json";

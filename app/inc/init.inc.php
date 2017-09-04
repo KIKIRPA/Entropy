@@ -7,7 +7,7 @@ if (count(get_included_files()) == 1) {
     exit("Direct access not permitted.");
 }
 
-require_once(INC_PATH . 'common_basic.inc.php');
+require_once(PRIVPATH . 'inc/common_basic.inc.php');
 
 /***********************************************************************************
   1. READ CONFIGURATION FILES

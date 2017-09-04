@@ -1,10 +1,10 @@
 <?php
 require_once('install.conf.php');
-require_once(PRIVPATH . 'entropy.conf.php');
-require_once(INC_PATH . 'init.inc.php');
-require_once(INC_PATH . 'common_basic.inc.php');
-require_once(INC_PATH . 'common_mailhide.inc.php');
-require_once(INC_PATH . 'common_writefile.inc.php');
+require_once(PRIVPATH . 'inc/entropy.conf.php');
+require_once(PRIVPATH . 'inc/init.inc.php');
+require_once(PRIVPATH . 'inc/common_basic.inc.php');
+require_once(PRIVPATH . 'inc/common_mailhide.inc.php');
+require_once(PRIVPATH . 'inc/common_writefile.inc.php');
 
 
 // security measures!
@@ -60,7 +60,7 @@ $scripts = "    <script type='text/javascript' src='" . JS_DT . "' async></scrip
 
 include(HEADER_FILE);
 if (!$error) {
-    include(INC_PATH . 'module_' . $_REQUEST["mod"] . '.inc.php');
+    include(PRIVPATH . 'inc/module_' . $_REQUEST["mod"] . '.inc.php');
 } else {
     echo $error;
 }

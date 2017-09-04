@@ -71,7 +71,7 @@ try {
     eventLog("WARNING", $errormsg  . " [download]");
 
     // FALLBACK TO VIEW MODULE
-    require_once(INC_PATH . 'index_view.inc.php');
+    require_once(PRIVPATH . 'inc/index_view.inc.php');
 }
 
 

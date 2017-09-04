@@ -5,26 +5,24 @@
             "xy": "line"
         },
         "axis": {
-            "x": {
-                "Raman shift (cm-1)": {
-                    "viewername": "Raman shift (cm<sup>-1<\/sup>)",
-                    "altnames": [
-                        "raman shift (cm-1)",
-                        "raman shift (1/cm)",
-                        "wavenumber (cm-1)",
-                        "wavenumber (1/cm)"
-                    ]
+            "x": [
+                 {
+                    "json": "Raman shift (cm-1)",
+                    "html": "Raman shift (cm<sup>-1<\/sup>)",
+                    "jcamp-dx": "Raman shift (cm-1)",
+                    "other1": "Raman shift (1/cm)",
+                    "other2": "Wavenumber (cm-1)",
+                    "other3": "Wavenumber (1/cm)"
                 }
-            },
-            "y": {
-                "Intensity (Arbitrary Units)": {
-                    "viewername": "Intensity (Arbitrary Units)",
-                    "altnames": [
-                        "intensity (arbitrary units)",
-                        "counts"
-                    ]
+            ],
+            "y": [
+                {
+                    "json": "Intensity (Arbitrary Units)",
+                    "html": "Intensity (Arbitrary Units)",
+                    "jcamp-dx": "Intensity (Arbitrary Units)",
+                    "other1": "Counts"
                 }
-            }
+            ]
         }
     },
     "Raman 785nm": {
@@ -48,30 +46,25 @@
             "xy": "line"
         },
         "axis": {
-            "x": {
-                "Wavenumber (cm-1)": {
-                    "viewername": "Wavenumber (cm<sup>-1<\/sup>)",
-                    "altnames": [
-                        "wavenumber (cm-1)",
-                        "wavenumber (1/cm)"
-                    ],
+            "x": [
+                {
+                    "json": "Wavenumber (cm-1)",
+                    "html": "Wavenumber (cm<sup>-1<\/sup>)",
+                    "other1": "Wavenumber (1/cm)",
                     "invert": true
                 }
-            },
-            "y": {
-                "Absorbance (Relative intensity)": {
-                    "viewername": "Absorbance (Relative intensity)",
-                    "altnames": [
-                        "absorbance (relative intensity)"
-                    ]
+            ],
+            "y": [
+                {
+                   "json": "Absorbance (Relative intensity)",
+                    "html": "Absorbance (Relative intensity)"
                 },
-                "Transmission (%)": {
-                    "viewername": "Transmission (%)",
-                    "altnames": [
-                        "transmission"
-                    ]
+                {
+                    "json": "Transmission (%)",
+                    "html": "Transmission (%)",
+                    "other1": "Transmission"
                 }
-            }
+            ]
         }
     },
     "MS": {
@@ -80,22 +73,18 @@
             "xy": "bar"
         },
         "axis": {
-            "x": {
-                "m/z": {
-                    "viewername": "m\/z",
-                    "altnames": [
-                        "m/z"
-                    ]
+            "x": [
+                {
+                    "json": "m/z",
+                    "html": "m\/z"
                 }
-            },
-            "y": {
-                "relative intensity": {
-                    "viewername": "Relative intensity",
-                    "altnames": [
-                        "relative intensity"
-                    ]
+            ],
+            "y": [
+                {
+                    "json": "Relative intensity",
+                    "html": "Relative intensity"
                 }
-            }
+            ]
         }
     },
     "Mass spectrum": {
@@ -108,30 +97,24 @@
             "xy": "bar"
         },
         "axis": {
-            "t": {
-                "Time (min)": {
-                    "viewername": "Time (min)",
-                    "altnames": [
-                        "time (min)"
-                    ]
+            "t":[
+                {
+                    "json": "Time (min)",
+                    "html": "Time (min)"
                 }
-            },
-            "x": {
-                "m/z": {
-                    "viewername": "m\/z",
-                    "altnames": [
-                        "m/z"
-                    ]
+            ],
+            "x":[
+                {
+                    "json": "m/z",
+                    "html": "m\/z"
                 }
-            },
-            "y": {
-                "Relative intensity": {
-                    "viewername": "Relative intensity",
-                    "altnames": [
-                        "relative intensity"
-                    ]
+            ],
+            "y": [
+                {
+                    "json": "Relative intensity",
+                    "html": "Relative intensity"
                 }
-            }
+            ]
         }
     },
     "GC-MS": {

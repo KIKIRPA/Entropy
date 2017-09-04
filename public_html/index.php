@@ -1,10 +1,10 @@
 <?php
 require_once('install.conf.php');
 require_once(PRIVPATH . 'entropy.conf.php');
-require_once(INC_PATH . 'init.inc.php');
-require_once(INC_PATH . 'common_basic.inc.php');
-require_once(INC_PATH . 'common_cookie.inc.php');
-require_once(INC_PATH . 'common_mailhide.inc.php');
+require_once(PRIVPATH . 'inc/init.inc.php');
+require_once(PRIVPATH . 'inc/common_basic.inc.php');
+require_once(PRIVPATH . 'inc/common_cookie.inc.php');
+require_once(PRIVPATH . 'inc/common_mailhide.inc.php');
 
 /*
 replacement for index.php
@@ -151,12 +151,12 @@ if (!$mode) {
 //
 switch ($mode) {
     case "dl":
-    require_once(INC_PATH . 'index_dl.inc.php');
+    require_once(PRIVPATH . 'inc/index_dl.inc.php');
     break;
     case "view":
-    require_once(INC_PATH . 'index_view.inc.php');
+    require_once(PRIVPATH . 'inc/index_view.inc.php');
     break;
     default:
     case "list":
-    require_once(INC_PATH . 'index_list.inc.php');
+    require_once(PRIVPATH . 'inc/index_list.inc.php');
 }

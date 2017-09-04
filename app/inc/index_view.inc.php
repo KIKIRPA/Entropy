@@ -107,7 +107,7 @@ if (LOG_DL) {
 
 $parenttype = datatypeParent($measurement["type"], $DATATYPES);
 $viewer = $DATATYPES[$parenttype]["viewer"];
-$units = datatypeUnits($parenttype, $DATATYPES, $data["dataset"][$showds]["units"]);
+$units = datatypeUnits($parenttype, $DATATYPES, 'html', $data["dataset"][$showds]["units"]);
 
 if (isset($data["dataset"][$showds]["anno"])) {
     if (is_array($data["dataset"][$showds]["anno"])) {
@@ -151,7 +151,7 @@ if (isset($data["dataset"][$showds]["anno"])) {
           <?php endif; ?>
 
           <!-- viewer box -->
-          <?php require_once(INC_PATH . 'viewer_' .  $viewer . '.inc.php'); ?>
+          <?php require_once(PRIVPATH . 'viewers/' .  $viewer . '/main.php'); ?>
 
           <?php if ($dl_ShowButtons):?>
           <!-- download box -->

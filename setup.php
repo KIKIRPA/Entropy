@@ -56,7 +56,6 @@ $types = array(
     "maxtries_ip"    => "integer",
     "cookie_expire"  => "integer",
     "admin_email"    => "e-mail",
-    "inc_path"       => "path",
     "config_path"    => "path",
     "lib_path"       => "path",
     "log_path"       => "path"

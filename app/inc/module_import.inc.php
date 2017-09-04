@@ -6,8 +6,8 @@ if (count(get_included_files()) == 1) {
     exit("Direct access not permitted.");
 }
 
-require_once(INC_PATH . 'common_upload.inc.php');
-require_once(INC_PATH . 'common_importfilters.inc.php');
+require_once(PRIVPATH . 'inc/common_upload.inc.php');
+require_once(PRIVPATH . 'inc/common_importfilters.inc.php');
 
 
 /****************************
@@ -1020,12 +1020,14 @@ STEP7:
                 $measurements[$_REQUEST["id"]]["dataset"][$ds]["_data"] = $_FILES["dataUp" . $key]['name'];
                 $build = true;
 
-                // set units (if not set e.g. via CSV)
+                // set units: correct if supplied in csv, or take the default values
                 // TODO: create a way to read those from the uploaded data (via the importfilters)
                 // TODO: create a way to change them in the data upload form
-                if (!isset($json["dataset"][$ds]["units"])) {
-                    $json["dataset"][$ds]["units"] = datatypeUnits($measurements[$_REQUEST["id"]]["type"], $DATATYPES);
-                }
+                $json["dataset"][$ds]["units"] = datatypeUnits( $measurements[$_REQUEST["id"]]["type"], 
+                                                                $DATATYPES, 
+                                                                "json",
+                                                                isset($json["dataset"][$ds]["units"]) ? $json["dataset"][$ds]["units"] : null
+                                                              );
             }
         
             // 2.2 process annotations
@@ -1199,7 +1201,9 @@ STEP9:
         if ($error) {
             throw new RuntimeException($error);
         }
-        unlink($libdir . "measurements.json");
+        if (file_exists($libdir . "measurements.json")) {
+            unlink($libdir . "measurements.json");
+        }
         $success = link($path, $libdir . "measurements.json");
         if ($success) {
             echo "<strong>Published</strong> library file<br><br>\n";
