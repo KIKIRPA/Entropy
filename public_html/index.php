@@ -1,6 +1,6 @@
 <?php
 require_once('install.conf.php');
-require_once(PRIVPATH . 'inc/entropy.conf.php');
+require_once(PRIVPATH . 'entropy.conf.php');
 require_once(PRIVPATH . 'inc/init.inc.php');
 require_once(PRIVPATH . 'inc/common_basic.inc.php');
 require_once(PRIVPATH . 'inc/common_cookie.inc.php');
