@@ -62,6 +62,7 @@ if ($is_logged_in) { // menu items to show = those modules with a non-false "men
     <script type='text/javascript' src='<?= JS_JQUERY ?>'></script>
     <script type='text/javascript' src='./js/jquery.notifyBar.js' async></script>
     <?= $scripts ?>
+    <script type='text/javascript' src='./js/main.js'></script>
   </head>
   
   <body>

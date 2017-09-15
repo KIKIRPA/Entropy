@@ -5,7 +5,10 @@ document.addEventListener('DOMContentLoaded', function () {
   // form validation
 
   var $target;
-  var validname = validinst = validemail = validlic = true;
+  var validname = true;
+  var validinst = true;
+  var validemail = true;
+  var validlic = true;
   var x = "";
 
   $target = document.getElementById("name");
@@ -16,8 +19,8 @@ document.addEventListener('DOMContentLoaded', function () {
       $target.classList.add('is-danger');
       document.getElementById("namehelp").display = '';
       document.getElementById("namehelp").value = "Please provide a valid name.";
-      document.getElementById("namehelp").remove('is-success');
-      document.getElementById("namehelp").add('is-danger');
+      document.getElementById("namehelp").classList.remove('is-success');
+      document.getElementById("namehelp").classList.add('is-danger');
       validname = false;
     }
     else {
@@ -36,8 +39,8 @@ document.addEventListener('DOMContentLoaded', function () {
       $target.classList.add('is-danger');
       document.getElementById("insthelp").display = '';
       document.getElementById("insthelp").value = "Please provide a valid institution/university/company name.";
-      document.getElementById("insthelp").remove('is-success');
-      document.getElementById("insthelp").add('is-danger');
+      document.getElementById("insthelp").classList.remove('is-success');
+      document.getElementById("insthelp").classList.add('is-danger');
       validinst = false;
     }
     else {
@@ -58,8 +61,8 @@ document.addEventListener('DOMContentLoaded', function () {
       $target.classList.add('is-danger');
       document.getElementById("emailhelp").display = '';
       document.getElementById("emailhelp").value = "Please provide a valid e-mail address.";
-      document.getElementById("emailhelp").remove('is-success');
-      document.getElementById("emailhelp").add('is-danger');
+      document.getElementById("emailhelp").classList.remove('is-success');
+      document.getElementById("emailhelp").classList.add('is-danger');
       validemail = false;
     }
     else {
@@ -75,8 +78,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!$target.checked) {	
       document.getElementById("lichelp").display = '';
       document.getElementById("lichelp").value = "You must comply to the license!";
-      document.getElementById("lichelp").remove('is-success');
-      document.getElementById("lichelp").add('is-danger');
+      document.getElementById("lichelp").classList.remove('is-success');
+      document.getElementById("lichelp").classList.add('is-danger');
       validlic = false;
     }
     else {

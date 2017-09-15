@@ -281,7 +281,7 @@ if (isset($data["dataset"][$showds]["anno"])) {
                 </div>
               </div>
 
-              <input type="hidden" name="dl">
+              <input type="hidden" id="dl" name="dl">
 
               <div class="field is-grouped is-grouped-right">
                 <button class='modal-close'>Cancel</button>
