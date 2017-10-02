@@ -115,7 +115,7 @@ if ($code[0] == "conv") {
     // TODO: code[1] should be the file extension!
     exit();
 } elseif ($code[0] == "bin") {
-    $filename = $code[1];
+    $filename = basename($code[1]);
 }
 
 
