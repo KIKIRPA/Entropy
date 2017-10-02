@@ -144,7 +144,7 @@ if (isset($data["dataset"][$showds]["anno"])) {
                       if ($dsid == $showds): ?>
             <p><strong><?=  $showds ?></strong>
             <?php     else: ?>
-            <p><a href='<?= $_SERVER["PHP_SELF"]; ?>?lib=<?= $showlib ?>&id=<?= $showspectrum ?>&ds=<?= $showds ?>'><?= $dsid ?></a>
+            <p><a href='<?= $_SERVER["PHP_SELF"]; ?>?lib=<?= $showlib ?>&id=<?= $showid ?>&ds=<?= $showds ?>'><?= $dsid ?></a>
             <?php     endif;
                   endforeach; ?>
           </div>
@@ -165,7 +165,7 @@ if (isset($data["dataset"][$showds]["anno"])) {
                 <span><?= $btncaption ?></span>
               </a>
               <?php   else: ?>
-              <a class="button is-primary" href="<?= $_SERVER["PHP_SELF"] ?>?lib=<?= $showlib ?>&id=<?= $showspectrum ?>&ds=<?= $showds ?>&dl=<?= $dl_Code ?>">
+              <a class="button is-primary" href="<?= $_SERVER["PHP_SELF"] ?>?lib=<?= $showlib ?>&id=<?= $showid ?>&ds=<?= $showds ?>&dl=<?= $dl_Code ?>">
                 <span class="icon is-small"><i class="fa fa-download"></i></span>
                 <span><?= $btncaption ?></span>
               </a>
@@ -233,7 +233,7 @@ if (isset($data["dataset"][$showds]["anno"])) {
         <div class='modal' id='dlmodal'>
           <div class='modal-background'></div>
           <div class='modal-content'>
-            <form name="dlform" action="<?= $_SERVER["PHP_SELF"] ?>?lib=<?= $showlib ?>&id=<?= $showspectrum ?>&ds=<?= $showds ?>" method="post">
+            <form name="dlform" action="<?= $_SERVER["PHP_SELF"] ?>?lib=<?= $showlib ?>&id=<?= $showid ?>&ds=<?= $showds ?>" method="post">
 
               <div class="field">
                 <label class="label">Name</label>
