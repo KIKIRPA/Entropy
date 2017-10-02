@@ -151,7 +151,7 @@ if (!$mode) {
 //
 switch ($mode) {
     case "dl":
-    require_once(PRIVPATH . 'inc/index_dl.inc.php');
+    require_once(PRIVPATH . 'inc/index_download.inc.php');
     break;
     case "view":
     require_once(PRIVPATH . 'inc/index_view.inc.php');
