@@ -35,14 +35,16 @@ function verifycookie($name, $institution = null, $email = null)
     
         // giving the array proper indices
         $cookiearray = array(
-        'name'        => $cookiearray[0],
-        'institution' => $cookiearray[1],
-        'email'       => $cookiearray[2]
-    );
+            'name'        => $cookiearray[0],
+            'institution' => $cookiearray[1],
+            'email'       => $cookiearray[2]
+        );
     } else {
-        $cookiearray = array( 'name'        => $name,
-                            'institution' => $institution,
-                            'email'       => $email );
+        $cookiearray = array( 
+            'name'        => $name,
+            'institution' => $institution,
+            'email'       => $email
+        );
     }
     
     // check if name and institution are at least 2 chars and email is a valid

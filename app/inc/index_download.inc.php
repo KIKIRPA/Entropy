@@ -35,7 +35,7 @@ try {
         }
     } elseif ($code[0] == "conv") { // is conversion allowed in library file?  TODO: is allowed in conversion settings json?
         if (!in_array($code[1], $LIBS[$showlib]["allowformat"])) {
-            throw new Exception("Download failed: conversion not allowed.");
+            throw new Exception("Download failed: conversion to ". $code[1] ." not allowed.");
         }
     } else {
         throw new Exception("Error in download code");
@@ -112,8 +112,21 @@ if ($code[0] == "conv") {
     //TODO: integrate convert-framework (check if we are able to convert to $format, preferably replacing the switch by a function)
     //$export = export($data["dataset"][$ds], $code, $EXPORT)
     $filename = $showid . (($showds == 'default')?"":"__".$showds) . "." . $code[1];
-    // TODO: code[1] should be the file extension!
-    exit();
+
+    /*
+    switch ($code[1]) {
+        case "dx":
+        case "jdx":
+            $file = ;
+            break;
+        case "ascii":
+        case "txt":
+
+            break;
+    }
+    */
+    echo "Conversion is not implemented yet!";
+    die();
 } elseif ($code[0] == "bin") {
     $filename = basename($code[1]);
 }

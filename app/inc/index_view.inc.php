@@ -56,11 +56,12 @@ if ( (!$is_logged_in and $MODULES["lib"]["download"]["public"])
             case "dx":
             case "jdx":
                 if (isset($meta["jcamptemplate"]) and file_exists(LIB_PATH . $showlib . "/templates/" . $meta["jcamptemplate"])) {
-                    $dl_List["JCAMP-DX"] = encode("conv=jcampdx");
+                    $dl_List["JCAMP-DX"] = encode("conv=" . $format);
                 }
                 break;
+            case "ascii":
             case "txt":
-                $dl_List["TXT"] = encode("conv=ascii");
+                $dl_List["TXT"] = encode("conv=" . $format);
                 break;
         }
     }
@@ -229,6 +230,95 @@ if (isset($data["dataset"][$showds]["anno"])) {
         </div>
 
         <?php if ($dl_ShowButtons and $dl_ShowForm): ?>
+        <script>
+          document.addEventListener('click', function () {
+            // form validation
+
+            var $target;
+            var validname = true;
+            var validinst = true;
+            var validemail = true;
+            var validlic = true;
+            var x = "";
+
+            $target = document.getElementById("name");
+            $help = document.getElementById("namehelp");
+            if ($target) {
+              x = $target.value;
+              if( x.length < 2 ) {
+                $target.classList.remove('is-success');
+                $target.classList.add('is-danger');
+                $help.style.display = "";
+                $help.innerHTML = "Please provide a valid name.";
+                validname = false;
+              }
+              else {
+                $target.classList.remove('is-danger');
+                $target.classList.add('is-success');
+                $help.style.display = "none";
+                validname = true;
+              }
+            }
+
+            $target = document.getElementById("institution");
+            $help = document.getElementById("insthelp");
+            if ($target) {
+              x = $target.value;
+              if( x.length < 2 ) {
+                $target.classList.remove('is-success');
+                $target.classList.add('is-danger');
+                $help.style.display = "";
+                $help.innerHTML = "Please provide a valid institution/university/company name.";
+                validinst = false;
+              }
+              else {
+                $target.classList.remove('is-danger');
+                $target.classList.add('is-success');
+                $help.style.display = "none";
+                validinst = true;
+              }
+            }
+
+            $target = document.getElementById("email");
+            $help = document.getElementById("emailhelp");
+            if ($target) {
+              x = $target.value;
+              var atpos = x.indexOf("@");
+              var dotpos = x.lastIndexOf(".");
+              if (atpos < 1 || dotpos < atpos + 2 || dotpos + 2 >= x.length) {
+                $target.classList.remove('is-success');
+                $target.classList.add('is-danger');
+                $help.style.display = "";
+                $help.innerHTML = "Please provide a valid e-mail address.";
+                validemail = false;
+              }
+              else {
+                $target.classList.remove('is-danger');
+                $target.classList.add('is-success');
+                $help.style.display = "none";
+                validemail = true;
+              }
+            }
+
+            $target = document.getElementById("license");
+            $help = document.getElementById("lichelp");
+            if ($target) {
+              if (!$target.checked) {	
+                $help.style.display = "";
+                $help.innerHTML = "Required";
+                $help.classList.remove('is-success');
+                validlic = false;
+              }
+              else {
+                $help.style.display = 'none';
+                validlic = true;
+              }
+            }
+
+            document.getElementById("btnsubmit").disabled = !(validname && validinst && validemail && validlic);
+          });
+        </script>
+
         <!-- download modal -->
         <div class='modal' id='dlmodal'>
           <div class='modal-background'></div>
@@ -284,14 +374,14 @@ if (isset($data["dataset"][$showds]["anno"])) {
               <input type="hidden" id="dl" name="dl">
 
               <div class="field is-grouped is-grouped-right">
-                <button class='modal-close'>Cancel</button>
-                <button class='modal-close is-primary' type="submit" id="btnsubmit" disabled>
+                <button class='button is-primary' type="submit" id="btnsubmit" disabled>
                   <span class="icon is-small"><i class="fa fa-download"></i></span>
                   <span>Download</span>
                 </button>
               </div>
             </form>
           </div>
+          <button class="modal-close is-large" aria-label="close"></button>
         </div>
         <?php endif;
 
