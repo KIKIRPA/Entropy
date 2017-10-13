@@ -34,7 +34,7 @@ const LOG_EV_FILE    = LOG_PATH . "event.csv";
 
 // style and javascript sources
 const CSS_FA         = "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css";
-const CSS_BULMA      = "https://cdnjs.cloudflare.com/ajax/libs/bulma/0.5.1/css/bulma.min.css";
+const CSS_BULMA      = "https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.0/css/bulma.min.css";
 const CSS_DT         = "https://cdn.datatables.net/v/dt/dt-1.10.15/fc-3.2.2/fh-3.1.2/r-2.1.1/datatables.min.css";
 const CSS_DT_BULMA   = "https://raw.githubusercontent.com/JDilleen/datatables-bulma/master/css/dataTables.bulma.min.css";
 const CSS_DYGRAPH    = "https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.css";
