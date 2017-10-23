@@ -12,7 +12,7 @@ if (count(get_included_files()) == 1) {
           <script type="text/javascript">
             g = new Dygraph(
               document.getElementById("graphdiv"),
-              <?= json_encode($data["dataset"][$showds]["data"]) ?>,
+              <?= json_encode($data["dataset"][$showDS]["data"]) ?>,
               { 
                 labels: ["<?= isset($units["x"]) ? $units["x"] : "Undefined" ?>","<?= $idbox_head ?>"],
                 xlabel: "<?= isset($units["x"]) ? $units["x"] : "Undefined" ?>", 

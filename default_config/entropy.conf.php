@@ -12,9 +12,13 @@ const LIB_PATH       = PRIVPATH . "data/libs/";
 const LOG_PATH       = PRIVPATH . "data/logs/";
 
 // webapp properties
-const APP_SHORT      = "Entropy";
-const APP_LONG       = "Entropy repository for analytical data";
+const APP_NAME      = "Entropy";
+const APP_CATCHPHRASE       = "A repository tailored for analytical data";
 const APP_KEYWORDS   = "";
+const APP_LOGO       = "./img/entropy_turquoise.png";
+const APP_ICON       = "./img/favicon_turquoise.png";
+const NAVBAR_COLOR   = "white";
+const DEFAULT_COLOR  = "primary";
 const HEADER_FILE    = PRIVPATH . 'inc/header.inc.php';
 const FOOTER_FILE    = PRIVPATH . 'inc/footer.inc.php';
 const MAIL_ADMIN     = "";
@@ -24,6 +28,7 @@ const USERS_FILE     = CONFIG_PATH . "users.json";
 const BLACKLIST_FILE = CONFIG_PATH . "blacklist.json";
 const MODULES_FILE   = CONFIG_PATH . "modules.json";
 const DATATYPES_FILE = CONFIG_PATH . "datatypes.json";
+const COLORS_FILE    = CONFIG_PATH . "colors.json";
 
 // repository storage
 const LIB_FILE       = LIB_PATH . "libraries.json";

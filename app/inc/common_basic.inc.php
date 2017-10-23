@@ -598,7 +598,7 @@ function eventLog($cat, $msg, $fatal = false, $mail = false)
     
     // mail: if asked ($mail=true), and if failed to write log ($success=false)
     if ($mail or !$success) {
-        $title = APP_SHORT . " event " . $cat;
+        $title = APP_NAME . " event " . $cat;
         $body = "Automated mail from " . gethostname() . ":\r\n\r\n";
         $headers = "From: " . MAIL_ADMIN . "\r\n"
             . "Reply-To: " . MAIL_ADMIN . "\r\n"
@@ -622,3 +622,65 @@ function eventLog($cat, $msg, $fatal = false, $mail = false)
     }
     return false;
 }
+
+
+/**
+ * Returns Bulma color modifier
+ *
+ * @param mixed $color Color name (without 'is-') or color number in colors.json 
+ * @param array $colorList Array of bulma colors
+ * @param mixed $default Default color if invalid (optional)
+ * @return string Returns Bulma color modifier string (eg is-dark) 
+ */
+function bulmaColorModifier($color, $colorList, $default = null) 
+{
+    // seach for $color as number or name
+    if (is_numeric($color)) {
+        if (isset($colorList[intval($color)])) {
+            return "is-" . $colorList[intval($color)];
+        }
+    }    
+    elseif (in_array(strtolower($color), $colorList)) {
+        return "is-" . strtolower($color);
+    }
+    
+    // if no answer yet, research for $default color (if supplied)
+    if (!is_null($default))
+    {
+        return bulmaColorModifier($default, $colorList); // no 3rd parameter, else infinite loop is possible
+    }
+    
+    // non-existing color (and default color): no bulma color tag
+    return "";
+}
+
+
+/**
+ * Returns color number
+ *
+ * @param mixed $color Color name (without 'is-') or color number in colors.json 
+ * @param array $colorList Array of bulma colors
+ * @param mixed $default Default color if invalid (optional)
+ * @return mixed Returns color number (or null in case no (valid) default)  
+ */
+ function bulmaColorInt($color, $colorList, $default = null) 
+ {
+     // seach for $color as number or name
+     if (is_numeric($color)) {
+         if (isset($colorList[intval($color)])) {
+             return intval($color);
+         }
+     }    
+     elseif (in_array(strtolower($color), $colorList)) {
+         return array_search (strtolower($color), $colorList);
+     }
+     
+     // if no answer yet, research for $default color (if supplied)
+     if (!is_null($default))
+     {
+         return bulmaColorInt($default, $colorList); // no 3rd parameter, else infinite loop is possible
+     }
+     
+     // non-existing color (and default color): null
+     return null;
+ }

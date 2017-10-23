@@ -15,16 +15,16 @@ if (($f == "set") and ($output == false)) {
     // give the creator access rights in users.json //
     //----------------------------------------------//
 
-    if (isset($USERS[$is_logged_in]) and isset($USERS[$is_logged_in]["permissions"])) {
+    if (isset($USERS[$isLoggedIn]) and isset($USERS[$isLoggedIn]["permissions"])) {
         foreach ($MODULES["lib"] as $mod => $value) {
-            if (isset($USERS[$is_logged_in]["permissions"][$mod])
-            and !in_array("_ALL", $USERS[$is_logged_in]["permissions"][$mod])
-            and !in_array("_NONE", $USERS[$is_logged_in]["permissions"][$mod])
-            and !in_array($id, $USERS[$is_logged_in]["permissions"][$mod])
+            if (isset($USERS[$isLoggedIn]["permissions"][$mod])
+            and !in_array("_ALL", $USERS[$isLoggedIn]["permissions"][$mod])
+            and !in_array("_NONE", $USERS[$isLoggedIn]["permissions"][$mod])
+            and !in_array($id, $USERS[$isLoggedIn]["permissions"][$mod])
         ) {
-                array_push($USERS[$is_logged_in]["permissions"][$mod], $id);
+                array_push($USERS[$isLoggedIn]["permissions"][$mod], $id);
             } else {
-                $USERS[$is_logged_in]["permissions"][$mod] = array($id);
+                $USERS[$isLoggedIn]["permissions"][$mod] = array($id);
             }
         }
     

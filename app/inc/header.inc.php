@@ -6,38 +6,114 @@ if (count(get_included_files()) == 1) {
     exit("Direct access not permitted.");
 }
 
-if ($is_logged_in) { // menu items to show = those modules with a non-false "menu"
-    $menuitems_lib = array();
-    $menuitems_adm = array();
 
-    foreach ($MODULES["lib"] as $id => $value) {
-        if ($value["menu"]) {
-            $menuitems_lib[$id] = $value["caption"];
+/*
+    This inc requires:
+        $LIBS
+        $isLoggedIn
+        $user
+        $showLib
+        $showMod
+
+    This inc creates:
+        $navMenuLibs
+        $isHiddenLib
+        $navMenuMods
+        $navMenuTitle
+        $navMenuSubtitle
+        $navMenuLogoBox
+*/
+
+// TODO temporary create $showLib and $showMod if not already set
+if (!isset($showLib)) $showLib = null;
+if (!isset($showMod)) $showMod = null;
+
+
+// initialize variables to initial values
+$navMenuLibs = array();
+$isHiddenLib = false;
+$navMenuMods = array();
+$navMenuTitle = APP_NAME;
+$navMenuSubtitle = APP_CATCHPHRASE;
+$navMenuLogoBox = false;
+
+// list accessible libraries
+foreach (array_keys($LIBS) as $lib) {
+    if (strtoupper($lib) != "_START") {
+        // add libraries that are either public, or if logged in, to which this user has view-access
+        if (    ( strtolower($LIBS[$lib]["view"]) == "public" ) 
+             or ( $isLoggedIn and calcPermLib($user["permissions"], "list", $lib))
+           ) {
+            $navMenuLibs[$lib] = $LIBS[$lib]["navmenucaption"];
         }
     }
-    foreach ($MODULES["adm"] as $id => $value) {
-        if ($value["menu"]) {
-            $menuitems_adm[$id] = $value["caption"];
-        }
-    }
-
-    /* TODO: the new modules.json has extra features that need to be implemented in the menu: the "public" variable
-            decides what modules should be available to public and hidden libraries for those that are not logged in
-
-            foreach lib:
-            - if logged in: those modules that are (1) marked public AND library is public/hidden
-                                                OR (2) to which a user has been granted access
-            - if not logged in: those modules that are marked public AND library is public/hidden
-            for adm:
-            - if not logged in: those modules marked public
-            - if logged in: those modules marked public OR to which a user has been granted access
-
-            if for a particular lib or adm there is only a single mod to show: don't draw the submenu
-
-            the [adm][auth] module may have to be an exception: when logged in, it should have the caption "log out"
-            and vice versa.
-    */
 }
+
+// if a $showLib is present: (1) check if hidden, (2) list submenu items for that library
+if ($showLib) {
+    if ($showLib != "_START") {
+        // are we accessing a hidden library?
+        if (!isset($navMenuLibs[$showLib])) {
+            $isHiddenLib = $showLib;
+            $navMenuLibs[$showLib] = $LIBS[$showLib]["navmenucaption"];
+        }
+
+        if ($isLoggedIn) {
+            // list library modules with non-false "navMenuShow"
+            foreach ($MODULES["lib"] as $id => $value) {
+                if ($value["navMenuShow"]) {
+                    $navMenuMods[$id] = $value["caption"];
+                }
+            }
+            // fetch permissions for $showLib
+            $perm = calcPermMod($user["permissions"], $showLib);
+            if (is_array($perm)) {
+                $perm = array_flip($perm);  //flips keys and values (mods are now keys)
+                $navMenuMods = array_intersect_key($navMenuMods, $perm);
+            } elseif (!$perm) {
+                $navMenuMods = array();     //no permissions: empty menu!
+            }          
+        }
+    }
+}
+
+// if an $showMod is an adm mod
+if ($showMod and $isLoggedIn) {
+    if (isset($MODULES["adm"][$showMod])) {
+        // list admin modules with non-false "navMenuShow"
+        foreach ($MODULES["adm"] as $id => $value) {
+            if ($value["navMenuShow"]) {
+                $navMenuMods[$id] = $value["caption"];
+            }
+        }
+        // fetch permissions
+        $perm = calcPermMod($user["permissions"]);
+        if (is_array($perm)) {
+            $perm = array_flip($perm);  //flips keys and values (mods are now keys)
+            $navMenuMods = array_intersect_key($navMenuMods, $perm);
+        } elseif (!$perm) {
+            $navMenuMods = array();     //no permissions: empty menu!
+        }
+    }
+}
+
+
+// title, subtitle and logobox
+if ($showLib) {
+    if (isset($LIBS[$showLib]["name"])) {
+        $navMenuTitle = $LIBS[$showLib]["name"];
+    }
+    if (isset($LIBS[$showLib]["catchphrase"])) {
+        $navMenuSubtitle = $LIBS[$showLib]["catchphrase"];
+    }
+    if (isset($LIBS[$showLib]["logobox"])) {
+        $navMenuLogoBox = $LIBS[$showLib]["logobox"];
+    }
+}
+
+// cleanup variables
+unset($lib, $id, $value, $perm);
+
   
   
   /* *****************
@@ -47,131 +123,129 @@ if ($is_logged_in) { // menu items to show = those modules with a non-false "men
 ?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">    
-  <head>
-    <title><?= $htmltitle ?></title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>		
-    <meta http-equiv="Window-target" content="_top" />
-    <meta name="keywords" content="<?= $htmlkeywords ?>"/>
-    <link rel="shortcut icon" href="./img/entropy.png" type="image/x-icon" />
-    <link rel="stylesheet" type='text/css' href='<?= CSS_FA ?>'>
-    <link rel="stylesheet" type='text/css' href='<?= CSS_BULMA ?>'>
-    <link rel='stylesheet' type='text/css' href='./css/general.css'>
-    <link rel='stylesheet' type='text/css' href='./css/navigation.css'>
-    <link rel='stylesheet' type='text/css' href='./css/jquery.notifyBar.css'>
-    <?= $style ?>
-    <script type='text/javascript' src='<?= JS_JQUERY ?>'></script>
-    <script type='text/javascript' src='./js/jquery.notifyBar.js' async></script>
-    <?= $scripts ?>
-    <script type='text/javascript' src='./js/main.js'></script>
-  </head>
+    <head>
+        <title><?= APP_NAME ?></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>		
+        <meta http-equiv="Window-target" content="_top"/>
+        <meta name="keywords" content="<?= APP_KEYWORDS ?>"/>
+        <link rel="shortcut icon" href="<?= APP_ICON ?>" />
+        <link rel="stylesheet" type='text/css' href='<?= CSS_FA ?>'>
+        <link rel="stylesheet" type='text/css' href='<?= CSS_BULMA ?>'>
+        <link rel='stylesheet' type='text/css' href='./css/jquery.notifyBar.css'>
+        <?= $style ?>
+        <script type='text/javascript' src='<?= JS_JQUERY ?>'></script>
+        <script type='text/javascript' src='./js/jquery.notifyBar.js' async></script>
+        <?= $scripts ?>
+        <script type='text/javascript' src='./js/main.js'></script>
+    </head>
   
-  <body>
-    <div class="wrapper">
-      <div class="header">
-        <div id="logo">
-          <img src="./img/entropy.png" title="Entropy" alt="Entropy">
-        </div>
-        <div id="title">
-          <h1><?= $pagetitle ?></h1>
-          <h2><?= $pagesubtitle ?></h2>
-        </div>
-      </div>
-    
-      <nav id="menu">
-        <ul> 
-<?php 
-// landing page
-if (isset($LIBS["_landingpage"])) {
-    if (strtolower($LIBS["_landingpage"]["view"]) == "public") {
-        echo "          <li>\n"
-        . "            <a href='./'>" . $LIBS["_landingpage"]["menu"] . "</a>\n"
-        . "          </li>\n";
-    }
-}
+    <body>
+        <nav class="navbar <?= bulmaColorModifier(NAVBAR_COLOR, $COLORS, "white") ?>">
+            <div class="container">
+                <div class="navbar-brand">
+                    <a class="navbar-item" href=".\">
+                        <img src="<?= APP_LOGO ?>" alt="<?= APP_NAME?>" height="28">
+                    </a>
+                    <div class="navbar-burger burger" data-target="navMenu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            
+                <div id="navMenu" class="navbar-menu">
+                    <div class="navbar-start">
+                        <?php foreach ($navMenuLibs as $id => $caption): ?>  
+                        <a class="navbar-item<?= ($showLib == $id) ? " is-active\"" : "" ?>" href="./index.php?lib=<?= $id ?>">
+                            <?= $isHiddenLib == $id ? "<span class=\"icon\"><i class=\"fa fa-eye-slash\"></i></span>" : "" ?>
+                            <?= $caption ?>
+                        </a>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php if (IS_HTTPS and !IS_BLACKLISTED): ?>
+                    <div class="navbar-end">
+                        <?php if ($isLoggedIn): ?>
+                        <div class="navbar-item">
+                            <div class="field has-addons">
+                                <p class="control">
+                                    <a class="button <?= bulmaColorModifier(NAVBAR_COLOR, $COLORS, "white") ?> is-inverted is-outlined is-static"><?= $isLoggedIn ?></a>
+                                </p>
+                                <p class="control">
+                                    <a class="button <?= bulmaColorModifier(NAVBAR_COLOR, $COLORS, "white") ?> is-inverted" href="./tools.php?mod=console">
+                                        <span class="icon">
+                                            <i class="fa fa-cog" aria-hidden="true"></i>
+                                        </span>
+                                    </a>
+                                </p>
+                                <p class="control">
+                                    <a class="button <?= bulmaColorModifier(NAVBAR_COLOR, $COLORS, "white") ?> is-inverted" href="./auth.php?logout">
+                                        <span class="icon">
+                                            <i class="fa fa-sign-out" aria-hidden="true"></i>
+                                        </span>
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                        <?php else: ?>
+                        <div class="navbar-item">
+                            <p class="control">
+                                <a class="button <?= bulmaColorModifier(NAVBAR_COLOR, $COLORS, "white") ?> is-inverted" href="./auth.php">
+                                    <span class="icon">
+                                        <i class="fa fa-sign-in" aria-hidden="true"></i>
+                                    </span>
+                                    <span>Log in</span>
+                                </a>
+                            </p>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </nav>
 
-// lib menu entries
-foreach ($LIBS as $libid => $lib) {
-    if (strtolower($libid) != "_landingpage") {
-        $perm = false;
-    
-        if ($is_logged_in) {
-            $perm = calcPermMod($user["permissions"], $libid);
-    
-            if (is_array($perm)) {
-                $perm = array_intersect($perm, array_keys($menuitems_lib));
-            } elseif ($perm) {
-                $perm = array_keys($menuitems_lib);
-            }
-            // else: $perm==false => do nothing ($perm remains false)
-        }
-    
-        if (!$perm) {
-            if (strtolower($lib["view"]) == "public") {
-                echo "          <li><a href=\"./index.php?lib=" . $libid . "\">" . $lib["menu"] . "</a></li>\n";
-            } elseif ((strtolower($lib["view"]) == "hidden") and ($_REQUEST["lib"] == $libid)) {
-                echo "          <li><a href=\"./index.php?lib=" . $libid . "\">" . $lib["menu"] . "&nbsp<img src='./img/freecons/70_white.png' height='10'></a></li>\n";
-            }
-        } elseif (is_array($perm)) {
-            if (strtolower($lib["view"]) == "hidden") {
-                $note = "&nbsp<img src='./img/freecons/70_white.png' height='10'>";
-            } elseif (strtolower($lib["view"]) == "public") {
-                $note = "";
-            } else {
-                $note = "&nbsp<img src='./img/freecons/32_white.png' height='10'>";
-            }
-    
-            if ((count($perm) == 1) and ($perm[0] == "view")) {
-                echo "          <li><a href=\"./index.php?lib=" . $libid . "\">" . $lib["menu"] . $note . "</a></li>\n";
-            } else {
-                echo "          <li><a href=\"#\">" . $lib["menu"] . $note . "</a>\n";
-                echo "            <ul>\n";
-                echo "              <li><a href=\"./index.php?lib=" . $libid . "\"> View</a></li>\n";
-                foreach ($perm as $item) {
-                    ///////////////////////////////////////////////////
-                    // TODO REMARK tools.php?mod=view == index.php //
-                    ///////////////////////////////////////////////////
-                    if ($item != "view") {
-                        echo "              <li><a href=\"./tools.php?mod=" . $item . "&lib=" . $libid . "\">" . $menuitems_lib[$item] . "</a></li>\n";
-                    }
-                }
-                echo "            </ul>\n";
-                echo "          </li>\n";
-            }
-        }
-    }
-}
+        <section class="hero <?= bulmaColorModifier($showLib ? $LIBS[$showLib]["color"] : DEFAULT_COLOR, $COLORS, DEFAULT_COLOR) ?>">
+            <div class="hero-body">
+                <div class="container">
 
-// admin login
-if (IS_HTTPS and !IS_BLACKLISTED) {
-    if ($is_logged_in) {
-        $perm = calcPermMod($user["permissions"]);
-    
-        if (is_array($perm)) {
-            $perm = array_intersect($perm, array_keys($menuitems_adm));
-        } elseif ($perm) {
-            $perm = array_keys($menuitems_adm);
-        }
-        // else: $perm==false => do nothing ($perm remains false)
-    
-        echo "          <li><a href=\"#\"><img src='./img/freecons/71_white.png' height='14' width='14'>&nbsp;" . $_SESSION['username'] . "</a>\n";
-        echo "            <ul>\n";
-        foreach ($perm as $item) {
-            echo "              <li><a href=\"./tools.php?mod=" . $item . "\">" . $menuitems_adm[$item] . "</a></li>\n";
-        }
-        echo "              <li><a href=\"./auth.php?logout\">Log out</a></li>\n";
-        echo "            </ul>\n";
-        echo "          </li>\n";
-    } else {
-        echo "          <li><a href=\"./auth.php\"><img src='./img/freecons/71_white.png' height='14' width='14'></a></li>\n";
-    }
-}
-        
-?>          
-        </ul>
-      </nav> 
+                    <div class="columns is-desktop is-vcentered">
+                        <div class="column">
+                            <h1 class="title"><?= $navMenuTitle ?></h1>
+                            <h2 class="subtitle"><?= $navMenuSubtitle ?></h2>
+                        </div>
+                        <?php if ($navMenuLogoBox): ?>
+                        <div class="column is-narrow">
+                            <div class="content is-small has-text-left-touch has-text-right-desktop">
+                                <?= $navMenuLogoBox ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            <?php if (!empty($navMenuMods)): ?>
+            <div class="hero-foot">
+                <nav class="tabs is-boxed">
+                    <div class="container">
+                        <ul>
+                            <?php foreach ($navMenuMods as $id => $caption): ?>
+                            <li<?= ($showMod == $id) ? " class=\"is-active\"" : "" ?>>
+                                <a href="./<?= ($id == "list") ? "index.php?" : "tools.php?mod=".$id."&" ?><?= $showLib ? "lib=". $showLib : "" ?>">
+                                    <?= $caption ?>
+                                </a>
+                            </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+            <?php endif; ?>
+        </section>
+         
       
 <?php 
-if ($is_expired) {
+if ($isExpired) {
     echo "      <script>\n"
     . "        $(function () {\n"
     . "          $.notifyBar({\n"
@@ -184,7 +258,7 @@ if ($is_expired) {
     . "      </script>\n";
 }
 
-unset($menuitems_lib, $menuitems_adm);
+unset($navMenuLibs, $navMenuMods, $isHiddenLib);
 ?>
       
       <div class ="main">

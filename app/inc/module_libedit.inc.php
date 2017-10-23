@@ -5,8 +5,6 @@ if (count(get_included_files()) == 1) {
     header("Status: 404 Not Found");
     exit("Direct access not permitted.");
 }
-   
-  //TODO is the library parameter "header" still used somewhere? if not, can it be removed?
   
   
 /* *********************************************************
@@ -16,20 +14,20 @@ if (count(get_included_files()) == 1) {
 if (!isset($libmk)) {
     $libmk = false;
 }  // in module_libmk.inc.php this is set to true!
-if (!isset($lp)) {
-    $lp = false;
-}     // in module_landingpage this is set to true
+if (!isset($startPage)) {
+    $startPage = false;
+}     // in module_START this is set to true
 
-if (!$lp) {
+if (!$startPage) {
     $id = str_replace(" ", "", strtolower($_REQUEST["lib"]));
 } else {
-    $id = "_landingpage";
+    $id = "_START";
 }
 
 $new = !isset($LIBS[$id]);           // if not in libs.json
 
-if ($lp) {
-    echo "      <h3>Modify landing page</h3>\n";
+if ($startPage) {
+    echo "      <h3>Modify start page</h3>\n";
 } elseif ($new) {
     echo "      <h3>Create library</h3>\n";
 } else {
@@ -39,15 +37,14 @@ if ($lp) {
 $f="error";
 
 if (isset($_REQUEST["set"])) {
-    if (!empty($_REQUEST["lib"])
-        and !empty($_REQUEST["name"])
-        and !empty($_REQUEST["menu"])
-        and !empty($_REQUEST["header"])
+    if (    !empty($_REQUEST["lib"])
         and !empty($_REQUEST["view"])
-    ) {
+        and ($startPage or !empty(trim($_REQUEST["name"])))
+        and ($startPage or !empty(trim($_REQUEST["navmenucaption"]))) 
+       ) {
         $f="set";
     } else {
-        $errormsg = "Some data is missing! (library id, name, menu, header and view need to be set)";
+        $errormsg = "Some data is missing: (requires id" . ($startPage ? "" : ", name, menu caption") . " and view)";
     }
 } else {
     $f="edit";
@@ -70,60 +67,56 @@ $errormsg = "Cannot make this library: a library with this library ID already ex
 if ($f == "edit") {
     $preset = array( "lib" => "",
                      "name" => "",
+                     "navmenucaption" => "",
                      "view" => "",
-                     "menu" => "",
-                     "header" => "",
-                     "colour" => "",
-                     "shortdescription" => "",
-                     "longdescription" => "",
+                     "color" => "",
+                     "logobox" => "",
+                     "catchphrase" => "",
+                     "text" => "",
                      "contact" => "",
                      "news" => array(),
-                     "ref" => array(),
-                     "columns" => "",
-                     "allowformat" => ""
+                     "references" => array(),
+                     "listcolumns" => array(),
+                     "downloadconverted" => array(),
+                     "downloadbinary" => array()
     );
 
     if (!$new) {
         foreach ($LIBS[$id] as $i => $item) {
             $preset[$i] = $item;
         }
-        if (is_array($preset["columns"])) {
-            $preset["columns"] = implode("|", $preset["columns"]);
-        }
-        if (is_array($preset["allowformat"])) {
-            $preset["allowformat"] = implode("|", $preset["allowformat"]);
-        }
     }
 ?>
 
 <script type="text/javascript">
-    var cRef = 1;
-    var lRef = 25;
-    var cNews = 1;
-    var lNews = 25;
-    
-    function addRef(divName){
-        if (cRef == lRef)  {
-            alert("Be reasonable, " + cRef + " references should be enough, no?");
-        }
-        else {
-            var newdiv = document.createElement('div');
-            newdiv.innerHTML = "<textarea name='ref[]' style='width: 100%;'></textarea><br>";
-            document.getElementById(divName).appendChild(newdiv);
-            cRef++;
-        }
-    }
-    
     function addNews(divName){
-        if (cNews == lNews)  {
-            alert("Be reasonable, " + cNews + " newsitems should be enough, no?");
-        }
-        else {
-            var newdiv = document.createElement('div');
-            newdiv.innerHTML = "<textarea name='news[]' style='width: 100%;'></textarea><br>";
-            document.getElementById(divName).appendChild(newdiv);
-            cNews++;
-        }
+        var newdiv = document.createElement('div');
+        newdiv.innerHTML = "<textarea name='news[]' style='width: 100%;'></textarea><br>";
+        document.getElementById(divName).appendChild(newdiv);
+    }
+
+    function addRef(divName){
+        var newdiv = document.createElement('div');
+        newdiv.innerHTML = "<textarea name='references[]' style='width: 100%;'></textarea><br>";
+        document.getElementById(divName).appendChild(newdiv);
+    }
+
+    function addCol(divName){
+        var newdiv = document.createElement('div');
+        newdiv.innerHTML = "<textarea name='listcolumns[]' style='width: 100%;'></textarea><br>";
+        document.getElementById(divName).appendChild(newdiv);
+    }
+
+    function addConv(divName){
+        var newdiv = document.createElement('div');
+        newdiv.innerHTML = "<textarea name='downloadconverted[]' style='width: 100%;'></textarea><br>";
+        document.getElementById(divName).appendChild(newdiv);
+    }
+
+    function addBin(divName){
+        var newdiv = document.createElement('div');
+        newdiv.innerHTML = "<textarea name='downloadbinary[]' style='width: 100%;'></textarea><br>";
+        document.getElementById(divName).appendChild(newdiv);
     }
     
     function validate()
@@ -146,12 +139,6 @@ if ($f == "edit") {
             document.libedit.menu.focus() ;
             return false;
         }
-        if( document.libedit.header.value == "" )
-        {
-            alert( "Library HEADER missing!" );
-            document.libedit.header.focus() ;
-            return false;
-        }
         return( true );
     }
     
@@ -159,85 +146,115 @@ if ($f == "edit") {
 
 <form name='libedit' action='<?= $_SERVER["REQUEST_URI"] . "&set" ?>' method='post' onsubmit='return(validate());'>
     <table cellspacing='8' style='width: 100%;'> 
-    <tr>
-        <td><label accesskey='l' for='lib' class='label'>lib</label><span style='color:red'>*</span></td>
-        <td><?php if ($lp):      ?>Landing page<input type='hidden' id='lib' name='lib' value='_landingpage'>
-            <?php elseif ($new): ?><input type='text' id='lib' name='lib' maxlength='12' value='<?= $id ?>' style='width: 100%;'>
-            <?php else:          ?><?= $id ?><input type='hidden' id='lib' name='lib' value='<?= $id ?>'>
-            <?php endif; ?>
-        </td>
-    </tr>
-    <tr>
-        <td><label accesskey='n' for='name' class='label'>name</label><span style='color:red'>*</span></td>
-        <td><input type='text' id='name' name='name' maxlength='256' style='width: 100%;' value='<?= $preset["name"] ?>'></td>
-    </tr>
-    <tr>
-        <td><label accesskey='v' for='view' class='label'>view</label><span style='color:red'>*</span></td>
-        <td>
-        <?php if (!$lp): ?>
-            <input type='radio' id='view' name='view' value='locked'<?= ((empty($preset["view"]) or $preset["view"] == "locked") ? " checked" : "") ?>>Locked (viewing this library requires logging in as a user with viewing rights)<br>
-            <input type='radio' id='view' name='view' value='hidden'<?= (($preset["view"] == "hidden") ? " checked" : "") ?>>Hidden (viewing this library is open, but requires a non-disclosed link)<br>
-            <input type='radio' id='view' name='view' value='public'<?= (($preset["view"] == "public") ? " checked" : "") ?>>Public (viewing this library is open, with direct access via the menu)
-        <?php else: ?>
-            <input type='radio' id='view' name='view' value='hidden'<?= ((empty($preset["view"]) or $preset["view"] == "hidden") ? " checked" : "") ?>>Hidden<br>
-            <input type='radio' id='view' name='view' value='public'<?= (($preset["view"] == "public") ? " checked" : "") ?>>Public
-        <?php endif; ?>
-        </td>
-    </tr>
-    <tr>
-        <td><label accesskey='m' for='menu' class='label'>menu</label><span style='color:red'>*</span></td>
-        <td><input type='text' id='menui' name='menu' maxlength='256' style='width: 100%;' value='<?= $preset["menu"] ?>'></td>
-    </tr>
-    <tr>
-        <td><label accesskey='h' for='header' class='label'>header</label><span style='color:red'>*</span></td>
-        <td><textarea id='header' name='header' style='width: 100%;'><?= $preset["header"] ?></textarea></td>
-    </tr>
-    <tr>
-        <td><label accesskey='c' for='colour' class='label'>colour</label></td>
-        <td><input type='color' id='colour' name='colour' style='width: 100%;' value='<?= $preset["colour"] ?>'></td>
-    </tr>
-    <?php if (!$lp): ?>
         <tr>
-            <td><label accesskey='s' for='shortdescription' class='label'>short description</label></td>
-            <td><textarea id='shortdescription' name='shortdescription' style='width: 100%;'><?= $preset["shortdescription"] ?></textarea></td>
+            <td><label for='le_lib' class='label'>Library ID</label><span style='color:red'>*</span></td>
+            <td><?php if ($startPage): ?>Start page<input type='hidden' id='le_lib' name='lib' value='_START'>
+                <?php elseif ($new):   ?><input type='text' id='le_lib' name='lib' maxlength='12' value='<?= $id ?>' style='width: 100%;'>
+                <?php else:            ?><?= $id ?><input type='hidden' id='le_lib' name='lib' value='<?= $id ?>'>
+                <?php endif; ?>
+            </td>
         </tr>
-    <?php endif; ?>
-    <tr>
-        <td><label accesskey='d' for='longdescription' class='label'>long description</label></td>
-        <td><textarea id='longdescription' name='longdescription' style='width: 100%;'><?= $preset["longdescription"] ?></textarea></td>
-    </tr>
-    <tr>
-        <td><label accesskey='o' for='contact' class='label'>contact</label></td>
-        <td><textarea id='contact' name='contact' style='width: 100%;'><?= $preset["contact"] ?></textarea></td>
-    </tr>
-    <tr>
-        <td><label accesskey='e' for='news' class='label'>news</label><br><input type="button" value="+" onClick="addNews('dynamicInputNews');"></td>
-        <td>
-            <div id="dynamicInputNews">
-                <?php foreach ($preset["news"] as $news): ?><textarea id='news' name='news[]' style='width: 100%;'><?= $news ?></textarea><br>
-                <?php endforeach; ?>
-            </div>
-        </td>
-    </tr>
-    <tr>
-        <td><label accesskey='r' for='ref' class='label'>references</label><br><input type="button" value="+" onClick="addRef('dynamicInputRef');"></td>
-        <td>
-            <div id="dynamicInputRef">
-                <?php foreach ($preset["ref"] as $ref): ?><textarea id='ref' name='ref[]' style='width: 100%;'><?= $ref ?></textarea><br>
-                <?php endforeach; ?>
-            </div>
-        </td>
-    </tr>
-    <?php if (!$lp): ?>
-    <tr>
-        <td><label accesskey='u' for='columns' class='label'>columns</label></td>
-        <td><input type='text' id='columns' name='columns' style='width: 100%;' value='<?= $preset["columns"] ?>'></td>
-    </tr>
-    <tr>
-        <td><label accesskey='a' for='allowformat' class='label'>allow formats</label></td>
-        <td><input type='text' id='allowformat' name='allowformat' style='width: 100%;' value='<?=  $preset["allowformat"] ?>'></td>
-    </tr>
-    <?php endif; ?>
+        <?php if (!$startPage): ?>
+        <tr>
+            <td><label for='le_name' class='label'>Name</label><span style='color:red'>*</span></td>
+            <td><input type='text' id='le_name' name='name' maxlength='256' style='width: 100%;' value='<?= $preset["name"] ?>'></td>
+        </tr>
+        <tr>
+            <td><label for='le_menu' class='label'>Navigation menu caption</label><span style='color:red'>*</span></td>
+            <td><input type='text' id='le_menu' name='navmenucaption' maxlength='256' style='width: 100%;' value='<?= $preset["navmenucaption"] ?>'></td>
+        </tr>
+        <?php endif; ?>
+        <tr>
+            <td><label for='le_view' class='label'>View</label><span style='color:red'>*</span></td>
+            <td>
+            <?php if (!$startPage): ?>
+                <input type='radio' id='le_view' name='view' value='locked'<?= ((empty($preset["view"]) or $preset["view"] == "locked") ? " checked" : "") ?>>Locked (viewing this library requires logging in as a user with viewing rights)<br>
+                <input type='radio' id='le_view' name='view' value='hidden'<?= (($preset["view"] == "hidden") ? " checked" : "") ?>>Hidden (viewing this library is open, but requires a non-disclosed link)<br>
+                <input type='radio' id='le_view' name='view' value='public'<?= (($preset["view"] == "public") ? " checked" : "") ?>>Public (viewing this library is open, with direct access via the menu)
+            <?php else: ?>
+                <input type='radio' id='le_view' name='view' value='hidden'<?= ((empty($preset["view"]) or $preset["view"] == "hidden") ? " checked" : "") ?>>Hidden<br>
+                <input type='radio' id='le_view' name='view' value='public'<?= (($preset["view"] == "public") ? " checked" : "") ?>>Public
+            <?php endif; ?>
+            </td>
+        </tr>
+        <tr>
+            <td><label for='le_color' class='label'>Theme color</label></td>
+            <td>
+                <div class="control">
+                    <?php foreach ($COLORS as $i => $c): ?>
+                    <label class="radio">
+                        <input type="radio" name="color" value="<?= $i ?>" <?= (bulmaColorInt($preset["color"], $COLORS) == $i) ? "checked" : "" ?>>
+                        <span class="tag <?= bulmaColorModifier($i, $COLORS) ?>"><?= $i ?></span>
+                    </label>
+                    <?php endforeach; ?>
+                </div>
+            </td>
+        </tr>
+        <?php if (!$startPage): ?>
+            <tr>
+                <td><label for='le_catchphrase' class='label'>Catchphrase</label></td>
+                <td><textarea id='le_catchphrase' name='catchphrase' style='width: 100%;'><?= $preset["catchphrase"] ?></textarea></td>
+            </tr>
+        <?php endif; ?>
+        <tr>
+            <td><label for='le_logobox' class='label'>Logobox</label></td>
+            <td><textarea id='le_logobox' name='logobox' style='width: 100%;'><?= $preset["logobox"] ?></textarea></td>
+        </tr>
+        <tr>
+            <td><label for='le_text' class='label'>Large textbox</label></td>
+            <td><textarea id='le_text' name='text' style='width: 100%;'><?= $preset["text"] ?></textarea></td>
+        </tr>
+        <tr>
+            <td><label for='le_contact' class='label'>Contact details box</label></td>
+            <td><textarea id='le_contact' name='contact' style='width: 100%;'><?= $preset["contact"] ?></textarea></td>
+        </tr>
+        <tr>
+            <td><label for='le_news' class='label'>News items box</label><br><input type="button" value="+" onClick="addNews('dynamicInputNews');"></td>
+            <td>
+                <div id="dynamicInputNews">
+                    <?php foreach ($preset["news"] as $item): ?><textarea id='le_news' name='news[]' style='width: 100%;'><?= $item ?></textarea><br>
+                    <?php endforeach; ?>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td><label for='le_ref' class='label'>Literature references box</label><br><input type="button" value="+" onClick="addRef('dynamicInputRef');"></td>
+            <td>
+                <div id="dynamicInputRef">
+                    <?php foreach ($preset["references"] as $item): ?><textarea id='le_ref' name='references[]' style='width: 100%;'><?= $item ?></textarea><br>
+                    <?php endforeach; ?>
+                </div>
+            </td>
+        </tr>
+        <?php if (!$startPage): ?>
+        <tr>
+            <td><label for='le_col' class='label'>Columns in list view</label><br><input type="button" value="+" onClick="addCol('dynamicInputCol');"></td>
+            <td>
+                <div id="dynamicInputCol">
+                    <?php foreach ($preset["listcolumns"] as $item): ?><textarea id='le_col' name='listcolumns[]' style='width: 100%;'><?= $item ?></textarea><br>
+                    <?php endforeach; ?>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td><label for='le_conv' class='label'>Allow download of converted formats</label><br><input type="button" value="+" onClick="addConv('dynamicInputConv');"></td>
+            <td>
+                <div id="dynamicInputConv">
+                    <?php foreach ($preset["downloadconverted"] as $item): ?><textarea id='le_conv' name='downloadconverted[]' style='width: 100%;'><?= $item ?></textarea><br>
+                    <?php endforeach; ?>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td><label for='le_bin' class='label'>Allow download of binary formats</label><br><input type="button" value="+" onClick="addBin('dynamicInputBin');"></td>
+            <td>
+                <div id="dynamicInputBin">
+                    <?php foreach ($preset["downloadbinary"] as $item): ?><textarea id='le_bin' name='downloadbinary[]' style='width: 100%;'><?= $item ?></textarea><br>
+                    <?php endforeach; ?>
+                </div>
+            </td>
+        </tr>
+        <?php endif; ?>
     </table>
 
     <br><br>
@@ -252,55 +269,71 @@ if ($f == "edit") {
 ********************************************************* */
 
 elseif ($f == "set") {
-    //take known and non-empty values from $_REQUEST
-    $newlib = array( "name"     => trim($_REQUEST["name"]),
-                     "menu"     => trim($_REQUEST["menu"]),
-                     "header"   => $_REQUEST["header"],
-                     "view"     => $_REQUEST["view"]
-    );
+    // make array and fill it with (corrected) $_REQUEST parameters in logical order (1=strings, 2=colors, 3=arrays, 4=arrays that need sanitizeStr) 
+    $newLib = array();
+    $params = array( "name" => 1,
+                     "navmenucaption" => 1,
+                     "view" => 1,
+                     "color" => 2,
+                     "logobox" => 1,
+                     "catchphrase" => 1,
+                     "text" => 1,
+                     "contact" => 1,
+                     "news" => 3,
+                     "references" => 3,
+                     "listcolumns" => 4,
+                     "downloadconverted" => 4,
+                     "downloadbinary" => 4
+                   );
 
-    if (empty($id) or empty($newlib["name"]) or empty($newlib["menu"]) or empty($newlib["header"]) or empty($newlib["view"])) {
-        $output = "missing library ID, name, menu, header or view!";
-    } else {
-        foreach (array("colour", "shortdescription", "longdescription", "contact") as $item) {
-            if (isset($_REQUEST[$item]) and ($_REQUEST[$item] != "")) {
-                $newlib[$item] = $_REQUEST[$item];
+    foreach ($params as $item => $category) {
+        if (isset($_REQUEST[$item])) {
+            switch ($category) {
+                case 1: // strings
+                    $value = trim($_REQUEST[$item]);
+                    if (!empty($value)) {
+                        $newLib[$item] = $value;
+                    }
+                    break;
+
+                case 2: // colors
+                    $value = bulmaColorInt(trim($_REQUEST[$item]), $COLORS, DEFAULT_COLOR);
+                    if (isset($value)) {
+                        $newLib[$item] = $value;
+                    }
+                    break;
+
+                case 3: // arrays
+                    if (is_array($_REQUEST[$item])) {
+                        foreach ($_REQUEST[$item] as $i => $value) {
+                            $value = trim($value);
+                            if (!empty($value)) {
+                                $newLib[$item][$i] = $value;
+                            }
+                        }
+                    }
+                    break;
+                case 4: // arrays that need sanitizeStr
+                    if (!is_array($_REQUEST[$item])) {
+                        $_REQUEST[$item] = explode("|", $_REQUEST[$item]);
+                    }
+                    foreach ($_REQUEST[$item] as $i => $value) {
+                        $value = str_replace(" ", "_", strtolower($value));
+                        $value = sanitizeStr($value, "_", false, false);
+                        if (!empty($value)) {
+                            $newLib[$item][$i] = $value;
+                        }
+                    }
+                    break;
             }
         }
-    
-        $i = 0;
-        if (isset($_REQUEST["news"]) and is_array($_REQUEST["news"])) {
-            foreach ($_REQUEST["news"] as $item) {
-                if ($item != "") {
-                    $newlib["news"][$i++] = $item;
-                }
-            }
-        }
-    
-        $i = 0;
-        if (isset($_REQUEST["ref"]) and is_array($_REQUEST["ref"])) {
-            foreach ($_REQUEST["ref"] as $item) {
-                if ($item != "") {
-                    $newlib["ref"][$i++] = $item;
-                }
-            }
-        }
-    
-        foreach (array("columns", "allowformat") as $item) {
-            if (isset($_REQUEST[$item]) and ($_REQUEST[$item] != "")) {
-                $arr = explode("|", str_replace(" ", "_", strtolower($_REQUEST[$item])));
-                foreach ($arr as $i => $val) {
-                    $newlib[$item][$i] = sanitizeStr($val, "_", false, false);
-                }
-            }
-        }
-    
-        //prepare file contents
-        $LIBS[$id] = $newlib;
-    
-        //and write file
-        $output = writeJSONfile(LIB_FILE, $LIBS);
     }
+
+    //prepare file contents
+    $LIBS[$id] = $newLib;
+
+    //and write file
+    $output = writeJSONfile(LIB_FILE, $LIBS);
 
     if ($output == false) {
         echo "    <p>Successfully created or updated library.<br><br>\n";

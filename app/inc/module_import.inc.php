@@ -46,7 +46,7 @@ try {
         }
     
         // check if this user permission
-        if (!$user["permissions"]["admin"] and ($transactions[$tr]["user"] != $is_logged_in)) {
+        if (!$user["permissions"]["admin"] and ($transactions[$tr]["user"] != $isLoggedIn)) {
             throw new RuntimeException('Unauthorised access to transaction ' . $tr);
         }
     
@@ -76,7 +76,7 @@ try {
     } else {
         // create a new transaction
         $tr = date("YmdHis");
-        $transactions[$tr] = array("user"   => $is_logged_in,
+        $transactions[$tr] = array("user"   => $isLoggedIn,
                             "action" => "none",
                             "step"   => 1
                             );
@@ -244,7 +244,7 @@ STEP1:
                 
                 foreach ($transactions as $id => $transaction) {
                     //test if the logged in user has made this transaction or is admin
-                    if (($transaction["user"] == $is_logged_in) or $user["permissions"]["admin"]) {
+                    if (($transaction["user"] == $isLoggedIn) or $user["permissions"]["admin"]) {
                         if (in_array($transaction["action"], array("append", "update", "replace"))) {
                             $a = $transaction["action"];
                             $u = $transaction["user"];

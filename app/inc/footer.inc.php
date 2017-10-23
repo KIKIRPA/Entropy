@@ -6,7 +6,7 @@ if (count(get_included_files()) == 1) {
     exit("Direct access not permitted.");
 }
 
-if ($is_logged_in) {
+if ($isLoggedIn) {
     $email = '<a href="mailto:wim.fremout@kikirpa.be">Wim Fremout <img src="./img/freecons/28_white.png" alt="e-mail" height="11" width="16"></a>';
 } else {
     $email = mailhide(

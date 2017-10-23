@@ -33,7 +33,7 @@ if (count(get_included_files()) == 1) {
           <th>id</th>
           <th>name</th>
           <th>view</th>
-          <th>colour</th>
+          <th>color</th>
           <th>actions
             <?= calcPermLib($user["permissions"], "libmk") ? " <a href='" . $_SERVER["PHP_SELF"] . "?mod=libmk'>&#10010</a>" : "" ?>
           </th>
@@ -44,12 +44,12 @@ if (count(get_included_files()) == 1) {
 
   foreach ($LIBS as $id => $lib) {
       if (($lib["view"] == "public") or calcPermLib($user["permissions"], "view", $id)) {
-          if ($libid != "_landingpage") {
+          if ($libid != "_START") {
               echo "        <tr>\n",
                   "          <td>" . $id . "</td>\n",
                   "          <td>" . $lib["name"] . "</td>\n",
                   "          <td>" . $lib["view"]. "</td>\n",
-                  "          <td><span style='color:" . $lib["colour"] . "'>&#9724;</span></td>\n",
+                  "          <td><span class=\"tag " . bulmaColorModifier($lib["color"], $COLORS) . "\">color</span></td>\n",
                   "          <td>\n";
         
               if (calcPermLib($user["permissions"], "libedit", $id)) {

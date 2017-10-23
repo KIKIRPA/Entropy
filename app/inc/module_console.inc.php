@@ -6,10 +6,3 @@ if (count(get_included_files()) == 1) {
     exit("Direct access not permitted.");
 }
 
-$startPage = true;  // let module_libedit know which data it should expect
-include(PRIVPATH . 'inc/module_libedit.inc.php');
-?>
-
-  
-  
-  

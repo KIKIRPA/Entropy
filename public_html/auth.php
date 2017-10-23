@@ -22,17 +22,17 @@ $ip = $_SERVER['REMOTE_ADDR'];
 ************** */
 
 if (!IS_HTTPS) {
-    $module = "empty";
+    $showMod = "empty";
     $msg = "A https connection is required for this page.";
 }
 
 if (IS_BLACKLISTED) {
-    $module = "empty";
+    $showMod = "empty";
     $msg = "This IP has been blacklisted due to too many failed login attempts. Please contact the system administrator.";
 }
 
-if ($is_expired) {
-    $module = "loginform";
+if ($isExpired) {
+    $showMod = "loginform";
     $msg = "Your session has expired.  Please re-login.";
     goto skip;
 }
@@ -45,14 +45,14 @@ if ($is_expired) {
 
 if (isset($_REQUEST["logout"])
         and isset($_SESSION['username'])
-        and !isset($module)
+        and !isset($showMod)
     ) {   //logout: destroy session first (in order to return to the login page in the next if)
     eventLog("AUTH", "User " . $_SESSION['username'] . " has logged out.");
     logout();
     
-    $is_logged_in = false;
+    $isLoggedIn = false;
     $msg = "You have successfully logged out.";
-    $module = "loginform";  // show login form (again)
+    $showMod = "loginform";  // show login form (again)
     goto skip;
 }
 
@@ -63,7 +63,7 @@ if (isset($_REQUEST["logout"])
 
 //$USERS = readJSONfile(USERS_FILE, true);  --> already loaded in init.inc.php
 
-if (!isset($_SESSION['username']) and !isset($module)) {
+if (!isset($_SESSION['username']) and !isset($showMod)) {
     if (isset($_POST['user']) and isset($_POST['pass'])) { //login action
         // 1. check username or email address
         if (filter_var($_POST['user'], FILTER_VALIDATE_EMAIL)) {
@@ -84,7 +84,7 @@ if (!isset($_SESSION['username']) and !isset($module)) {
         }
         
             $msg = "The account <i>" . $user . "</i> has been disabled due to too many failed login attempts. Contact the site administrator to re-enable it.";
-            $module = "loginform";
+            $showMod = "loginform";
             goto skip;
         }
         
@@ -94,7 +94,7 @@ if (!isset($_SESSION['username']) and !isset($module)) {
         $BLACKLIST[$ip][$ts] = $_POST['user']; // ip based blacklist
         
         $msg = "Wrong password for " . $user . ".  Attempt " . (count($USERS[$user]['tries']) + 1) . " of " . MAXTRIES_PW ;  //add number of tries left?
-        $module = "loginform";        // show login form (again)
+        $showMod = "loginform";        // show login form (again)
         eventLog("AUTH", "Login " . $user .  " FAILED. Password count: " . count($USERS[$user]['tries']));
         } else { //correct password!
             if (!isset($USERS[$user]['tries'])) {
@@ -111,8 +111,8 @@ if (!isset($_SESSION['username']) and !isset($module)) {
             }
         
             eventLog("AUTH", "Login ". $user .  " SUCCESS.");
-            //login successfull -> let the following procedure set $module
-            unset($module, $msg);
+            //login successfull -> let the following procedure set $showMod
+            unset($showMod, $msg);
         
             $_SESSION['username'] = $user;          // create session username
             $_SESSION['trusted'] = (in_array($ip, $USERS[$user]['trusted']) or in_array("*", $USERS[$user]['trusted']));
@@ -123,10 +123,10 @@ if (!isset($_SESSION['username']) and !isset($module)) {
         
         eventLog("AUTH", "Login attempt for inexistent user ". $_POST['user'] . ". IP count: " . count($BLACKLIST[$ip]));
             $msg = "Username/password mismatch. Attempt " . count($BLACKLIST[$ip]);
-            $module = "loginform";
+            $showMod = "loginform";
         }
     } else { // show login form!  --> display $msg if set!
-    $module = "loginform";    //show loginform
+    $showMod = "loginform";    //show loginform
     }
 } else {
     $user = $_SESSION['username'];
@@ -137,10 +137,10 @@ if (!isset($_SESSION['username']) and !isset($module)) {
     4. two-factor auth for untrusted ip's
 *************************************** */
 
-//if (empty($module) and !in_array($ip, $USERS[$user]['trusted']))  //isset($_SESSION('untrusted'))
+//if (empty($showMod) and !in_array($ip, $USERS[$user]['trusted']))  //isset($_SESSION('untrusted'))
 if (TWOPASS_ENABLE) {
     if (!$_SESSION['trusted']
-        and !isset($module)
+        and !isset($showMod)
         and isset($_SESSION['username'])
     ) {
         // if no trustcode is given (POST): create one and show form
@@ -148,11 +148,11 @@ if (TWOPASS_ENABLE) {
             $_SESSION['trustcode'] = sprintf("%04d", mt_rand(0, 9999));
             mail(
             $USERS[$user]['email'],
-            APP_SHORT . " authorisation code",
+            APP_NAME . " authorisation code",
             "Automated mail from " . gethostname() . ", do not reply.\r\n\r\nAuthorisation code : <b>" . $_SESSION['trustcode'] . "</b>\r\n\r\nCopy this code in the designated code box on " . gethostname() . ".\r\nThe code is time-limited and will expire after a given time.\r\n",
             "From:  " . MAIL_ADMIN . "\r\nReply-To:  " . MAIL_ADMIN . "\r\nX-Mailer: PHP/" . phpversion()
             );
-            $module = "trustform";
+            $showMod = "trustform";
             unset($msg);
         }
         // if trustcode is given (POST): evaluate
@@ -160,11 +160,11 @@ if (TWOPASS_ENABLE) {
             if ($_POST['trustcode'] == $_SESSION['trustcode']) { //correct
                 $_SESSION['trusted'] = true;
                 array_push($USERS[$user]['trusted'], $ip);
-                unset($module, $msg);       // let $module be set later
+                unset($showMod, $msg);       // let $showMod be set later
         $BLACKLIST[$ip] = array();  //reset blacklist
             } else { //incorrect
         $BLACKLIST[$ip][$ts] = $user . ": wrong trustcode";  // IP blacklisting
-        $module = "trustform";
+        $showMod = "trustform";
                 $msg = "Try again!";
             }
         }
@@ -178,18 +178,18 @@ if (TWOPASS_ENABLE) {
     5 reset passwd
 **************** */
     
-//if (empty($module) and !empty($USERS[$user]['reset']))
+//if (empty($showMod) and !empty($USERS[$user]['reset']))
 if (!$_SESSION['pwdok']
-        and !isset($module)
+        and !isset($showMod)
         and isset($_SESSION['username'])
     ) {
     //reset pw form or action
     if (!empty($_POST['oldpwd']) and !empty($_POST['newpwd']) and !empty($_POST['verify'])) { //password set action
     if (!password_verify($_POST['oldpwd'], $USERS[$user]['hash'])) {
-        $module = "resetpwdform";
+        $showMod = "resetpwdform";
         $msg = "The old (original) password was wrong!";
     } elseif ($_POST['newpwd'] != $_POST['verify']) {
-        $module = "resetpwdform";
+        $showMod = "resetpwdform";
         $msg = "The new passwords did not match!";
     } else {
         $_SESSION['pwdok'] = true;
@@ -197,10 +197,10 @@ if (!$_SESSION['pwdok']
         $USERS[$user]['date'] = $ts;
         $USERS[$user]['reset'] = false;
         eventLog("AUTH", "Reset password for " . $user);
-        unset($module, $msg);
+        unset($showMod, $msg);
     }
     } else { //passwd reset form
-        $module = "resetpwdform";
+        $showMod = "resetpwdform";
         unset($msg);
     }
 }
@@ -221,16 +221,16 @@ if (!file_put_contents(BLACKLIST_FILE, json_encode($BLACKLIST, JSON_PRETTY_PRINT
 if (isset($_SESSION['username'])
         and $_SESSION['trusted']
         and $_SESSION['pwdok']
-        and !isset($module)
+        and !isset($showMod)
     ) {
-    $is_logged_in = $_SESSION['username'];
-    $user = $USERS[$is_logged_in];
-    $module = "empty";
+    $isLoggedIn = $_SESSION['username'];
+    $user = $USERS[$isLoggedIn];
+    $showMod = "empty";
     $msg = "Welcome " . $_SESSION['username'] . ".";
 }
 
-if (!isset($module)) {
-    $module = "empty";
+if (!isset($showMod)) {
+    $showMod = "empty";
     $msg = "Unknown error!";
 }
 
@@ -240,16 +240,12 @@ if (!isset($module)) {
 
 skip:
 
-$htmltitle = APP_SHORT;
-$htmlkeywords = APP_KEYWORDS;
-$pagetitle = APP_LONG;
-$pagesubtitle = "";
 $style   = "";
 $scripts = "";
 
 include(HEADER_FILE);
-if ($module != "empty") {
-    include(PRIVPATH . 'inc/auth_' . $module . '.inc.php');
+if ($showMod != "empty") {
+    include(PRIVPATH . 'inc/auth_' . $showMod . '.inc.php');
 } elseif (isset($msg)) {
     echo $msg;
 }

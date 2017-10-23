@@ -10,10 +10,6 @@ if (count(get_included_files()) == 1) {
     HEADER
     ******** */
 
-$htmltitle = APP_SHORT . ": " . $LIBS[$showlib]["menu"];
-$htmlkeywords = APP_KEYWORDS;
-$pagetitle = APP_LONG;
-$pagesubtitle = $LIBS[$showlib]["name"];
 $style   = "<link rel='stylesheet' type='text/css' href='" . CSS_DYGRAPH . "'>";
 $scripts = "<script type='text/javascript' src='" . JS_DYGRAPH  . "'></script>";
 
@@ -30,7 +26,7 @@ $transaction = $measurement["_transaction"];
 unset($measurement["_transaction"]);
 
 // metadata can be saved on different levels, override lesser priority metadata
-$meta = overrideMeta($data, $showds);
+$meta = overrideMeta($data, $showDS);
 
 
 /* ***********
@@ -45,17 +41,17 @@ $meta = overrideMeta($data, $showds);
 
 // 1+2 $dl_ShowButtons boolean (show download box?) and $dl_List (array of buttons to show)
 $dl_ShowButtons = false;
-if ( (!$is_logged_in and $MODULES["lib"]["download"]["public"])
-     or ($is_logged_in and calcPermLib($user["permissions"], "download", $showlib))) {
+if ( (!$isLoggedIn and $MODULES["lib"]["download"]["public"])
+     or ($isLoggedIn and calcPermLib($user["permissions"], "download", $showLib))) {
     $dl_List = array();
 
     // 1. convert from json data files
     //    TODO: integrate convert-framework (check if we are able to convert to $format, preferably replacing the switch by a function)
-    foreach ($LIBS[$showlib]["allowformat"] as $format) {
+    foreach ($LIBS[$showLib]["allowformat"] as $format) {
         switch ($format) {
             case "dx":
             case "jdx":
-                if (isset($meta["jcamptemplate"]) and file_exists(LIB_PATH . $showlib . "/templates/" . $meta["jcamptemplate"])) {
+                if (isset($meta["jcamptemplate"]) and file_exists(LIB_PATH . $showLib . "/templates/" . $meta["jcamptemplate"])) {
                     $dl_List["JCAMP-DX"] = encode("conv=" . $format);
                 }
                 break;
@@ -67,7 +63,7 @@ if ( (!$is_logged_in and $MODULES["lib"]["download"]["public"])
     }
 
     // 2. binary uploaded files
-    $prefix = LIB_PATH . $showlib . "/" . $transaction . "/" . $showid . (($showds == 'default')?"":"__".$showds);
+    $prefix = LIB_PATH . $showLib . "/" . $transaction . "/" . $showID . (($showDS == 'default')?"":"__".$showDS);
     $binfiles = glob($prefix . "__*");  //by using "__*" we exclude the original (converted) data files, json data files and annotations
     foreach ($binfiles as $f) {
         // button caption = EXT (ORIG BIN FILENAME)
@@ -83,7 +79,7 @@ if ( (!$is_logged_in and $MODULES["lib"]["download"]["public"])
 
 // 3+4+5 $dl_ShowForm boolean (show download form)
 if (LOG_DL) {
-    if ($is_logged_in) {
+    if ($isLoggedIn) {
         $dl_ShowForm = false;
     } elseif (isset($_COOKIE[COOKIE_NAME])) {
         $cookie = verifycookie($_COOKIE[COOKIE_NAME]);               // in case of false data, this will output False
@@ -108,12 +104,12 @@ if (LOG_DL) {
 
 $parenttype = datatypeParent($measurement["type"], $DATATYPES);
 $viewer = $DATATYPES[$parenttype]["viewer"];
-$units = datatypeUnits($parenttype, $DATATYPES, 'html', $data["dataset"][$showds]["units"]);
+$units = datatypeUnits($parenttype, $DATATYPES, 'html', $data["dataset"][$showDS]["units"]);
 
-if (isset($data["dataset"][$showds]["anno"])) {
-    if (is_array($data["dataset"][$showds]["anno"])) {
+if (isset($data["dataset"][$showDS]["anno"])) {
+    if (is_array($data["dataset"][$showDS]["anno"])) {
         $anno = array();
-        foreach ($data["dataset"][$showds]["anno"] as $i => $a) {
+        foreach ($data["dataset"][$showDS]["anno"] as $i => $a) {
             $anno[$i] = array();
             $anno[$i]["series"] = $idbox_head;
             $anno[$i] = array_merge($anno[$i], $a);
@@ -142,10 +138,10 @@ if (isset($data["dataset"][$showds]["anno"])) {
           <div class='boxed' id='greybox'>
             <h3>Datasets</h3>
             <?php foreach ($data["dataset"] as $dsid => $dsval): 
-                      if ($dsid == $showds): ?>
-            <p><strong><?=  $showds ?></strong>
+                      if ($dsid == $showDS): ?>
+            <p><strong><?=  $showDS ?></strong>
             <?php     else: ?>
-            <p><a href='<?= $_SERVER["PHP_SELF"]; ?>?lib=<?= $showlib ?>&id=<?= $showid ?>&ds=<?= $showds ?>'><?= $dsid ?></a>
+            <p><a href='<?= $_SERVER["PHP_SELF"]; ?>?lib=<?= $showLib ?>&id=<?= $showID ?>&ds=<?= $showDS ?>'><?= $dsid ?></a>
             <?php     endif;
                   endforeach; ?>
           </div>
@@ -166,14 +162,14 @@ if (isset($data["dataset"][$showds]["anno"])) {
                 <span><?= $btncaption ?></span>
               </a>
               <?php   else: ?>
-              <a class="button is-primary" href="<?= $_SERVER["PHP_SELF"] ?>?lib=<?= $showlib ?>&id=<?= $showid ?>&ds=<?= $showds ?>&dl=<?= $dl_Code ?>">
+              <a class="button is-primary" href="<?= $_SERVER["PHP_SELF"] ?>?lib=<?= $showLib ?>&id=<?= $showID ?>&ds=<?= $showDS ?>&dl=<?= $dl_Code ?>">
                 <span class="icon is-small"><i class="fa fa-download"></i></span>
                 <span><?= $btncaption ?></span>
               </a>
               <?php   endif;
                     endforeach; ?>
             </div>
-            <p><i>The complete <?= $LIBS[$showlib]["name"] ?> can be requested by email.</i>
+            <p><i>The complete <?= $LIBS[$showLib]["name"] ?> can be requested by email.</i>
             <p><i>By downloading this file you agree to the terms described in the license.</i>
           </div>
           <?php   endif;?>
@@ -323,7 +319,7 @@ if (isset($data["dataset"][$showds]["anno"])) {
         <div class='modal' id='dlmodal'>
           <div class='modal-background'></div>
           <div class='modal-content'>
-            <form name="dlform" action="<?= $_SERVER["PHP_SELF"] ?>?lib=<?= $showlib ?>&id=<?= $showid ?>&ds=<?= $showds ?>" method="post">
+            <form name="dlform" action="<?= $_SERVER["PHP_SELF"] ?>?lib=<?= $showLib ?>&id=<?= $showID ?>&ds=<?= $showDS ?>" method="post">
 
               <div class="field">
                 <label class="label">Name</label>

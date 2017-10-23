@@ -25,6 +25,7 @@ $USERS     = readJSONfile(USERS_FILE);
 $MODULES   = readJSONfile(MODULES_FILE, true);
 $LIBS      = readJSONfile(LIB_FILE, true);
 $DATATYPES = readJSONfile(DATATYPES_FILE, true);
+$COLORS    = readJSONfile(COLORS_FILE, true);
 
 
 /***********************************************************************************
@@ -33,7 +34,7 @@ $DATATYPES = readJSONfile(DATATYPES_FILE, true);
     - constant IS_BLACKLISTED
     - constant BLACKLIST_COUNT
     - SESSION management: start, renew or expire
-    - variable $is_logged_in (username or false) and $is_expired (true or false)
+    - variable $isLoggedIn (username or false) and $isExpired (true or false)
     - variables $BLACKLIST, $user
   ***********************************************************************************/
   
@@ -56,19 +57,19 @@ define("IS_BLACKLISTED", ($temp >= MAXTRIES_IP));
 
 // SESSION MANAGEMENT
 
-$is_logged_in = $is_expired = false;
+$isLoggedIn = $isExpired = false;
 
 if (IS_HTTPS and !IS_BLACKLISTED) {
     session_start();
   
     if (isset($_SESSION['username']) and $_SESSION['trusted'] and $_SESSION['pwdok']) {
-        $is_logged_in = $_SESSION['username'];
+        $isLoggedIn = $_SESSION['username'];
     
         //set $user
-        if (isset($USERS[$is_logged_in])) {
-            $user = $USERS[$is_logged_in];
-        } else { //set $user and $is_logged_in to false and log
-            $user = $is_logged_in = eventLog("WARNING", "Non-existant username stored in session: " . $is_logged_in, false, true);
+        if (isset($USERS[$isLoggedIn])) {
+            $user = $USERS[$isLoggedIn];
+        } else { //set $user and $isLoggedIn to false and log
+            $user = $isLoggedIn = eventLog("WARNING", "Non-existant username stored in session: " . $isLoggedIn, false, true);
         }
     }
   
@@ -79,9 +80,9 @@ if (IS_HTTPS and !IS_BLACKLISTED) {
         session_regenerate_id(true);    // change session ID for the current session and invalidate old session ID (protects against session fixation attack)
         $_SESSION['ts'] = time();       // update timestamp
     } else {                              // auto log off
-        if ($is_logged_in) {
-            $is_logged_in = false;
-            $is_expired = true;
+        if ($isLoggedIn) {
+            $isLoggedIn = false;
+            $isExpired = true;
         }
         logout();
     }

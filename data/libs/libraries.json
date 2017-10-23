@@ -1,40 +1,41 @@
 {
-    "_landingpage": {
-        "name": "start",
-        "menu": "start",
-        "header": "start",
+    "_START": {
         "view": "public",
-        "colour": "#ff0000",
-        "longdescription": "test",
+        "color": 2,
+        "logobox": "",
+        "text": "test",
         "contact": "test",
         "news": [
-            "test"
+            "Newsitem"
         ],
-        "ref": [
-            "test"
+        "references": [
+            "Literature reference"
         ]
     },
     "test": {
-        "name": "test library",
-        "menu": "test library",
-        "header": "test library",
+        "name": "Example library",
+        "navmenucaption": "Example",
         "view": "public",
-        "colour": "#ff0000",
-        "shortdescription": "test library",
-        "longdescription": "test library",
-        "contact": "test library",
+        "color": 2,
+        "catchphrase": "Catchphrase",
+        "logobox": "",
+        "text": "long description",
+        "contact": "Contact details",
         "news": [
-            "test library"
+            "Newsitem"
         ],
-        "ref": [
-            "test"
+        "references": [
+            "Literature reference"
         ],
-        "columns": [
+        "listcolumns": [
             "id",
             "type"
         ],
-        "allowformat": [
+        "downloadconverted": [
             "txt"
+        ],
+        "downloadbinary": [
+            "_NONE"
         ]
     }
 }

@@ -34,7 +34,7 @@ try {
             throw new Exception("Download failed: binary file not found.");
         }
     } elseif ($code[0] == "conv") { // is conversion allowed in library file?  TODO: is allowed in conversion settings json?
-        if (!in_array($code[1], $LIBS[$showlib]["allowformat"])) {
+        if (!in_array($code[1], $LIBS[$showLib]["allowformat"])) {
             throw new Exception("Download failed: conversion to ". $code[1] ." not allowed.");
         }
     } else {
@@ -43,11 +43,11 @@ try {
 
     // 3. evaluate download logging (via login, cookie or form)
     if (LOG_DL) {
-        if ($is_logged_in) {
-            $log = array($USERS[$is_logged_in]["name"], $USERS[$is_logged_in]["institution"], $USERS[$is_logged_in]["email"], "login");
+        if ($isLoggedIn) {
+            $log = array($USERS[$isLoggedIn]["name"], $USERS[$isLoggedIn]["institution"], $USERS[$isLoggedIn]["email"], "login");
         } elseif (isset($_COOKIE[COOKIE_NAME])) {
             if (verifycookie($_COOKIE[COOKIE_NAME])) {
-                $log = array($USERS[$is_logged_in]["name"], $USERS[$is_logged_in]["institution"], $USERS[$is_logged_in]["email"], "cookie");
+                $log = array($USERS[$isLoggedIn]["name"], $USERS[$isLoggedIn]["institution"], $USERS[$isLoggedIn]["email"], "cookie");
             } else {
                 removecookie();   // remove invalid cookie
                 throw new Exception("Download failed: invalid cookie.");
@@ -55,7 +55,7 @@ try {
         } elseif (isset($_REQUEST["name"]) and isset($_REQUEST["institution"]) and isset($_REQUEST["email"])) {
             $cookie = verifycookie($_REQUEST["name"], $_REQUEST["institution"], $_REQUEST["email"]);
             if ($cookie) {
-                $log = array($USERS[$is_logged_in]["name"], $USERS[$is_logged_in]["institution"], $USERS[$is_logged_in]["email"], "form");
+                $log = array($USERS[$isLoggedIn]["name"], $USERS[$isLoggedIn]["institution"], $USERS[$isLoggedIn]["email"], "form");
                 if (isset($_REQUEST["cookie"])) {
                     $cookie = makecookie($cookie);
                 } // set cookie, if the user checked the checkbox
@@ -89,7 +89,7 @@ try {
 //  (*) reserved for (optional) conversion rules (eg TXT: tabulated, comma separated, eg SPC: old format), stored in $code[2]  --> TODO
 if (LOG_DL) {
     array_unshift($log, date('Y-m-d H:i'));
-    array_push($log, $_SERVER['REMOTE_ADDR'], $showlib, $showid, $showds, $code[0], $code[1], "");
+    array_push($log, $_SERVER['REMOTE_ADDR'], $showLib, $showID, $showDS, $code[0], $code[1], "");
 
     // open or create download.csv and append line
     $handle = fopen(LOG_DL_FILE, "a");
@@ -111,7 +111,7 @@ if (LOG_DL) {
 if ($code[0] == "conv") {
     //TODO: integrate convert-framework (check if we are able to convert to $format, preferably replacing the switch by a function)
     //$export = export($data["dataset"][$ds], $code, $EXPORT)
-    $filename = $showid . (($showds == 'default')?"":"__".$showds) . "." . $code[1];
+    $filename = $showID . (($showDS == 'default')?"":"__".$showDS) . "." . $code[1];
 
     /*
     switch ($code[1]) {
