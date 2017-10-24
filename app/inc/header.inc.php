@@ -9,6 +9,9 @@ if (count(get_included_files()) == 1) {
 
 /*
     This inc requires:
+        $htmlHeaderStyles
+        $htmlHeaderScripts
+
         $LIBS
         $isLoggedIn
         $user
@@ -122,21 +125,20 @@ unset($lib, $id, $value, $perm);
   
 ?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">    
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">  
     <head>
         <title><?= APP_NAME ?></title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>		
-        <meta http-equiv="Window-target" content="_top"/>
-        <meta name="keywords" content="<?= APP_KEYWORDS ?>"/>
-        <link rel="shortcut icon" href="<?= APP_ICON ?>" />
-        <link rel="stylesheet" type='text/css' href='<?= CSS_FA ?>'>
-        <link rel="stylesheet" type='text/css' href='<?= CSS_BULMA ?>'>
-        <link rel='stylesheet' type='text/css' href='./css/jquery.notifyBar.css'>
-        <?= $style ?>
-        <script type='text/javascript' src='<?= JS_JQUERY ?>'></script>
-        <script type='text/javascript' src='./js/jquery.notifyBar.js' async></script>
-        <?= $scripts ?>
-        <script type='text/javascript' src='./js/main.js'></script>
+        <meta charset="utf-8">		
+        <meta http-equiv="Window-target" content="_top">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="keywords" content="<?= APP_KEYWORDS ?>">
+        <link rel="shortcut icon" href="<?= APP_ICON ?>">
+<?php foreach ($htmlHeaderStyles as $value): ?>
+        <link rel="stylesheet" type="text/css" href="<?= $value ?>">
+<?php endforeach; ?>
+<?php foreach ($htmlHeaderScripts as $value): ?>
+        <script type='text/javascript' src="<?= $value ?>"></script>
+<?php endforeach; ?>
     </head>
   
     <body>
@@ -155,16 +157,15 @@ unset($lib, $id, $value, $perm);
             
                 <div id="navMenu" class="navbar-menu">
                     <div class="navbar-start">
-                        <?php foreach ($navMenuLibs as $id => $caption): ?>  
+<?php                 foreach ($navMenuLibs as $id => $caption): ?>
                         <a class="navbar-item<?= ($showLib == $id) ? " is-active\"" : "" ?>" href="./index.php?lib=<?= $id ?>">
-                            <?= $isHiddenLib == $id ? "<span class=\"icon\"><i class=\"fa fa-eye-slash\"></i></span>" : "" ?>
-                            <?= $caption ?>
+                            <?= $isHiddenLib == $id ? "<span class=\"icon\"><i class=\"fa fa-eye-slash\"></i></span>" : "" ?><?= $caption . "\n" ?>
                         </a>
-                        <?php endforeach; ?>
+<?php                 endforeach; ?>
                     </div>
-                    <?php if (IS_HTTPS and !IS_BLACKLISTED): ?>
+<?php             if (IS_HTTPS and !IS_BLACKLISTED): ?>
                     <div class="navbar-end">
-                        <?php if ($isLoggedIn): ?>
+<?php                 if ($isLoggedIn): ?>
                         <div class="navbar-item">
                             <div class="field has-addons">
                                 <p class="control">
@@ -186,7 +187,7 @@ unset($lib, $id, $value, $perm);
                                 </p>
                             </div>
                         </div>
-                        <?php else: ?>
+<?php                 else: ?>
                         <div class="navbar-item">
                             <p class="control">
                                 <a class="button <?= bulmaColorModifier(NAVBAR_COLOR, $COLORS, "white") ?> is-inverted" href="./auth.php">
@@ -197,9 +198,9 @@ unset($lib, $id, $value, $perm);
                                 </a>
                             </p>
                         </div>
-                        <?php endif; ?>
+<?php                 endif; ?>
                     </div>
-                    <?php endif; ?>
+<?php             endif; ?>
                 </div>
             </div>
         </nav>
@@ -213,37 +214,35 @@ unset($lib, $id, $value, $perm);
                             <h1 class="title"><?= $navMenuTitle ?></h1>
                             <h2 class="subtitle"><?= $navMenuSubtitle ?></h2>
                         </div>
-                        <?php if ($navMenuLogoBox): ?>
+<?php                 if ($navMenuLogoBox): ?>
                         <div class="column is-narrow">
                             <div class="content is-small has-text-left-touch has-text-right-desktop">
                                 <?= $navMenuLogoBox ?>
                             </div>
                         </div>
-                        <?php endif; ?>
+<?php                 endif; ?>
                     </div>
                 </div>
             </div>
-
-            <?php if (!empty($navMenuMods)): ?>
+<?php     if (!empty($navMenuMods)): ?>
             <div class="hero-foot">
                 <nav class="tabs is-boxed">
                     <div class="container">
                         <ul>
-                            <?php foreach ($navMenuMods as $id => $caption): ?>
+<?php                     foreach ($navMenuMods as $id => $caption): ?>
                             <li<?= ($showMod == $id) ? " class=\"is-active\"" : "" ?>>
                                 <a href="./<?= ($id == "list") ? "index.php?" : "tools.php?mod=".$id."&" ?><?= $showLib ? "lib=". $showLib : "" ?>">
                                     <?= $caption ?>
                                 </a>
                             </li>
-                            <?php endforeach; ?>
+<?php                     endforeach; ?>
                         </ul>
                     </div>
                 </nav>
             </div>
-            <?php endif; ?>
+<?php     endif; ?>
         </section>
          
-      
 <?php 
 if ($isExpired) {
     echo "      <script>\n"

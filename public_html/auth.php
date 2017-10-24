@@ -240,10 +240,8 @@ if (!isset($showMod)) {
 
 skip:
 
-$style   = "";
-$scripts = "";
-
 include(HEADER_FILE);
+
 if ($showMod != "empty") {
     include(PRIVPATH . 'inc/auth_' . $showMod . '.inc.php');
 } elseif (isset($msg)) {

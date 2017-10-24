@@ -87,3 +87,22 @@ if (IS_HTTPS and !IS_BLACKLISTED) {
         logout();
     }
 }
+
+
+/***********************************************************************************
+  3. HTML header things
+    - variable (array) $htmlHeaderStyles
+    - variable (array) $htmlHeaderScripts
+  ***********************************************************************************/
+
+$htmlHeaderStyles = Array(
+    CSS_FA,
+    CSS_BULMA,
+    "./css/jquery.notifyBar.css"
+);
+
+$htmlHeaderScripts = Array(
+    JS_JQUERY,
+    "./js/jquery.notifyBar.js",
+    "./js/main.js"
+);

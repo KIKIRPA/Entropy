@@ -53,12 +53,11 @@ if ($isLoggedIn) {
 
 //HEADER
 $LIBS = json_decode(file_get_contents(LIB_FILE), true);
-$style   = "    <link rel='stylesheet' type='text/css' href='" . CSS_DT_BULMA . "'>\n";
-$scripts = "    <script type='text/javascript' src='" . JS_DT . "' async></script>\n"
-         . "    <script type='text/javascript' src='" . JS_DT_BULMA . "' async></script>\n";
-
+array_push($htmlHeaderStyles, CSS_DT_BULMA);
+array_push($htmlHeaderScripts, JS_DT, JS_DT_BULMA);  
 $showMod = $_REQUEST["mod"];
 include(HEADER_FILE);
+
 if (!$error) {
     include(PRIVPATH . 'inc/module_' . $showMod . '.inc.php');
 } else {

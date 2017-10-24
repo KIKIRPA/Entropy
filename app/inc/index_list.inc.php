@@ -8,12 +8,8 @@ if (count(get_included_files()) == 1) {
 
 
 // HEADER
-
-//$LIBS: already loaded
-$style   = "    <link rel='stylesheet' type='text/css' href='" . CSS_DT_BULMA . "'>\n";
-$scripts = "    <script type='text/javascript' src='" . JS_DT . "' async></script>\n"
-        . "    <script type='text/javascript' src='" . JS_DT_BULMA . "' async></script>\n";
-            
+array_push($htmlHeaderStyles, CSS_DT_BULMA);
+array_push($htmlHeaderScripts, JS_DT, JS_DT_BULMA);            
 include(HEADER_FILE);
 
 if ($error) {

@@ -10,9 +10,8 @@ if (count(get_included_files()) == 1) {
     HEADER
     ******** */
 
-$style   = "<link rel='stylesheet' type='text/css' href='" . CSS_DYGRAPH . "'>";
-$scripts = "<script type='text/javascript' src='" . JS_DYGRAPH  . "'></script>";
-
+array_push($htmlHeaderStyles, CSS_DYGRAPH);
+array_push($htmlHeaderScripts, JS_DYGRAPH);  
 include(HEADER_FILE);
 
 
