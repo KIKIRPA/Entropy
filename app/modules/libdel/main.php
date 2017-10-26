@@ -19,7 +19,7 @@ echo "      <h3>Delete library</h3>\n";
 
 if ($id == "_START") {
     // the special 'library' _START cannot be deleted; should be set to invisible instead!
-    echo "      <span style='color:red'>ERROR: cannot remove the landing page!</span><br><br>\n";
+    echo "      <span style='color:red'>ERROR: cannot remove the startpage!</span><br><br>\n";
 } elseif (!isset($_REQUEST["del"]) and isset($LIBS[$id])) {
     echo "        <span style='color:red'>This will IRREVOCABLY DELETE LIBRARY " . $id . "!</span><br><br>\n"
        . "        <form name='myform' action='" . $_SERVER["REQUEST_URI"] . "' method='POST'>\n"

@@ -57,7 +57,7 @@ $LIBS = json_decode(file_get_contents(LIB_FILE), true);
 $showMod = $_REQUEST["mod"];
 
 if (!$error) {
-    include(PRIVPATH . 'inc/module_' . $showMod . '.inc.php');
+    require_once(PRIVPATH . 'modules/' . $showMod . '/main.php');
 } else {
     echo $error;
 }

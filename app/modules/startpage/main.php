@@ -7,7 +7,7 @@ if (count(get_included_files()) == 1) {
 }
 
 $startPage = true;  // let module_libedit know which data it should expect
-include(PRIVPATH . 'inc/module_libedit.inc.php');
+require_once(PRIVPATH . 'modules/libedit/main.php');
 ?>
 
   

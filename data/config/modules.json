@@ -67,8 +67,8 @@
             "navMenuShow": false,
             "public": false
         },
-        "landingpage": {
-            "caption": "Modify landing page",
+        "startpage": {
+            "caption": "Modify startpage",
             "navMenuShow": true,
             "public": false
         },
