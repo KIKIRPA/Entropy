@@ -6,6 +6,13 @@ if (count(get_included_files()) == 1) {
     exit("Direct access not permitted.");
 }
 
+
+//HEADER
+array_push($htmlHeaderStyles, CSS_DT_BULMA);
+array_push($htmlHeaderScripts, JS_DT, JS_DT_BULMA);  
+include(HEADER_FILE);
+
+
 $id = str_replace(" ", "", strtolower($_REQUEST["lib"]));
 
 echo "      <h3>Delete library</h3>\n";
@@ -37,3 +44,7 @@ if ($id == "_START") {
 } else {
     echo "      <span style='color:red'>Wouldn't you rather choose an existing library to delete?</span><br><br>\n";
 }
+
+
+//FOOTER
+include(FOOTER_FILE);

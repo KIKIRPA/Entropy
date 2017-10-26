@@ -16,6 +16,11 @@ require_once(PRIVPATH . 'inc/common_importfilters.inc.php');
 *                           *
 ****************************/
 
+//HEADER
+array_push($htmlHeaderStyles, CSS_DT_BULMA);
+array_push($htmlHeaderScripts, JS_DT, JS_DT_BULMA);  
+include(HEADER_FILE);
+
 echo "      <h3>Library upload tool</h3>\n";
 
 # check if the transaction already exists and set $tr and $action
@@ -273,6 +278,10 @@ STEP1:
 
       </div>
 <?php
+
+
+    //FOOTER
+    include(FOOTER_FILE);
 
     return;   // return to the main php page
 }
@@ -671,6 +680,10 @@ STEP3:
     } else {
         echo "        There are errors. Please correct the original file and reupload. <a href='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "'>Return</a>\n";
     }
+
+
+    //FOOTER
+    include(FOOTER_FILE);
     
     return;   // return to the main php page
   }
@@ -861,6 +874,10 @@ STEP5:
         echo "    <div>Data files that need to be uploaded: " . $needdata . "</div><br><br>\n";
     }
     
+
+    //FOOTER
+    include(FOOTER_FILE);
+
     return;
 }
 
@@ -945,6 +962,10 @@ STEP6:
         <input type="submit" value="Update >" />
       </form>
     <?php
+
+
+    //FOOTER
+    include(FOOTER_FILE);
 
     return;
   }
@@ -1230,4 +1251,7 @@ STEP9:
       $transactions[$tr]["step"] = 10;  // lock this transaction, so that a sysadmin can look into it
       $error = writeJSONfile(LIB_PATH . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
     }
+
+    //FOOTER
+    include(FOOTER_FILE);
 }

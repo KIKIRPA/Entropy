@@ -5,7 +5,13 @@ if (count(get_included_files()) == 1) {
     header("Status: 404 Not Found");
     exit("Direct access not permitted.");
 }
-  
+
+
+//HEADER
+array_push($htmlHeaderStyles, CSS_DT_BULMA);
+array_push($htmlHeaderScripts, JS_DT, JS_DT_BULMA);  
+include(HEADER_FILE);
+
   
 /* *********************************************************
     FUNCTION CHOOSER
@@ -355,3 +361,7 @@ else {
     echo "    <span style='color:red'>ERROR: " . $errormsg . "</span><br><br>";
     eventLog("ERROR", $errormsg . " [module_libedit]", false, false);
 }
+
+
+//FOOTER
+include(FOOTER_FILE);

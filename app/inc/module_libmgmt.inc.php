@@ -6,6 +6,11 @@ if (count(get_included_files()) == 1) {
     exit("Direct access not permitted.");
 }
 
+//HEADER
+array_push($htmlHeaderStyles, CSS_DT_BULMA);
+array_push($htmlHeaderScripts, JS_DT, JS_DT_BULMA);  
+include(HEADER_FILE);
+
 ?>
   <h3>Library management</h3>
   <script type="text/javascript" charset="utf-8">
@@ -74,3 +79,8 @@ if (count(get_included_files()) == 1) {
       </tbody>
     </table>
   </div>
+
+<?php
+
+//FOOTER
+include(FOOTER_FILE);
