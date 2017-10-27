@@ -17,6 +17,7 @@ if (count(get_included_files()) == 1) {
 
 ?>
 
+<?php  if ($listText or $listNews or $listContact or $listReferences): ?>
         <section class="section">
             <div class="container">
                 <div class="columns">
@@ -70,6 +71,7 @@ if (count(get_included_files()) == 1) {
                 </div>
             </div>
         </section>
+<?php endif; ?>
 
 <?php if ($showLib != "_START"): ?>
         <script type="text/javascript" charset="utf-8">

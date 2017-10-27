@@ -121,7 +121,7 @@ if ($showLib != "_START") { //normal library
                 $listLibs[$row][$id]["color"] = isset($lib["color"]) ? bulmaColorModifier($lib["color"], $COLORS, DEFAULT_COLOR) : bulmaColorModifier(DEFAULT_COLOR, $COLORS);
                 $listLibs[$row][$id]["catchphrase"] = isset($lib["catchphrase"]) ? $lib["catchphrase"] : false;
                 $listLibs[$row][$id]["logobox"] = isset($lib["logobox"]) ? $lib["logobox"] : false;
-                if (count($listLibs[$row] == 3)) {
+                if (count($listLibs[$row]) == 3) {
                     $row++;
                 }
             }
@@ -129,7 +129,6 @@ if ($showLib != "_START") { //normal library
     }
     unset($row, $id, $lib);
 }
-
 
 
 
