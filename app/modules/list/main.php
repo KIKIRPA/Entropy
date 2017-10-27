@@ -7,6 +7,136 @@ if (count(get_included_files()) == 1) {
 }
 
 
+/* 
+    requires $showLib
+             $LIBS
+             $htmlHeaderStyles
+             $htmlHeaderScripts
+
+    creates  $listTitle
+             $listText
+             $listNews (array)
+             $listNewsColor
+             $listContact
+             $listReferences (array)
+
+    TODO ERROR NOTIFICATIONS
+*/
+
+
+/*
+    1. CONDITIONS
+    --> fallback: ?
+*/
+
+// TODO load measurements.json
+
+
+/*
+    2. CODE
+*/
+
+// textbox (title + descriptive text of the library)
+$listText = False;
+if (isset($LIBS[$showLib]["text"])) {
+    if (!empty($LIBS[$showLib]["text"])) {
+        $listTitle = ($showLib == "_START") ? APP_NAME : $LIBS[$showLib]["name"];
+        $listText  = $LIBS[$showLib]["text"];
+    }
+}
+
+// newsboxes
+$listNews = array();
+$listNewsColor = "";
+if (isset($LIBS[$showLib]["news"])) {
+    foreach ($LIBS[$showLib]["news"] as $item) {
+        if(!empty($item)) {
+            array_push($listNews, $item);
+        }
+    }
+}
+if (isset($LIBS[$showLib]["color"])) {
+    $listNewsColor = bulmaColorModifier($LIBS[$showLib]["color"], $COLORS, DEFAULT_COLOR);
+}
+
+// contacts
+$listContact = "";
+if (isset($LIBS[$showLib]["contact"])) {
+    if (!empty($LIBS[$showLib]["contact"])) {
+        $listContact =  $isLoggedIn ? $LIBS[$showLib]["contact"] : searchMailHide($LIBS[$showLib]["contact"]);
+    }
+}
+
+// references
+$listReferences = array();
+if (isset($LIBS[$showLib]["references"])) {
+    foreach ($LIBS[$showLib]["references"] as $item) {
+        if(!empty($item)) {
+            array_push($listReferences, $item);
+        }
+    }
+}
+
+// measurement list
+if ($showLib != "_START") { //normal library
+    // the columns to show can be defined in libraries.json, otherwise take defaults
+    $listColumns = array();
+    if (!empty($LIBS[$showLib]["columns"])) {
+        $temp = $LIBS[$showLib]["columns"];
+    } else {  
+        $temp = array("id", "type"); // columns that are by definition available in measurements.json
+    }
+    // column names to be displayed
+    foreach ($temp as $item) {
+        $listColumns[$item] = nameMeta($item);
+    }
+    unset($temp, $item);
+    // NOTE: as long as the data is stored databaseless, the data that will be filled in practice
+    // will be limited to those that are stored in the measurements.json file
+
+    // prepare the measurement data in an easy to process grid
+    $listData = array();
+    foreach ($measurements as $id => $measurement) {
+        foreach ($listColumns as $col => $caption) {
+            if (strtolower($col) == "id") {
+                $listData[$id][$col] = $id;
+            } elseif (isset($measurement[$col])) {
+                $listData[$id][$col] = $measurement[$col];
+            }
+            else {  // this column is not set in measurements (for this measurement):
+                $listData[$id][$col] = "";
+            }
+        }
+    }
+    unset($measurements, $id, $measurement, $col);
+
+} else {    // startpage
+    $listLibs = array();
+    $row = 0;
+    foreach ($LIBS as $id => $lib) {
+        if ($id != "_START") {
+            if ((strtolower($lib["view"]) == "public") or calcPermLib($user["permissions"], "view", $id)) {
+                $listLibs[$row][$id] = array();
+                $listLibs[$row][$id]["name"] = $lib["name"];
+                $listLibs[$row][$id]["color"] = isset($lib["color"]) ? bulmaColorModifier($lib["color"], $COLORS, DEFAULT_COLOR) : bulmaColorModifier(DEFAULT_COLOR, $COLORS);
+                $listLibs[$row][$id]["catchphrase"] = isset($lib["catchphrase"]) ? $lib["catchphrase"] : false;
+                $listLibs[$row][$id]["logobox"] = isset($lib["logobox"]) ? $lib["logobox"] : false;
+                if (count($listLibs[$row] == 3)) {
+                    $row++;
+                }
+            }
+        }
+    }
+    unset($row, $id, $lib);
+}
+
+
+
+
+/*
+    3. HTML
+*/
+
 // HEADER
 array_push($htmlHeaderStyles, CSS_DT_BULMA);
 array_push($htmlHeaderScripts, JS_DT, JS_DT_BULMA);            
@@ -16,146 +146,7 @@ if ($error) {
     echo $error . "<br><br>\n";
 }
 
-
-/* *********
-    details
-    ********* */
-
-if (count($LIBS[$showLib]) > 0) {
-    // text
-    if (!empty($LIBS[$showLib]["text"])) {
-        echo "        <div class='nonboxed'>\n",
-        "          <h3>About " . ($showLib == "_START")?$LIBS[$showLib]["name"]:"the library" . "</h3>\n",
-        "          ".$LIBS[$showLib]["text"]."\n",
-        "        </div>\n";
-    }
-
-    // news
-    if (!empty($LIBS[$showLib]["news"])) {
-        foreach ($LIBS[$showLib]["news"] as $news) {
-            echo "        <div class='boxed' id='greybox'>\n",
-            "          <p>$news</p>\n",
-            "        </div>\n";
-        }
-    }
-    
-    // contacts
-    if (!empty($LIBS[$showLib]["contact"])) {
-        echo "        <div class='boxed'>\n",
-        "          <h3>Contact</h3>\n",
-        "          <p>" . ($isLoggedIn ? $LIBS[$showLib]["contact"] : searchmailhide($LIBS[$showLib]["contact"])) . "</p>\n",
-        "        </div>\n";
-    }
-
-    // refs
-    if (!empty($LIBS[$showLib]["ref"])) {
-        echo "        <div class='boxed'>\n",
-        "          <h3>Related literature</h3>\n";
-        foreach ($LIBS[$showLib]["ref"] as $ref) {
-            echo "          <p>$ref</p>\n";
-        }
-        echo "        </div>\n";
-    }
-} else {
-    echo "        <div>\n",
-        "          <p>No library details were found for $showLib</p>\n",
-        "        </div>\n";
-}
-
-  
-/* ******************
-    measurement list
-   ****************** */
-  
-if ($showLib != "_START") { //normal library
-// 1. which columns to show
-
-    // the columns to show can be defined in libraries.json, otherwise take defaults
-    if (!empty($LIBS[$showLib]["columns"])) {
-        $columns = $LIBS[$showLib]["columns"];
-    } else {  //just take the columns that are certainly available in measurements.json
-        $columns = array("id", "type");
-    }
-
-    // column names to be displayed
-    foreach ($columns as $i => $column) {
-        $columnnames[$i] = nameMeta($column);
-    } ?>
-    <script type="text/javascript" charset="utf-8">
-        $(document).ready(function() {
-        var oTable = $('#datatable').dataTable( {
-            //"sScrollY": "300px",
-            "bPaginate": false,
-            "bScrollCollapse": true,
-            "aoColumns": [ { "bSortable": false }, <?php foreach ($columns as $column) {
-        echo "null, ";
-    } ?> ]        
-        } );
-        new FixedHeader( oTable );
-        } );
-    </script>
-        
-    <div class='fullwidth'>
-        <h3>Spectral library contents</h3>
-        <table id="datatable" width="100%">
-        <thead>
-            <tr>
-            <th> </th>
-<?php 
-
-foreach ($columnnames as $name) {
-    echo "                <th>" . $name . "</th>\n";
-} ?>
-            </tr>
-        </thead>
-        <tbody>
-<?php
-
-// 2. read measurements.json
-
-foreach ($measurements as $id => $m) {
-    echo "              <tr>\n";
-    // first column: link to open
-    echo '                <td><a href="./index.php?lib=' . $showLib . '&id=' . $id . '"><img src="./images/freecons/06.png" alt="[open]"></a></td>' . "\n";
-    foreach ($columns as $column) {
-        if (strtolower($column) == "id") {
-            echo "                <td>" . $id . "</td>\n";
-        } else {
-            echo "                <td>" . $m[$column] . "</td>\n";
-        }
-    }
-    echo "              </tr>\n";
-} ?>
-        </tbody>
-        </table>
-    </div>
-<?php
-}
-
-/* ******************
-      library list
-   ****************** */
-  
-else { //$showLib == "_START"
-    echo "        <div class=\"fullwidth\">\n",
-        "          <h3>Available libraries</h3>\n";
-    
-    foreach ($LIBS as $libid => $lib) {
-        if ($libid != "_START") {
-            if ((strtolower($lib["view"]) == "public") or calcPermLib($user["permissions"], "view", $libid)) {
-                echo "          <div class=\"boxed\" id=\"libbox\">\n",
-            "            <h4>".$lib["name"]."</h4>\n",
-            "            <p>".$lib["catchphrase"]."</p>\n",
-            "            <a class=\"libboxlink\" href=\"./index.php?lib=" . $libid . "\">>> visit library</a>\n",
-            "          </div>\n";
-            }
-        }
-    }
-    echo "        </div>\n";
-}
-
-
-
 FOOTER:
   // FOOTER
   include(FOOTER_FILE);
+  

@@ -16,8 +16,6 @@ if ($isLoggedIn) {
 }
   
 ?>
-    </div><!-- main -->
-  </div><!-- wrapper -->
   
   <div class="footer">
     <div id="left">

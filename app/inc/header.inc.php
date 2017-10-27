@@ -259,5 +259,3 @@ if ($isExpired) {
 
 unset($navMenuLibs, $navMenuMods, $isHiddenLib);
 ?>
-      
-      <div class ="main">
