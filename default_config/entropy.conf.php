@@ -21,6 +21,7 @@ const NAVBAR_COLOR   = "white";
 const DEFAULT_COLOR  = "primary";
 const HEADER_FILE    = PRIVPATH . 'inc/header.inc.php';
 const FOOTER_FILE    = PRIVPATH . 'inc/footer.inc.php';
+const FOOTER_BOX     = "<p><strong>Footer text box</strong></p><p>Link to privacy policy</p>";
 const MAIL_ADMIN     = "";
 
 // json configuration files
