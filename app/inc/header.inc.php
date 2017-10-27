@@ -158,7 +158,7 @@ unset($lib, $id, $value, $perm);
                 <div id="navMenu" class="navbar-menu">
                     <div class="navbar-start">
 <?php                 foreach ($navMenuLibs as $id => $caption): ?>
-                        <a class="navbar-item<?= ($showLib == $id) ? " is-active\"" : "" ?>" href="./index.php?lib=<?= $id ?>">
+                        <a class="navbar-item<?= ($showLib == $id) ? " is-active" : "" ?>" href="./index.php?lib=<?= $id ?>">
                             <?= $isHiddenLib == $id ? "<span class=\"icon\"><i class=\"fa fa-eye-slash\"></i></span>" : "" ?><?= $caption . "\n" ?>
                         </a>
 <?php                 endforeach; ?>
@@ -217,7 +217,7 @@ unset($lib, $id, $value, $perm);
 <?php                 if ($navMenuLogoBox): ?>
                         <div class="column is-narrow">
                             <div class="content is-small has-text-left-touch has-text-right-desktop">
-                                <?= $navMenuLogoBox ?>
+                                <?= $navMenuLogoBox ?> 
                             </div>
                         </div>
 <?php                 endif; ?>
@@ -232,7 +232,7 @@ unset($lib, $id, $value, $perm);
 <?php                     foreach ($navMenuMods as $id => $caption): ?>
                             <li<?= ($showMod == $id) ? " class=\"is-active\"" : "" ?>>
                                 <a href="./<?= ($id == "list") ? "index.php?" : "tools.php?mod=".$id."&" ?><?= $showLib ? "lib=". $showLib : "" ?>">
-                                    <?= $caption ?>
+                                    <?= $caption ?> 
                                 </a>
                             </li>
 <?php                     endforeach; ?>

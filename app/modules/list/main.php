@@ -137,16 +137,17 @@ if ($showLib != "_START") { //normal library
     3. HTML
 */
 
-// HEADER
+// HEADER + NAVBAR
 array_push($htmlHeaderStyles, CSS_DT_BULMA);
 array_push($htmlHeaderScripts, JS_DT, JS_DT_BULMA);            
 include(HEADER_FILE);
 
+// MAIN
 if ($error) {
     echo $error . "<br><br>\n";
 }
+require_once(__DIR__ . '/template.php');
 
-FOOTER:
-  // FOOTER
-  include(FOOTER_FILE);
+// FOOTER
+include(FOOTER_FILE);
   

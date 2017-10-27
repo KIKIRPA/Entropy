@@ -13,16 +13,13 @@ if (count(get_included_files()) == 1) {
              $listNewsColor
              $listContact
              $listReferences (array)
-
-
-
 */
 
 ?>
 
         <section class="section">
             <div class="container">
-                <div class="columns is-desktop">
+                <div class="columns">
 <?php             if ($listText): ?>
                     <div class="column">
                         <h1 class="title">About <?= $listTitle ?></h1>
@@ -34,10 +31,10 @@ if (count(get_included_files()) == 1) {
 <?php             endif; ?>
 
 <?php             if ($listNews or $listContact or $listReferences): ?>
-                    <div class="column<?= $listText ? " is-narrow" : "" ?>">
+                    <div class="column<?= $listText ? " is-one-quarter" : "" ?>">
 
 <?php                 foreach ($listNews as $item): ?>
-                        <div class="box <?= $listNewsColor ?>">
+                        <div class="notification <?= $listNewsColor ?>">
                             <div class="content">
                                 <?= $item ?> 
                             </div>
@@ -46,7 +43,7 @@ if (count(get_included_files()) == 1) {
 
 <?php                 if ($listContact): ?>
                         <div class="box">
-                            <h1 class="title">Contact</h1>
+                            <h1 class="title is-5">Contact</h1>
                             <hr>
                             <div class="content">
                                 <?= $listContact ?> 
@@ -56,35 +53,40 @@ if (count(get_included_files()) == 1) {
 
 <?php                 if ($listReferences): ?>
                         <div class="box">
-                            <h1 class="title">Related literature</h1>
+                            <h1 class="title is-5">Related literature</h1>
                             <hr>
                             <div class="content">
                                 <ul>
 <?php                             foreach ($listReferences as $item): ?>
-                                    <li><?= $listReferences ?></li>
+                                    <li><?= $item ?></li>
 <?php                             endforeach; ?>
                                 </ul>   
                             </div>
                         </div>
 <?php                 endif; ?>
 
-                    <div>
+                    </div>
 <?php             endif; ?>
                 </div>
+            </div>
+        </section>
 
-<?php         if ($showLib != "_START"): ?>
-                <script type="text/javascript" charset="utf-8">
-                    $(document).ready(function() {
-                        var oTable = $('#datatable').dataTable( {
-                            //"sScrollY": "300px",
-                            "bPaginate": false,
-                            "bScrollCollapse": true,
-                            "aoColumns": [ { "bSortable": false }, 
-                                        <?php foreach ($columns as $column): echo "null, "; endforeach; ?> ]        
-                        } );
-                    new FixedHeader( oTable );
-                    } );
-                </script>
+<?php if ($showLib != "_START"): ?>
+        <script type="text/javascript" charset="utf-8">
+            $(document).ready(function() {
+                var oTable = $('#datatable').dataTable( {
+                    //"sScrollY": "300px",
+                    "bPaginate": false,
+                    "bScrollCollapse": true,
+                    "aoColumns": [ { "bSortable": false }, 
+                                <?php foreach ($listColumns as $name): echo "null, "; endforeach; ?> ]        
+                } );
+                new FixedHeader( oTable );
+            } );
+        </script>
+
+        <section class="section">
+            <div class="container">
 
                 <h1 class="title">Measurements in this library</h1>
                 <hr>
@@ -115,8 +117,12 @@ if (count(get_included_files()) == 1) {
 <?php                 endforeach; ?>
                     </tbody>
                 </table>
+            </div>
+        </section>
 
-<?php         else:  // $showLib == "_START": START PAGE?>
+<?php else:  // $showLib == "_START": START PAGE?>
+        <section class="section">
+            <div class="container">
                 <h1 class="title">Available libraries</h1>
                 <hr>
                 <?= !$listLibs ? "<p>No libraries available</p>" : "" ?> 
@@ -125,17 +131,23 @@ if (count(get_included_files()) == 1) {
                 <div class="tile is-ancestor">
 <?php             foreach ($libs as $id => $lib): ?>
                     <div class="tile is-parent is-4">
-                        <article class="tile is-child box <?= $lib[$color] ?>">
-                            <p class="title"><?= $lib[$name] ?></p>
-                            <p class="subtitle"><?= $lib[$catchphrase] ?></p>
-                            <div class="content">
-                                <?= $lib[$logobox] ?> 
+                        <article class="tile notification is-child <?= $lib["color"] ?>">
+                            <p class="title is-5"><?= $lib["name"] ?></p>
+                            <p class="subtitle is-5"><?= $lib["catchphrase"] ?></p>
+                            <div class="content is-small">
+                                <?= $lib["logobox"] ?> 
                             </div>
+                            <a href="./index.php?lib=<?= $id ?>" class="button <?= $lib["color"] ?> is-inverted is-outlined is-pulled-right">
+                                <span class="icon is-small">
+                                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                                </span>
+                                <span>Visit...</span>
+                            </a>
                         </article>
                     </div>
 <?php             endforeach; ?>
                 </div>
 <?php          endforeach; ?>
-<?php         endif; ?>
             </div>
         </section>
+<?php endif; ?>
