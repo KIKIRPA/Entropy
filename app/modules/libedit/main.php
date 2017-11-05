@@ -288,8 +288,8 @@ elseif ($f == "set") {
                      "news" => 3,
                      "references" => 3,
                      "listcolumns" => 4,
-                     "downloadconverted" => 4,
-                     "downloadbinary" => 4
+                     "downloadconverted" => 5,
+                     "downloadbinary" => 5
                    );
 
     foreach ($params as $item => $category) {
@@ -319,13 +319,14 @@ elseif ($f == "set") {
                         }
                     }
                     break;
-                case 4: // arrays that need sanitizeStr
+                case 4: // arrays that need sanitizeStr, lowercase
+                case 5: // arrays that need sanitizeStr, uppercase
                     if (!is_array($_REQUEST[$item])) {
                         $_REQUEST[$item] = explode("|", $_REQUEST[$item]);
                     }
                     foreach ($_REQUEST[$item] as $i => $value) {
-                        $value = str_replace(" ", "_", strtolower($value));
-                        $value = sanitizeStr($value, "_", false, false);
+                        //$value = str_replace(" ", "_", $value);
+                        $value = sanitizeStr($value, "_", false, $category - 3);
                         if (!empty($value)) {
                             $newLib[$item][$i] = $value;
                         }

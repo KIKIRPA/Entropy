@@ -29,12 +29,15 @@ try {
         throw new Exception("Download failed: error in download code");
     }
 
-    if ($code[0] == "bin") { // search the binary file
-        if (!file_exists($code[1])) {
+    if ($code[0] == "bin") { 
+        if (!file_exists($code[1])) { // search the binary file
             throw new Exception("Download failed: binary file not found.");
         }
+        elseif (!(in_array($code[1], $LIBS[$showLib]["downloadbinary"]) or in_array("_ALL", $LIBS[$showLib]["downloadbinary"])) or in_array("_NONE", $LIBS[$showLib]["downloadbinary"])) {
+            throw new Exception("Download failed: binary download not allowed.");
+        }
     } elseif ($code[0] == "conv") { // is conversion allowed in library file?  TODO: is allowed in conversion settings json?
-        if (!in_array($code[1], $LIBS[$showLib]["allowformat"])) {
+        if (!in_array($code[1], $LIBS[$showLib]["downloadconverted"])) {
             throw new Exception("Download failed: conversion to ". $code[1] ." not allowed.");
         }
     } else {
@@ -71,7 +74,7 @@ try {
     eventLog("WARNING", $errormsg  . " [download]");
 
     // FALLBACK TO VIEW MODULE
-    require_once(PRIVPATH . 'inc/index_view.inc.php');
+    require_once(PRIVPATH . 'modules/view/main.php');
 }
 
 

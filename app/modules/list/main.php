@@ -112,18 +112,17 @@ if ($showLib != "_START") { //normal library
 
 } else {    // startpage
     $listLibs = array();
-    $row = 0;
+    $i = 0;
     foreach ($LIBS as $id => $lib) {
         if ($id != "_START") {
             if ((strtolower($lib["view"]) == "public") or calcPermLib($user["permissions"], "view", $id)) {
+                $row = intdiv($i, 3);
                 $listLibs[$row][$id] = array();
                 $listLibs[$row][$id]["name"] = $lib["name"];
                 $listLibs[$row][$id]["color"] = isset($lib["color"]) ? bulmaColorModifier($lib["color"], $COLORS, DEFAULT_COLOR) : bulmaColorModifier(DEFAULT_COLOR, $COLORS);
                 $listLibs[$row][$id]["catchphrase"] = isset($lib["catchphrase"]) ? $lib["catchphrase"] : false;
                 $listLibs[$row][$id]["logobox"] = isset($lib["logobox"]) ? $lib["logobox"] : false;
-                if (count($listLibs[$row]) == 3) {
-                    $row++;
-                }
+                $i++;
             }
         }
     }

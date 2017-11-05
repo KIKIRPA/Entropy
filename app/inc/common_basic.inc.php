@@ -12,10 +12,11 @@ if (count(get_included_files()) == 1) {
 
     logout()                              close session
 
-    sanitizeStr($string, $replaceby = "_", $others = False, $lowercase = False)
+    sanitizeStr($string, $replaceby = "_", $others = False, $case = 0)
         sanitize string, removes all characters, html-tags... that should not be there
         eg. string to be used as a part of a filename, or for loose string comparisons
         $others is other characters to replace, e.g. "-+:^"
+        $case: 1 lowercase, 2 uppercase, 0 and everything else: do nothing
 
     calcPermMod($permtable, [$lib])
         returns the allowed modules for a given user.
@@ -90,7 +91,7 @@ function logout()
 }
 
 
-function sanitizeStr($string, $replaceby = "_", $others = false, $lowercase = false)
+function sanitizeStr($string, $replaceby = "_", $others = false, $case = 0)
 {
     $replace = str_split(" _!\"#$%&'()*,/;<=>?@[\\]`{}~");
     
@@ -104,8 +105,11 @@ function sanitizeStr($string, $replaceby = "_", $others = false, $lowercase = fa
     }  // replace multiple underscores by a single
     $string = trim($string, "_");
     
-    if ($lowercase) {
+    if ($case == 1) {
         $string = strtolower($string);
+    }
+    elseif ($case == 2) {
+        $string = strtoupper($string);
     }
     
     return filter_var($string, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);

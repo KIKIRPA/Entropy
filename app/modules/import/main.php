@@ -414,7 +414,7 @@ STEP3:
     $existing = array_keys($existing);
     
     foreach ($DATATYPES as $type => $tval) {
-        $types_sani[sanitizeStr($type, "", "-+:^", true)] = $type;
+        $types_sani[sanitizeStr($type, "", "-+:^", 1)] = $type;
     }
     
     //unset($measurements[""]);   //remove empty rows
@@ -520,7 +520,7 @@ STEP3:
         foreach ($measurement as $param => $value) {
             $tt = array();
             $col = "";
-            $param_sani = sanitizeStr($param, "", "-+^", true);
+            $param_sani = sanitizeStr($param, "", "-+^", 1);
         
             switch ($param_sani) {
                 case "jcampdxtemplate":
@@ -546,7 +546,7 @@ STEP3:
                     break;
                 case "type":
                     //check if type is set and exists in dataformat.json!!
-                    $val_sani = sanitizeStr($value, "", "-+:^", true);
+                    $val_sani = sanitizeStr($value, "", "-+:^", 1);
                     if (isset($types_sani[$val_sani])) {
                         //if the value in the CSV is not identical to the one in dataformat.json, autocorrect
                         if ($value != $types_sani[$val_sani]) {
@@ -621,7 +621,7 @@ STEP3:
                     break;
                 } elseif (substr($param_sani, -10) === ":meta:type") {
                     //check if type is set and exists in datatypes.json!!
-                    $val_sani = sanitizeStr($value, "", "-+:^", true);
+                    $val_sani = sanitizeStr($value, "", "-+:^", 1);
                     if (isset($types_sani[$val_sani])) {
                         //if the value in the CSV is not identical to the one in datatypes.json, autocorrect
                         if ($value != $types_sani[$val_sani]) {
@@ -743,7 +743,7 @@ STEP3:
         }
       
         //make $list with keys from $columns and values retrieved from $measurements
-        $columns = $LIBS[$_REQUEST["lib"]]["columns"];
+        $columns = $LIBS[$_REQUEST["lib"]]["listcolumns"];
         $list =  array();
         foreach ($measurements as $id => $measurement) {
             $measurement = overrideMeta($measurement); //fold "meta:" metadata together with direct metadata
