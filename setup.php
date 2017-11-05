@@ -8,40 +8,40 @@
 
 // default values
 $cfg = array(
-    "forceinstall"   => false,
-    "privpath"       => "/usr/local/share/entropy/",
-    "pubpath"        => "/var/www/html/",
-    "htgroup"        => "www-data",
-    "app_short"      => "Entropy",
-    "app_long"       => "Entropy repository for analytical data",
-    "twopass_enable" => false,
-    "admin_login"    => "admin",
-    "admin_name"     => "Administrator user",
-    "admin_passwd"   => "entropy"
+    "forceinstall"    => false,
+    "privpath"        => "/usr/local/share/entropy/",
+    "pubpath"         => "/var/www/html/",
+    "htgroup"         => "www-data",
+    "app_name"        => "Entropy",
+    "app_catchphrase" => "A repository tailored for analytical data",
+    "twopass_enable"  => false,
+    "admin_login"     => "admin",
+    "admin_name"      => "Administrator user",
+    "admin_passwd"    => "entropy"
 );
 
 // questions for installation
 $qinstall = array(
-    "forceinstall" => "Force a clean install, even if a previous installation is found. This removes all data and settings.",
-    "privpath"     => "Main installation path outside webroot (where files will be stored that should remain inaccessible from the web).",
-    "pubpath"      => "Webroot path (accessible for the web server).",
-    "htgroup"      => "Group name of the Web server"
+    "forceinstall"    => "Force a clean install, even if a previous installation is found. This removes all data and settings.",
+    "privpath"        => "Main installation path outside webroot (where files will be stored that should remain inaccessible from the web).",
+    "pubpath"         => "Webroot path (accessible for the web server).",
+    "htgroup"         => "Group name of the Web server"
 );
 
 // questions for config files
 $qconfig = array(
-    "app_short"      => "Short website name.",
-    "app_long"       => "Long, descriptive website name.",
-    "app_keywords"   => "Website keywords used to improve indexing by seach engines (eg google). Separate keywords with commas.",
-    "mail_admin"     => "E-mail address of the system administrator.",
-    "mailhide_pub"   => "Mailhide is a service that protects e-mail addresses on a website from spam. The addresses are obfuscated until a (human) visitor solves a reCAPTCHA. If you want to use this feature in Entropy, get your public and private API keys on https://www.google.com/recaptcha/mailhide/apikey. Fill in the public key here.",
-    "mailhide_priv"  => "Mailhide private key",
-    "twopass_enable" => "Enable twopass verification for unknown IPs. Please make sure to have a working sendmail configuration.",
-    "admin_name"     => "Full name for the administrator user.",
-    "admin_inst"     => "Institution or department of the the administrator user.",
-    "admin_email"    => "E-mail address of the administrator user.",
-    "admin_login"    => "Username (login name) for the administrator user.",
-    "admin_passwd"   => "Passphrase or password for the administrator user."
+    "app_name"        => "Short website name.",
+    "app_catchphrase" => "Long, descriptive website name.",
+    "app_keywords"    => "Website keywords used to improve indexing by seach engines (eg google). Separate keywords with commas.",
+    "mail_admin"      => "E-mail address of the system administrator.",
+    "mailhide_pub"    => "Mailhide is a service that protects e-mail addresses on a website from spam. The addresses are obfuscated until a (human) visitor solves a reCAPTCHA. If you want to use this feature in Entropy, get your public and private API keys on https://www.google.com/recaptcha/mailhide/apikey. Fill in the public key here.",
+    "mailhide_priv"   => "Mailhide private key",
+    "twopass_enable"  => "Enable twopass verification for unknown IPs. Please make sure to have a working sendmail configuration.",
+    "admin_name"      => "Full name for the administrator user.",
+    "admin_inst"      => "Institution or department of the the administrator user.",
+    "admin_email"     => "E-mail address of the administrator user.",
+    "admin_login"     => "Username (login name) for the administrator user.",
+    "admin_passwd"    => "Passphrase or password for the administrator user."
 );
 
 // used for type evaluation and casting. possible values: boolean, integer, string (default), e-mail, path

@@ -6,10 +6,11 @@ if (count(get_included_files()) == 1) {
     exit("Direct access not permitted.");
 }
 
-$lp = true;  // let module_libedit know which data it should expect
-include(PRIVPATH . 'inc/module_libedit.inc.php');
-?>
+//HEADER
+array_push($htmlHeaderStyles, CSS_DT_BULMA);
+array_push($htmlHeaderScripts, JS_DT, JS_DT_BULMA);  
+include(HEADER_FILE);
 
-  
-  
-  
+
+//FOOTER
+include(FOOTER_FILE);

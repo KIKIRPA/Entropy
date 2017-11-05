@@ -14,11 +14,11 @@ Entropy is under heavy development and may or may not function. Expect it to fai
 ## Planned milestones
 
 ### M1
-- Single user (more users are possible, but no front-end)
-- Twodimensional data (spectra)
+- ~~Single user (more users are possible, but no front-end)~~
+- ~~Twodimensional data (spectra)~~
 - File conversion from/to common file formats for Raman spectroscopy
-- Flexible file-based data storage (database-less)
-- Mass import of data (metadata supplied as comma-separated-values file)
+- ~~Flexible file-based data storage (database-less)~~
+- ~~Mass import of data (metadata supplied as comma-separated-values file)~~
 
 ### M2
 - Multi-user (user and permission management)

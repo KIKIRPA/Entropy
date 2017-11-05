@@ -16,6 +16,11 @@ require_once(PRIVPATH . 'inc/common_importfilters.inc.php');
 *                           *
 ****************************/
 
+//HEADER
+array_push($htmlHeaderStyles, CSS_DT_BULMA);
+array_push($htmlHeaderScripts, JS_DT, JS_DT_BULMA);  
+include(HEADER_FILE);
+
 echo "      <h3>Library upload tool</h3>\n";
 
 # check if the transaction already exists and set $tr and $action
@@ -46,7 +51,7 @@ try {
         }
     
         // check if this user permission
-        if (!$user["permissions"]["admin"] and ($transactions[$tr]["user"] != $is_logged_in)) {
+        if (!$user["permissions"]["admin"] and ($transactions[$tr]["user"] != $isLoggedIn)) {
             throw new RuntimeException('Unauthorised access to transaction ' . $tr);
         }
     
@@ -76,7 +81,7 @@ try {
     } else {
         // create a new transaction
         $tr = date("YmdHis");
-        $transactions[$tr] = array("user"   => $is_logged_in,
+        $transactions[$tr] = array("user"   => $isLoggedIn,
                             "action" => "none",
                             "step"   => 1
                             );
@@ -244,7 +249,7 @@ STEP1:
                 
                 foreach ($transactions as $id => $transaction) {
                     //test if the logged in user has made this transaction or is admin
-                    if (($transaction["user"] == $is_logged_in) or $user["permissions"]["admin"]) {
+                    if (($transaction["user"] == $isLoggedIn) or $user["permissions"]["admin"]) {
                         if (in_array($transaction["action"], array("append", "update", "replace"))) {
                             $a = $transaction["action"];
                             $u = $transaction["user"];
@@ -273,6 +278,10 @@ STEP1:
 
       </div>
 <?php
+
+
+    //FOOTER
+    include(FOOTER_FILE);
 
     return;   // return to the main php page
 }
@@ -405,7 +414,7 @@ STEP3:
     $existing = array_keys($existing);
     
     foreach ($DATATYPES as $type => $tval) {
-        $types_sani[sanitizeStr($type, "", "-+:^", true)] = $type;
+        $types_sani[sanitizeStr($type, "", "-+:^", 1)] = $type;
     }
     
     //unset($measurements[""]);   //remove empty rows
@@ -511,7 +520,7 @@ STEP3:
         foreach ($measurement as $param => $value) {
             $tt = array();
             $col = "";
-            $param_sani = sanitizeStr($param, "", "-+^", true);
+            $param_sani = sanitizeStr($param, "", "-+^", 1);
         
             switch ($param_sani) {
                 case "jcampdxtemplate":
@@ -537,7 +546,7 @@ STEP3:
                     break;
                 case "type":
                     //check if type is set and exists in dataformat.json!!
-                    $val_sani = sanitizeStr($value, "", "-+:^", true);
+                    $val_sani = sanitizeStr($value, "", "-+:^", 1);
                     if (isset($types_sani[$val_sani])) {
                         //if the value in the CSV is not identical to the one in dataformat.json, autocorrect
                         if ($value != $types_sani[$val_sani]) {
@@ -612,7 +621,7 @@ STEP3:
                     break;
                 } elseif (substr($param_sani, -10) === ":meta:type") {
                     //check if type is set and exists in datatypes.json!!
-                    $val_sani = sanitizeStr($value, "", "-+:^", true);
+                    $val_sani = sanitizeStr($value, "", "-+:^", 1);
                     if (isset($types_sani[$val_sani])) {
                         //if the value in the CSV is not identical to the one in datatypes.json, autocorrect
                         if ($value != $types_sani[$val_sani]) {
@@ -671,6 +680,10 @@ STEP3:
     } else {
         echo "        There are errors. Please correct the original file and reupload. <a href='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "'>Return</a>\n";
     }
+
+
+    //FOOTER
+    include(FOOTER_FILE);
     
     return;   // return to the main php page
   }
@@ -730,7 +743,7 @@ STEP3:
         }
       
         //make $list with keys from $columns and values retrieved from $measurements
-        $columns = $LIBS[$_REQUEST["lib"]]["columns"];
+        $columns = $LIBS[$_REQUEST["lib"]]["listcolumns"];
         $list =  array();
         foreach ($measurements as $id => $measurement) {
             $measurement = overrideMeta($measurement); //fold "meta:" metadata together with direct metadata
@@ -861,6 +874,10 @@ STEP5:
         echo "    <div>Data files that need to be uploaded: " . $needdata . "</div><br><br>\n";
     }
     
+
+    //FOOTER
+    include(FOOTER_FILE);
+
     return;
 }
 
@@ -945,6 +962,10 @@ STEP6:
         <input type="submit" value="Update >" />
       </form>
     <?php
+
+
+    //FOOTER
+    include(FOOTER_FILE);
 
     return;
   }
@@ -1230,4 +1251,7 @@ STEP9:
       $transactions[$tr]["step"] = 10;  // lock this transaction, so that a sysadmin can look into it
       $error = writeJSONfile(LIB_PATH . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
     }
+
+    //FOOTER
+    include(FOOTER_FILE);
 }

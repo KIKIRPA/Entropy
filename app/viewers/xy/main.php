@@ -7,23 +7,21 @@ if (count(get_included_files()) == 1) {
 }
 
 ?>
-
-          <div id="graphdiv" class="nonboxed" style="height:400px; float: left;"></div>          
-          <script type="text/javascript">
-            g = new Dygraph(
-              document.getElementById("graphdiv"),
-              <?= json_encode($data["dataset"][$showds]["data"]) ?>,
-              { 
-                labels: ["<?= isset($units["x"]) ? $units["x"] : "Undefined" ?>","<?= $idbox_head ?>"],
-                xlabel: "<?= isset($units["x"]) ? $units["x"] : "Undefined" ?>", 
-                ylabel: "<?= isset($units["y"]) ? $units["y"] : "Undefined" ?>",
-                //drawYAxis: false,
-                axisLabelFontSize: 10,
-                yAxisLabelWidth: 70,
-                colors: ["red", "black", "blue", "green"],
-              }
-            );
-
-          <?= isset($anno) ? "g.ready(function() { g.setAnnotations(" . json_encode($anno) . "); });" : "" ?>
-          </script>
+                        <div id="graph" style="width: 100%; height: 450px;"></div>          
+                        <script type="text/javascript">
+                            g = new Dygraph(
+                                document.getElementById("graph"),
+                                <?= json_encode($data["dataset"][$showDS]["data"]) ?>,
+                                { 
+                                    labels: ["<?= isset($units["x"]) ? $units["x"] : "Undefined" ?>","<?= reset($viewTags) ?>"],
+                                    xlabel: "<?= isset($units["x"]) ? $units["x"] : "Undefined" ?>", 
+                                    ylabel: "<?= isset($units["y"]) ? $units["y"] : "Undefined" ?>",
+                                    //drawYAxis: false,
+                                    axisLabelFontSize: 10,
+                                    yAxisLabelWidth: 70,
+                                    colors: ["red", "black", "blue", "green"],
+                                }
+                            );
+                            <?= isset($anno) ? "g.ready(function() { g.setAnnotations(" . json_encode($anno) . "); });" : "" ?> 
+                        </script>
 <?php

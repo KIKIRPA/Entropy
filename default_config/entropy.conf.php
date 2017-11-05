@@ -12,11 +12,16 @@ const LIB_PATH       = PRIVPATH . "data/libs/";
 const LOG_PATH       = PRIVPATH . "data/logs/";
 
 // webapp properties
-const APP_SHORT      = "Entropy";
-const APP_LONG       = "Entropy repository for analytical data";
+const APP_NAME      = "Entropy";
+const APP_CATCHPHRASE       = "A repository tailored for analytical data";
 const APP_KEYWORDS   = "";
+const APP_LOGO       = "./img/entropy_turquoise.png";
+const APP_ICON       = "./img/favicon_turquoise.png";
+const NAVBAR_COLOR   = "white";
+const DEFAULT_COLOR  = "primary";
 const HEADER_FILE    = PRIVPATH . 'inc/header.inc.php';
 const FOOTER_FILE    = PRIVPATH . 'inc/footer.inc.php';
+const FOOTER_BOX     = "<p><strong>Footer text box</strong></p><p>Link to privacy policy</p>";
 const MAIL_ADMIN     = "";
 
 // json configuration files
@@ -24,6 +29,7 @@ const USERS_FILE     = CONFIG_PATH . "users.json";
 const BLACKLIST_FILE = CONFIG_PATH . "blacklist.json";
 const MODULES_FILE   = CONFIG_PATH . "modules.json";
 const DATATYPES_FILE = CONFIG_PATH . "datatypes.json";
+const COLORS_FILE    = CONFIG_PATH . "colors.json";
 
 // repository storage
 const LIB_FILE       = LIB_PATH . "libraries.json";
@@ -34,7 +40,7 @@ const LOG_EV_FILE    = LOG_PATH . "event.csv";
 
 // style and javascript sources
 const CSS_FA         = "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css";
-const CSS_BULMA      = "https://cdnjs.cloudflare.com/ajax/libs/bulma/0.5.1/css/bulma.min.css";
+const CSS_BULMA      = "https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.0/css/bulma.min.css";
 const CSS_DT         = "https://cdn.datatables.net/v/dt/dt-1.10.15/fc-3.2.2/fh-3.1.2/r-2.1.1/datatables.min.css";
 const CSS_DT_BULMA   = "https://raw.githubusercontent.com/JDilleen/datatables-bulma/master/css/dataTables.bulma.min.css";
 const CSS_DYGRAPH    = "https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.css";

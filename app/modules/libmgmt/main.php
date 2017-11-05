@@ -6,6 +6,11 @@ if (count(get_included_files()) == 1) {
     exit("Direct access not permitted.");
 }
 
+//HEADER
+array_push($htmlHeaderStyles, CSS_DT_BULMA);
+array_push($htmlHeaderScripts, JS_DT, JS_DT_BULMA);  
+include(HEADER_FILE);
+
 ?>
   <h3>Library management</h3>
   <script type="text/javascript" charset="utf-8">
@@ -33,7 +38,7 @@ if (count(get_included_files()) == 1) {
           <th>id</th>
           <th>name</th>
           <th>view</th>
-          <th>colour</th>
+          <th>color</th>
           <th>actions
             <?= calcPermLib($user["permissions"], "libmk") ? " <a href='" . $_SERVER["PHP_SELF"] . "?mod=libmk'>&#10010</a>" : "" ?>
           </th>
@@ -44,12 +49,12 @@ if (count(get_included_files()) == 1) {
 
   foreach ($LIBS as $id => $lib) {
       if (($lib["view"] == "public") or calcPermLib($user["permissions"], "view", $id)) {
-          if ($libid != "_landingpage") {
+          if ($libid != "_START") {
               echo "        <tr>\n",
                   "          <td>" . $id . "</td>\n",
                   "          <td>" . $lib["name"] . "</td>\n",
                   "          <td>" . $lib["view"]. "</td>\n",
-                  "          <td><span style='color:" . $lib["colour"] . "'>&#9724;</span></td>\n",
+                  "          <td><span class=\"tag " . bulmaColorModifier($lib["color"], $COLORS) . "\">color</span></td>\n",
                   "          <td>\n";
         
               if (calcPermLib($user["permissions"], "libedit", $id)) {
@@ -74,3 +79,8 @@ if (count(get_included_files()) == 1) {
       </tbody>
     </table>
   </div>
+
+<?php
+
+//FOOTER
+include(FOOTER_FILE);

@@ -5,30 +5,35 @@ if (count(get_included_files()) == 1) {
     header("Status: 404 Not Found");
     exit("Direct access not permitted.");
 }
-
-if ($is_logged_in) {
-    $email = '<a href="mailto:wim.fremout@kikirpa.be">Wim Fremout <img src="./img/freecons/28_white.png" alt="e-mail" height="11" width="16"></a>';
-} else {
-    $email = mailhide(
-      'wim.fremout@kikirpa.be',
-                      'Wim Fremout <img src="./img/freecons/28_white.png" alt="e-mail" height="11" width="16">'
-                    );
-}
   
 ?>
-    </div><!-- main -->
-  </div><!-- wrapper -->
-  
-  <div class="footer">
-    <div id="left">
-      Powered by <a href="https://github.com/KIKIRPA/Entropy">Entropy</a><br>
-      &copy;2012-<?= date("Y") . " " . $email ?> and contributors 
-    </div>
-    <div id="right">
-      Development was supported by 
-      <a href="http://www.kikirpa.be"><img src="./img/kikirpa.png" width="40" height="40"></a>
-      <a href="http://iperionch.eu"><img src="./img/iperion.png" width="40" height="40"></a>
-    </div>
-  </div>
-</body>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="columns">
+                    <div class="column is-8">
+                        <div class="content is-size-6">
+                            <?= $isLoggedIn ? FOOTER_BOX : searchMailHide(FOOTER_BOX) ?> 
+                        </div>
+                    </div>
+                    <div class="column has-text-right">
+                        <p class="is-size-6">Powered by <strong>Entropy</strong>
+                            <a href="https://github.com/KIKIRPA/Entropy" target="_blank">
+                                <span class="icon is-medium">
+                                    <i class="fa fa-2x fa-github" aria-hidden="true"></i>
+                                </span>
+                            </a>
+                        </p>
+                        <p class="is-size-7">
+                            A repository tailored for analytical data<br><br>
+                            Developed by Wim Fremout<br>
+                            Supported by:<br>
+                            <a href="http://www.kikirpa.be" target="_blank"><img src="./img/footer_kikirpa.png" alt="KIK/IRPA" height="30"></a> 
+                            <a href="http://iperionch.eu" target="_blank"><img src="./img/footer_iperion.png" alt="IPERION-CH" height="30"></a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </body>
 </html>

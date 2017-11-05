@@ -6,13 +6,20 @@ if (count(get_included_files()) == 1) {
     exit("Direct access not permitted.");
 }
 
+
+//HEADER
+array_push($htmlHeaderStyles, CSS_DT_BULMA);
+array_push($htmlHeaderScripts, JS_DT, JS_DT_BULMA);  
+include(HEADER_FILE);
+
+
 $id = str_replace(" ", "", strtolower($_REQUEST["lib"]));
 
 echo "      <h3>Delete library</h3>\n";
 
-if ($id == "_landingpage") {
-    // the special 'library' _landingpage cannot be deleted; should be set to invisible instead!
-    echo "      <span style='color:red'>ERROR: cannot remove the landing page!</span><br><br>\n";
+if ($id == "_START") {
+    // the special 'library' _START cannot be deleted; should be set to invisible instead!
+    echo "      <span style='color:red'>ERROR: cannot remove the startpage!</span><br><br>\n";
 } elseif (!isset($_REQUEST["del"]) and isset($LIBS[$id])) {
     echo "        <span style='color:red'>This will IRREVOCABLY DELETE LIBRARY " . $id . "!</span><br><br>\n"
        . "        <form name='myform' action='" . $_SERVER["REQUEST_URI"] . "' method='POST'>\n"
@@ -37,3 +44,7 @@ if ($id == "_landingpage") {
 } else {
     echo "      <span style='color:red'>Wouldn't you rather choose an existing library to delete?</span><br><br>\n";
 }
+
+
+//FOOTER
+include(FOOTER_FILE);
