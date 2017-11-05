@@ -242,7 +242,7 @@ unset($lib, $id, $value, $perm);
             </div>
 <?php     endif; ?>
         </section>
-         
+
 <?php 
 if ($isExpired) {
     echo "      <script>\n"

@@ -170,9 +170,9 @@ foreach ($meta as $key => $item) {
 unset($meta, $i, $row, $header, $key, $item, $subkey, $subitem);
 
 
-/*
-    3. HTML
-*/
+/* ******
+    HTML
+   ****** */
 
 // HEADER + NAVBAR
 array_push($htmlHeaderStyles, CSS_DYGRAPH);
@@ -184,6 +184,11 @@ if ($error) {
     echo $error . "<br><br>\n";
 }
 require_once(__DIR__ . '/template.php');
+
+// MODAL
+if ($viewDownloadEnabled and $viewShowModal) {
+    require_once(__DIR__ . '/modal.template.php');
+}
 
 // FOOTER
 include(FOOTER_FILE);

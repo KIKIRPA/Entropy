@@ -58,7 +58,7 @@ try {
         } elseif (isset($_REQUEST["name"]) and isset($_REQUEST["institution"]) and isset($_REQUEST["email"])) {
             $cookie = verifycookie($_REQUEST["name"], $_REQUEST["institution"], $_REQUEST["email"]);
             if ($cookie) {
-                $log = array($USERS[$isLoggedIn]["name"], $USERS[$isLoggedIn]["institution"], $USERS[$isLoggedIn]["email"], "form");
+                $log = array($_REQUEST["name"], $_REQUEST["institution"], $_REQUEST["email"], "form");
                 if (isset($_REQUEST["cookie"])) {
                     $cookie = makecookie($cookie);
                 } // set cookie, if the user checked the checkbox
