@@ -1,5 +1,13 @@
 {
-    "Raman": {
+    "raman": {
+        "alias": [
+            "Raman",
+            "Raman 785nm",
+            "Raman 514nm",
+            "Raman 532nm",
+            "Raman 633nm",
+            "Raman 1064nm"
+        ],
         "viewer": "xy",
         "graph": {
             "xy": "line"
@@ -25,22 +33,10 @@
             ]
         }
     },
-    "Raman 785nm": {
-        "alias": "Raman"
-    },
-    "Raman 514nm": {
-        "alias": "Raman"
-    },
-    "Raman 532nm": {
-        "alias": "Raman"
-    },
-    "Raman 633nm": {
-        "alias": "Raman"
-    },
-    "Raman 1064nm": {
-        "alias": "Raman"
-    },
-    "FTIR": {
+    "ftir": {
+        "alias": [
+            "FTIR"
+        ],
         "viewer": "xy",
         "graph": {
             "xy": "line"
@@ -67,7 +63,11 @@
             ]
         }
     },
-    "MS": {
+    "ms": {
+        "alias": [
+            "MS",
+            "Mass spectrum"
+        ],
         "viewer": "xy",
         "graph": {
             "xy": "bar"
@@ -87,10 +87,11 @@
             ]
         }
     },
-    "Mass spectrum": {
-        "alias": "MS"
-    },
     "chromms": {
+        "alias": [
+            "ChromMS",
+            "GC-MS"
+        ],
         "viewer": "txy",
         "graph": {
             "ty": "line",
@@ -116,8 +117,5 @@
                 }
             ]
         }
-    },
-    "GC-MS": {
-        "alias": "chromms"
     }
 }

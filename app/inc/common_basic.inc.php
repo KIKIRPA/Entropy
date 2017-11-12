@@ -59,13 +59,9 @@ if (count(get_included_files()) == 1) {
         "meta:", and optionally with metadata specific to a dataset
         returns merged metadata (analytical data is stripped)
 
-    datatypeParent($type, $datatypes)
-        if $type is an alias, it recursively looks for the parent (but checks for circular aliassing:
-        e.g. "Raman 785nm" is alias for "Raman", which is an alias for "Raman 785nm").
-
-    datatypeUnits($type, $datatypes, $key = "json", $search = Null)
+    findDataTypeUnits($type, $datatypes, $key = "json", $search = Null)
         extracts a list of axis units/names for a given datatype ($type) from the $DATATYPES json resource.
-        Includes searching for parent datatype (using datatypeParent())
+        Includes searching for parent datatype
         By default it returns the json-names, other names (or invert booleans) can be requested with the $key.
         In absence of $search, the default (first listed) entries for each axis will be returned.
         $search is a list of one alternative name per axis to search for; if found, the function
@@ -477,35 +473,40 @@ function overrideMeta($metadata, $dataset = false)
     return array_replace_recursive($metadata, $metameta, $dsmeta);
 }
 
-
-function datatypeParent($type, $datatypes)
+/**
+ * findDataType($type, $datatypes, $returnAlias = false) 
+ * 
+ * finds the generic or corrected alias for a datatype
+ * returns false if not found
+ */
+function findDataType($type, $datatypes, $returnAlias = false) 
 {
-    // types can be aliassed against a parent, which can itself be aliassed against another type.
-    // potentially we can end up in a loop, which would cause the recursive parent lookup to end up in an eternal loop.
-    // a list of child types will be made to prevent this from happening.
-    $children = array();
-
-    if (!isset($datatypes[$type])) {  // should be checked and autocorrected before; just in case
-        eventLog("ERROR", "Unknown data type: " . $type . " [datatypeParent]", true);
-    }
-
-    // recursively find parent datatype
-    while (1) {
-        if (isset($datatypes[$type]["alias"])) {
-            if (!in_array($datatypes[$type]["alias"], $children)) { // detect circular aliassing
-                $children[] = $type;
-                $type = $datatypes[$type]["alias"];
-            } else {
-                eventLog("ERROR", "Circular aliassing in the Datatypes settings: " . $type . " [datatypeParent]", true);
+    $type = trim(strtolower($type));
+    $type = str_replace(" ", "", $type);
+    
+    foreach ($datatypes as $generic => $array) {
+        if (isset($array["alias"])) {
+            foreach ($array["alias"] as $alias) {
+                $clean = trim(strtolower($alias));
+                $clean = str_replace(" ", "", $clean);
+                
+                if ($type == $clean) {
+                    return ($returnAlias ? $alias : $generic);
+                }
             }
-        } else {
-            return $type;
+        }
+        elseif ($type == $generic) {
+            return $generic;
         }
     }
+
+    // not found
+    eventLog("WARNING", "Unknown data type: " . $type . " [findDataType()]", false);
+    return false;
 }
 
 
-function datatypeUnits($type, $datatypes, $key = "json", $search = null)
+function findDataTypeUnits($type, $datatypes, $key = "json", $search = null)
 {
     $results = array();
 
@@ -521,46 +522,47 @@ function datatypeUnits($type, $datatypes, $key = "json", $search = null)
         $search = array_map('strtolower', $search);
     }
     
-    // find parent type
-    $type = datatypeParent($type, $datatypes);
+    // find generic datatype
+    $type = findDataType($type, $datatypes);
+    if ($type) {
+        foreach ($datatypes[$type]["axis"] as $i => $axis) {  // iterate over x, y, z, t...
+            $searchresult = false;
 
-    foreach ($datatypes[$type]["axis"] as $i => $axis) {  // iterate over x, y, z, t...
-        $searchresult = false;
-
-        // if a search array is given: search corresponding value for this axis
-        if (is_array($search)) {
-            if (isset($search[$i])) {
-                foreach ($axis as $namelist) {      // iterate over different options for each axis (e.g. absorption, transmission...)
-                    // make a working copy of the namelist, where we can remove "invert" and convert to lowercase
-                    $haystack = $namelist;
-                    if (isset($haystack["invert"])) {
-                        unset($haystack["invert"]);
-                    }
-                    $haystack = array_map('strtolower', $haystack);
-                    // search in namelist
-                    if (in_array($search[$i], $haystack)) {
-                        $searchresult = $namelist;
-                        break;
+            // if a search array is given: search corresponding value for this axis
+            if (is_array($search)) {
+                if (isset($search[$i])) {
+                    foreach ($axis as $namelist) {      // iterate over different options for each axis (e.g. absorption, transmission...)
+                        // make a working copy of the namelist, where we can remove "invert" and convert to lowercase
+                        $haystack = $namelist;
+                        if (isset($haystack["invert"])) {
+                            unset($haystack["invert"]);
+                        }
+                        $haystack = array_map('strtolower', $haystack);
+                        // search in namelist
+                        if (in_array($search[$i], $haystack)) {
+                            $searchresult = $namelist;
+                            break;
+                        }
                     }
                 }
             }
-        }
 
-        // if no search-array was given, or search[$i] was not found: get the name from the first axis option (first namelist)
-        if (!$searchresult) {
-            $namelist = reset($axis);
-        }
+            // if no search-array was given, or search[$i] was not found: get the name from the first axis option (first namelist)
+            if (!$searchresult) {
+                $namelist = reset($axis);
+            }
 
-        // get the key-name if it exists, else the default key-name, or else the first name in the array
-        if (isset($namelist[$key])) {
-            $result[$i] = $namelist[$key];
-        } elseif (isset($namelist[$defaultkey])) {
-            $result[$i] = $namelist[$defaultkey];
-        } else {
-            $return[$i] = reset($namelist);
-        } 
+            // get the key-name if it exists, else the default key-name, or else the first name in the array
+            if (isset($namelist[$key])) {
+                $result[$i] = $namelist[$key];
+            } elseif (isset($namelist[$defaultkey])) {
+                $result[$i] = $namelist[$defaultkey];
+            } else {
+                $return[$i] = reset($namelist);
+            } 
+        }
     }
-
+            
     return $results;
 }
 

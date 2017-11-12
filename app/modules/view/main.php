@@ -121,18 +121,17 @@ unset ($cookie, $code, $format, $prefix, $binfiles);
   viewer
   ******** */
 
-$parenttype = datatypeParent($viewTags["Type"], $DATATYPES);
+$parenttype = findDataType($viewTags["Type"], $DATATYPES);
 $viewer = $DATATYPES[$parenttype]["viewer"];
-$units = datatypeUnits($parenttype, $DATATYPES, 'html', $data["dataset"][$showDS]["units"]);
+$units = findDataTypeUnits($parenttype, $DATATYPES, 'html', $data["dataset"][$showDS]["units"]);
 
 if (isset($data["dataset"][$showDS]["anno"])) {
     if (is_array($data["dataset"][$showDS]["anno"])) {
-        $anno = array();
-        foreach ($data["dataset"][$showDS]["anno"] as $i => $a) {
-            $anno[$i] = array();
-            $anno[$i]["series"] = $viewTitle;
-            $anno[$i] = array_merge($anno[$i], $a);
+        $anno = $data["dataset"][$showDS]["anno"];
+        foreach ($anno as $i => $a) {
+            $anno[$i]["series"] = reset($viewTags);
         }
+        $anno = json_encode($anno);
     }
 }
 
