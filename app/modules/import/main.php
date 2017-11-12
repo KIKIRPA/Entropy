@@ -980,7 +980,6 @@ STEP7:
                 $data = false;
                 $parameters = selectImportHelper($IMPORT, findDataType($json["type"], $DATATYPES), $ext, $parameters);
                 if (isset($parameters["helper"])) {
-                    echo $parameters["helper"] . "<br>";
                     // create helper class 
                     $class = "Import" . $parameters["helper"];
                     unset($parameters["helper"]);

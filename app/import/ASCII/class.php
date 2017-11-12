@@ -75,9 +75,10 @@ class ImportASCII
     {
         if (is_numeric(substr($line, 0, 1))) {            // don't include comments (only lines beginning with a number are considered)
             $line = getSpectrumValues($line);             // decompose line into an array of values
-            echo count($line) . " => " .implode("|", $line) . "<br>";
             if (count($line) >= 2) {
                 if (is_numeric($line[0]) and is_numeric($line[1])) {
+                    $line[0] = floatval($line[0]);
+                    $line[1] = floatval($line[1]);
                     return array_slice($line, 0, 2);
                 }
             } // inconsisten data: return false but and log warning
