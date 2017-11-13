@@ -22,6 +22,6 @@ if (count(get_included_files()) == 1) {
                                     colors: ["red", "black", "blue", "green"],
                                 }
                             );
-                            <?= isset($anno) ? "g.ready(function() { g.setAnnotations(" . json_encode($anno) . "); });" : "" ?> 
+                            <?= isset($anno) ? "g.ready(function() { g.setAnnotations(" . $anno . "); });" : "" ?>
                         </script>
 <?php

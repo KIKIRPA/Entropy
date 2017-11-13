@@ -7,7 +7,6 @@ if (count(get_included_files()) == 1) {
 }
 
 require_once(PRIVPATH . 'inc/common_upload.inc.php');
-require_once(PRIVPATH . 'inc/common_importfilters.inc.php');
 
 
 /****************************
@@ -413,10 +412,6 @@ STEP3:
     $existing = readJSONfile(LIB_PATH . $_REQUEST["lib"] . "/measurements.json");  //if file does not exist: empty array
     $existing = array_keys($existing);
     
-    foreach ($DATATYPES as $type => $tval) {
-        $types_sani[sanitizeStr($type, "", "-+:^", 1)] = $type;
-    }
-    
     //unset($measurements[""]);   //remove empty rows
     
     $a = 0; // automatically corrected issues (green bg)
@@ -523,42 +518,18 @@ STEP3:
             $param_sani = sanitizeStr($param, "", "-+^", 1);
         
             switch ($param_sani) {
-                case "jcampdxtemplate":
-                    // autocorrect filename
-                    $val_sani = sanitizeStr($value);
-                    if ($val_sani != $value) {
-                        $a++;
-                        $col = "green";
-                        array_push($tt, "[NOTE] Automatically removed illegal characters");
-                        $measurements[$id][$param] = $value = $val_sani;
-                    }
-                    
-                    if (empty($value) and (in_array("dx", $LIBS[$_REQUEST["lib"]]["allowformat"])
-                                        or in_array("jdx", $LIBS[$_REQUEST["lib"]]["allowformat"]))) {
-                        $b++;
-                        $col = "orange";
-                        array_push($tt, "[WARNING] Empty: downloading JCAMP-DX will not be possible");
-                    } elseif (!file_exists(LIB_PATH . $_REQUEST["lib"] . "/dxt/" . $value)) {
-                        $b++;
-                        $col = "orange";
-                        array_push($tt, "[WARNING] JCAMP-DX template file not found");
-                    }
-                    break;
                 case "type":
-                    //check if type is set and exists in dataformat.json!!
-                    $val_sani = sanitizeStr($value, "", "-+:^", 1);
-                    if (isset($types_sani[$val_sani])) {
-                        //if the value in the CSV is not identical to the one in dataformat.json, autocorrect
-                        if ($value != $types_sani[$val_sani]) {
-                            $a++;
-                            $col = "green";
-                            array_push($tt, "[NOTE] Automatically corrected type");
-                            $measurements[$id][$param] = $value = $types_sani[$val_sani];
-                        }
-                    } else { // type in CSV does not exist!
+                    //check if type is set and exists in datatypes.json!!
+                    $val_sani = findDataType(sanitizeStr($value, "", "-+:^", 1), $DATATYPES, true);
+                    if (!$val_sani) { // type in CSV does not exist! (findDataType() returned false)
                         $c++;
                         $col = "red";
                         array_push($tt, "[ERROR] Undefined data type");
+                    } elseif ($val_sani != $value) { //if the value in the CSV is not identical to the one in dataformat.json, autocorrect
+                        $a++;
+                        $col = "green";
+                        array_push($tt, "[NOTE] Automatically corrected type");
+                        $measurements[$id][$param] = $value = $val_sani;
                     }
                     // no break
                 default:
@@ -598,42 +569,17 @@ STEP3:
         
             // check dataset fields jcampdxtemplate and type
             if (substr($param_sani, 0, 8) === "dataset:") {
-                if (substr($param_sani, -16) === ":jcampdxtemplate") {
-                    // autocorrect filename
-                    $val_sani = sanitizeStr($value);
-                    if ($val_sani != $value) {
-                        $a++;
-                        $col = "green";
-                        array_push($tt, "[NOTE] Automatically removed illegal characters");
-                        $measurements[$id][$param] = $value = $val_sani;
-                    }
-            
-                    if (empty($value) and (in_array("dx", $LIBS[$_REQUEST["lib"]]["allowformat"])
-                                   or in_array("jdx", $LIBS[$_REQUEST["lib"]]["allowformat"]))) {
-                        $b++;
-                        $col = "orange";
-                        array_push($tt, "[WARNING] Empty: downloading JCAMP-DX will not be possible");
-                    } elseif (!file_exists(LIB_PATH . $_REQUEST["lib"] . "/dxt/" . $value)) {
-                        $b++;
-                        $col = "orange";
-                        array_push($tt, "[WARNING] JCAMP-DX template file not found");
-                    }
-                    break;
-                } elseif (substr($param_sani, -10) === ":meta:type") {
-                    //check if type is set and exists in datatypes.json!!
-                    $val_sani = sanitizeStr($value, "", "-+:^", 1);
-                    if (isset($types_sani[$val_sani])) {
-                        //if the value in the CSV is not identical to the one in datatypes.json, autocorrect
-                        if ($value != $types_sani[$val_sani]) {
-                            $a++;
-                            $col = "green";
-                            array_push($tt, "[NOTE] Automatically corrected type");
-                            $measurements[$id][$param] = $value = $types_sani[$val_sani];
-                        }
-                    } else { // type in CSV does not exist!
+                if (substr($param_sani, -10) === ":meta:type") {
+                    $val_sani = findDataType(sanitizeStr($value, "", "-+:^", 1), $DATATYPES, true);
+                    if (!$val_sani) { // type in CSV does not exist! (findDataType() returned false)
                         $c++;
                         $col = "red";
                         array_push($tt, "[ERROR] Undefined data type");
+                    } elseif ($val_sani != $value) { //if the value in the CSV is not identical to the one in dataformat.json, autocorrect
+                        $a++;
+                        $col = "green";
+                        array_push($tt, "[NOTE] Automatically corrected type");
+                        $measurements[$id][$param] = $value = $val_sani;
                     }
                 }
             }
@@ -1023,11 +969,29 @@ STEP7:
                 if ($error) {
                     throw new RuntimeException($error);
                 }
-          
+                
+                // fetch import parameters from the metadata (if any)
+                $parameters = array();
+                if (isset($json["_import"])) {
+                    $parameters = $json["_import"];
+                } 
+
                 // convert file
-                $data = importfilter($trdir . $fn . $ext);
+                $data = false;
+                $parameters = selectImportHelper($IMPORT, findDataType($json["type"], $DATATYPES), $ext, $parameters);
+                if (isset($parameters["helper"])) {
+                    // create helper class 
+                    $class = "Import" . $parameters["helper"];
+                    unset($parameters["helper"]);
+                    $imported = new $class($trdir . $fn . $ext, $parameters);
+                    $data = $imported->getData();
+                    $error = $imported->getError();
+                    if ($error) {
+                        eventLog("WARNING", $error . " File: " . $_FILES["dataUp" . $key]['name'] . " [" . $class . "]");
+                    }
+                }
                 if (!$data) {
-                    throw new RuntimeException('Failed to convert ' . $fn . $ext . '.');
+                    throw new RuntimeException('Failed to convert ' . $_FILES["dataUp" . $key]['name'] . ': ' .$error);
                 }
           
                 // merge with metadata, update original $measurements and set $build
@@ -1044,7 +1008,7 @@ STEP7:
                 // set units: correct if supplied in csv, or take the default values
                 // TODO: create a way to read those from the uploaded data (via the importfilters)
                 // TODO: create a way to change them in the data upload form
-                $json["dataset"][$ds]["units"] = datatypeUnits( $measurements[$_REQUEST["id"]]["type"], 
+                $json["dataset"][$ds]["units"] = findDataTypeUnits( $measurements[$_REQUEST["id"]]["type"], 
                                                                 $DATATYPES, 
                                                                 "json",
                                                                 isset($json["dataset"][$ds]["units"]) ? $json["dataset"][$ds]["units"] : null
@@ -1059,11 +1023,17 @@ STEP7:
                 if ($error) {
                     throw new RuntimeException($error);
                 }
-          
-                // read file
-                $data =  importfilter_anno($trdir . $fn . $ext);
+
+                // create import helper class
+                $viewer = $DATATYPES[findDataType($json["type"], $DATATYPES)]["viewer"];
+                $imported = new ImportAnnotations($trdir . $fn . $ext, $viewer);
+                $data = $imported->getAnno();
+                $error = $imported->getError();
+                if ($error) {
+                    eventLog("WARNING", $error . " File: " . $_FILES["annoUp" . $key]['name'] . " [" . $class . "]");
+                }
                 if (!$data) {
-                    throw new RuntimeException('Failed to convert ' . $fn . $ext . '.');
+                    throw new RuntimeException('Failed to convert ' . $_FILES["annoUp" . $key]['name'] . ': ' . $error);
                 }
           
                 // merge with metadata, $measurements and set $build

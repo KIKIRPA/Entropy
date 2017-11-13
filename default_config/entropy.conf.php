@@ -30,6 +30,8 @@ const BLACKLIST_FILE = CONFIG_PATH . "blacklist.json";
 const MODULES_FILE   = CONFIG_PATH . "modules.json";
 const DATATYPES_FILE = CONFIG_PATH . "datatypes.json";
 const COLORS_FILE    = CONFIG_PATH . "colors.json";
+const IMPORT_FILE    = CONFIG_PATH . "import.json";
+const EXPORT_FILE    = CONFIG_PATH . "export.json";
 
 // repository storage
 const LIB_FILE       = LIB_PATH . "libraries.json";
