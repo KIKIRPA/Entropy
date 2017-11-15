@@ -26,7 +26,7 @@ if (count(get_included_files()) == 1) {
                     <ul>
 <?php                 foreach ($data["dataset"] as $key => $value): ?>
                         <li<?= ($key == $showDS) ? " class=\"is-active\"" : "" ?>>
-                            <a href="<?= $_SERVER["PHP_SELF"]; ?>?lib=<?= $showLib ?>&id=<?= $showID ?>&ds=<?= $showDS ?>"><?= $key ?></a>
+                            <a href="<?= $_SERVER["PHP_SELF"]; ?>?lib=<?= $showLib ?>&id=<?= $showID ?>&ds=<?= $key ?>"><?= $key ?></a>
                         </li>
 <?php                 endforeach; ?>
                     </ul>
