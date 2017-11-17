@@ -81,8 +81,8 @@ if (isset($LIBS[$showLib]["references"])) {
 if ($showLib != "_START") { //normal library
     // the columns to show can be defined in libraries.json, otherwise take defaults
     $listColumns = array();
-    if (!empty($LIBS[$showLib]["columns"])) {
-        $temp = $LIBS[$showLib]["columns"];
+    if (!empty($LIBS[$showLib]["listcolumns"])) {
+        $temp = $LIBS[$showLib]["listcolumns"];
     } else {  
         $temp = array("id", "type"); // columns that are by definition available in measurements.json
     }

@@ -92,7 +92,7 @@ if (count(get_included_files()) == 1) {
                 <h1 class="title">Measurements in this library</h1>
                 <hr>
 
-                <table id="datatable" width="100%">
+                <table id="datatable" width="100%" class="table is-striped">
                     <thead>
                         <tr>
                             <th> </th>
