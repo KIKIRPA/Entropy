@@ -27,6 +27,8 @@ $LIBS      = readJSONfile(LIB_FILE, true);
 $DATATYPES = readJSONfile(DATATYPES_FILE, true);
 $COLORS    = readJSONfile(COLORS_FILE, true);
 
+$IMPORT = readJSONfile(IMPORT_FILE, true);
+
 
 /***********************************************************************************
   2. SESSION MANAGEMENT

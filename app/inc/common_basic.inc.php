@@ -326,17 +326,17 @@ function getMeta($metadata, $get, $concatenate = "; ", $description = ": ")
     $n = count($tree);
     
     //split the "leaves" from the tree: the actual fields to be retrieved
-    $leaves = explode("+", $tree[$n - 1]);
+    $leafs = explode("+", $tree[$n - 1]);
     unset($tree[$n - 1]);
     
     //split the notation from the fields to be retrieved
-    foreach ($leaves as $id => $leave) {
-        $arr = explode("^", $leave);
+    foreach ($leafs as $id => $leaf) {
+        $arr = explode("^", $leaf);
         if (count($arr) > 1) {
-            $leaves[$id] = $arr[0];
-            $shapes[$arr[0]] = $arr[1]; //if $arr[2+] exist we'll neglect it; we can only have one notation
+            $leafs[$id] = $arr[0];
+            $formats[$arr[0]] = $arr[1]; //if $arr[2+] exist we'll neglect it; we can only have one notation
         } else {
-            $shapes[$id] = null;
+            $formats[$id] = null;
         }
     }
     
@@ -350,11 +350,11 @@ function getMeta($metadata, $get, $concatenate = "; ", $description = ": ")
     
     //next the leaves
     $arr = array();
-    foreach ($leaves as $leave) {
-        if (isset($metadata[$leave])) {
-            $arr[$leave] = $metadata[$leave];
+    foreach ($leafs as $leaf) {
+        if (isset($metadata[$leaf])) {
+            $arr[$leaf] = $metadata[$leaf];
         } else {
-            $arr[$leave] = null;
+            $arr[$leaf] = null;
         }
     }
     
@@ -364,30 +364,34 @@ function getMeta($metadata, $get, $concatenate = "; ", $description = ": ")
     //formatting: add descriptions (eg "age: 1900") and formatting options (eg. date^year)
     foreach ($metadata as $id => $value) {
         $id2 = explode(":", $id);    //break down the flattened description, and only keep the last part
-    $id2 = $id[count($id2) - 1];  // eg. "sample:age" --> "age"
+        $id2 = $id[count($id2) - 1];  // eg. "sample:age" --> "age"
 
-    // formatting options, eg for timestamps
-        if (array_key_exists(strtolower($id2), $shapes) and !is_null($value)) {
-            if (strtolower($id2) === "timestamp") {
-                $ts = new DateTime($value);
-                switch ($shapes[strtolower($id)]) {
-            case "long":
-            case "longdate":
-            $value = $ts->format('Y/m/d');
-            break;
-            case "short":
-            case "shortdate":
-            $value = $ts->format('y/m/d');
-            break;
-            case "year":
-            $value = $ts->format('Y');
-            break;
-            case "time":
-            $value = $ts->format('H:i:s');
-            break;
-            default:
-            $value = $ts->format('Y/m/d H:i:s');
-        }
+        // formatting options, eg for timestamps
+        if (array_key_exists(strtolower($id2), $formats) and !is_null($value)) {
+            // try to convert the string into a DateTime type; will be false if not a valid timestamp
+            $ts = new DateTime($value);
+            switch ($formats[strtolower($id)]) {
+                case "long":
+                case "longdate":
+                    $temp = $ts->format('Y/m/d');
+                    break;
+                case "short":
+                case "shortdate":
+                    $temp = $ts->format('y/m/d');
+                    break;
+                case "year":
+                    $temp = $ts->format('Y');
+                    break;
+                case "time":
+                    $temp = $ts->format('H:i:s');
+                    break;
+                case "datetime":
+                case "timestamp":
+                default:
+                    $temp = $ts->format('Y/m/d H:i:s');
+            }
+            if ($temp) {    // a valid timestamp
+                $value = $temp;
             }
         }
     

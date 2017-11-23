@@ -982,6 +982,7 @@ STEP7:
                 if (isset($parameters["helper"])) {
                     // create helper class 
                     $class = "Import" . $parameters["helper"];
+                    $class = sanitizeStr($class, "", "-+:^"); // remove illegal symbols from class name (e.g. JCAMP-DX -> JCAMPDX)
                     unset($parameters["helper"]);
                     $imported = new $class($trdir . $fn . $ext, $parameters);
                     $data = $imported->getData();

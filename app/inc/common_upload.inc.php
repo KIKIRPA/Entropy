@@ -6,13 +6,11 @@ if (count(get_included_files()) == 1) {
     exit("Direct access not permitted.");
 }
   
-$IMPORT = readJSONfile(IMPORT_FILE, true);
 
 // load import php classes
 foreach ($IMPORT as $class => $temp) {
-  include_once(PRIVPATH . 'import/' . $class . '/class.php');
+    include_once(PRIVPATH . 'import/' . $class . '/class.php');
 }
-
 
 
 /**
@@ -36,16 +34,16 @@ function checkUpload($upload, $updir, $filename = null)
 
     // Check $_FILES[$upload]['error'] value.
     switch ($_FILES[$upload]['error']) {
-    case UPLOAD_ERR_OK:
-      break;
-    case UPLOAD_ERR_NO_FILE:
-      return 'No file sent.';
-    case UPLOAD_ERR_INI_SIZE:
-    case UPLOAD_ERR_FORM_SIZE:
-      return 'Exceeded filesize limit [html limit].';
-    default:
-      return 'Unknown errors.';
-  }
+        case UPLOAD_ERR_OK:
+            break;
+        case UPLOAD_ERR_NO_FILE:
+            return 'No file sent.';
+        case UPLOAD_ERR_INI_SIZE:
+        case UPLOAD_ERR_FORM_SIZE:
+            return 'Exceeded filesize limit [html limit].';
+        default:
+            return 'Unknown errors.';
+    }
 
     // You should also check filesize here.
     if ($_FILES[$upload]['size'] > 2000000) {
