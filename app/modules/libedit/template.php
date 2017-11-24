@@ -83,7 +83,7 @@ if (count(get_included_files()) == 1) {
                         <div class="field-body">
                             <div class="field">
                                 <p class="control">
-                                    <input type="text" id="le_lib" name="lib" maxlength=16 value="<?= $id ?>" class="input"<?= ($startPage or !$new) ? " disabled" : "" ?>>
+                                    <input type="text" id="le_lib" name="lib" maxlength=16 value="<?= $libeditId ?>" class="input<?= ($startPage or !$libmk) ? " is-static\" readonly" : "\"" ?>>
                                 </p>
                                 <p class="help">
                                     A unique identifier for the library, which may (or may intentionally not) be a recognisable keyword for the library. 
@@ -128,8 +128,8 @@ if (count(get_included_files()) == 1) {
                             </div>
                         </div>
                     </div>
-<?php             endif; ?>
                     <br>
+<?php             endif; ?>
                     <div class="field is-horizontal">
                         <div class="field-label is-normal">
                             <label class="label" for="le_view">Viewability<span class="has-text-danger">*</span></label>
@@ -198,8 +198,8 @@ if (count(get_included_files()) == 1) {
                             </div>
                         </div>
                     </div>
-<?php             endif; ?>
                     <br>
+<?php             endif; ?>
                     <div class="field is-horizontal">
                         <div class="field-label is-normal">
                             <label class="label" for="le_logobox">Logobox</label>
@@ -343,7 +343,6 @@ if (count(get_included_files()) == 1) {
                             </div>
                         </div>
                     </div>
-<?php             endif; ?>
                     <br>
                     <div class="field is-horizontal">
                         <div class="field-label is-normal">
@@ -394,6 +393,7 @@ if (count(get_included_files()) == 1) {
                         </div>
                     </div>
                     <br>
+<?php             endif; ?>
 
                     <div class="field is-horizontal">
                         <div class="field-label"></div>

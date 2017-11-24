@@ -10,6 +10,7 @@ if (count(get_included_files()) == 1) {
 $notifications = array();
 $libeditColor = isset($LIBS[$showLib]["color"]) ? bulmaColorModifier($LIBS[$showLib]["color"], $COLORS, DEFAULT_COLOR) : bulmaColorModifier(DEFAULT_COLOR, $COLORS);
 
+
 /* *********************************************************
     FUNCTION CHOOSER
    ********************************************************* */
@@ -21,24 +22,9 @@ if (!isset($startPage)) {
     $startPage = false;
 }   // in module_START this is set to true
 
-if (!$startPage) {
-    $id = str_replace(" ", "", strtolower($_REQUEST["lib"]));
-} else {
-    $id = "_START";
-}
+$f = "error";
 
-$new = !isset($LIBS[$id]);           // if not in libs.json
-
-if ($startPage) {
-    $libeditTitle = "Modify start page";
-} elseif ($new) {
-    $libeditTitle = "Create library";
-} else {
-    $libeditTitle = "Edit library";
-}
-
-$f="error";
-
+// conditions based on POST/GET values
 if (isset($_REQUEST["set"])) {
     if (    !empty($_REQUEST["lib"])
         and !empty($_REQUEST["view"])
@@ -47,20 +33,42 @@ if (isset($_REQUEST["set"])) {
        ) {
         $f="set";
     } else {
-        $f="edit";
-        $notifications[] = array("danger", "Some data is missing: (requires id" . ($startPage ? "" : ", name, menu caption") . " and view)");
+        $f="warning";
+        $notifications[] = array("warning", "Some data is missing: (requires a unique identifier" . ($startPage ? "" : ", name, navigation menu caption") . " and viewabililty setting)");
+        echo "lib " . $_REQUEST["lib"] . "<br>";
+        echo "view " . $_REQUEST["view"] . "<br>";
     }
 } else {
     $f="edit";
 }
 
-// disallowed combinations of $new and $libmk
-if (!$new and $libmk) {  // libmk: cannot make this lib, because the libID already exists!
-    $notifications[] = array("danger", "Cannot make this library: a library with this library ID already exists!");
-    $f="error";
-} elseif ($new and !$libmk) {  // libedit: cannot make a new lib with libedit
-    $notifications[] = array("danger", "Cannot edit this library: library ID not found!");
-    $f="error";
+// conditions implied by the three modes (libedit, libmk, startpage)
+if ($startPage) {
+    $libeditId = "_START";
+    $libeditTitle = "Modify start page";
+} elseif ($libmk) {
+    $libeditId = "";
+    $libeditTitle = "Create library";
+    
+    // when setting up a library, check if it does not already exist
+    if (isset($_REQUEST["lib"]) and isset($_REQUEST["set"])) {
+        if (isset($LIBS[strtolower($_REQUEST["lib"])])) {
+            $f="warning";
+            $notifications[] = array("warning", "Library \"" . strtolower($_REQUEST["lib"]) . "\" already exists!");
+        } else {
+            $libeditId = strtolower($_REQUEST["lib"]);
+        }
+    }
+} else {
+    $libeditId = str_replace(" ", "", strtolower($_REQUEST["lib"]));
+    $libeditTitle = "Edit library";
+
+    if (!isset($LIBS[$libeditId])) {  // if not in libs.json
+        // if libedit is invoked (not libmk) on a non-existing lib, we won't make one
+        // because this could trick the permissions for libmk
+        $f="error";
+        $notifications[] = array("danger", "Library " . $libeditId . " does not exist.");
+    }
 }
 
 
@@ -131,7 +139,7 @@ if ($f == "set") {
     }
 
     //prepare file contents
-    $LIBS[$id] = $newLib;
+    $LIBS[$libeditId] = $newLib;
 
     //and write file
     $output = writeJSONfile(LIB_FILE, $LIBS);
@@ -139,15 +147,16 @@ if ($f == "set") {
     if ($output == false) {
         $notifications[] = array("success", "Successfully created or updated library.");
     } else {
+        $f = "warning";
         $notifications[] = array("danger", "Could not save the changes: " . $output . "!");
     }
 }
 
 /* *********************************************************
-2. EDIT and SET: library detail view; adding/updating libraries
+2. EDIT and SET and WARNING: library detail view; adding/updating libraries
 ********************************************************* */
 
-if (($f == "edit") or ($f == "set")) {
+if (($f == "edit") or ($f == "set") or ($f == "warning")) {
     $preset = array( "lib" => "",
                      "name" => "",
                      "navmenucaption" => "",
@@ -164,8 +173,17 @@ if (($f == "edit") or ($f == "set")) {
                      "downloadbinary" => array()
     );
 
-    if (!$new) {
-        foreach ($LIBS[$id] as $i => $item) {
+    // load preset data from unsaved $_REQUEST[] in case of $f==warning
+    // load preset data from existing data in $libs (in case of libedit or startpage)
+    if ($f == "warning") {
+        foreach ($preset as $key => $value) {
+            if (isset($_REQUEST[$key])) {
+                $preset[$key] = $_REQUEST[$key];
+            }
+        }
+    }
+    elseif (!$libmk) {
+        foreach ($LIBS[$libeditId] as $i => $item) {
             $preset[$i] = $item;
         }
     }
