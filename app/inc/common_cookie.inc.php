@@ -30,7 +30,8 @@ function verifycookie($name, $institution = null, $email = null)
     if (($institution == null) and ($email == null)) {
         $cookiearray = explode("||", decode($name, CRYPT_KEY));
         if (count($cookiearray) != 3) {
-            return eventLog("WARNING", "cookie could not be decrypted: ".decode($name, CRYPT_KEY)." [tools_cookie.verifycookie]", false);
+            eventLog("WARNING", "cookie could not be decrypted: ".decode($name, CRYPT_KEY)." [tools_cookie.verifycookie]", false);
+            return false;
         }
     
         // giving the array proper indices

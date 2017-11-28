@@ -54,7 +54,7 @@ class ImportJCAMPDX
                     $this->readJcampDxDataMulti($file, $dataTags);
                     break;
                 default:
-                    $this->error = "Unsupported JCAMP-DX XYDATA format.";
+                    $this->error = eventLog("WARNING", "Unsupported JCAMP-DX XYDATA format.");
                     break;
             }
         
@@ -83,7 +83,7 @@ class ImportJCAMPDX
                 }
                 // we could also check on ##MINY and ##MAXY, but why?
                 if (count($sanityCheck) > 0) {
-                    $this->error = "Invalid information in JCAMP-DX file: " . implode(", ", $sanityCheck).".";
+                    $this->error = eventLog("WARNING", "Invalid information in JCAMP-DX file: " . implode(", ", $sanityCheck).".");
                 }
                 
                 // ROUND DATA - do this after all calculations
@@ -179,7 +179,7 @@ class ImportJCAMPDX
     private function readJcampDxDataMulti(&$lines, $dataTags) {
         // Required parameters:
         if (!(isset($dataTags["##LASTX"]) or isset($dataTags["##FIRSTX"]) or isset($dataTags["##NPOINTS"]))) {
-            $this->error = "Missing required tags in the JCAMP-DX file.";
+            $this->error = eventLog("WARNING", "Missing required tags in the JCAMP-DX file.");
             return;
         }
         
@@ -187,7 +187,7 @@ class ImportJCAMPDX
         $firstx = $dataTags["##FIRSTX"];
         // check deltax:
         if (!isset($dataTags["##DELTAX"]) and !$this->compareDecimals($dataTags["##DELTAX"], $deltax)) {
-            $this->error = "Invalid DELTAX in JCAMP-DX file.";
+            $this->error = eventLog("WARNING", "Invalid DELTAX in JCAMP-DX file.");
             return;
         }
         
@@ -205,7 +205,7 @@ class ImportJCAMPDX
 
             $x = array_shift($values) * $dataTags["##XFACTOR"];
             if (!$this->compareDecimals($x, $firstx)) {
-                $this->error = "JCAMP-DX (X++(Y..Y)) data is not evenly spaced (first X value: " . $x . " <-> calculated X value: " . $firstx . ").";
+                $this->error = eventLog("WARNING", "JCAMP-DX (X++(Y..Y)) data is not evenly spaced (first X value: " . $x . " <-> calculated X value: " . $firstx . ").");
                 return;
             }
 

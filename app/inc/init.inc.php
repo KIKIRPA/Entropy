@@ -71,7 +71,8 @@ if (IS_HTTPS and !IS_BLACKLISTED) {
         if (isset($USERS[$isLoggedIn])) {
             $user = $USERS[$isLoggedIn];
         } else { //set $user and $isLoggedIn to false and log
-            $user = $isLoggedIn = eventLog("WARNING", "Non-existant username stored in session: " . $isLoggedIn, false, true);
+            $user = $isLoggedIn = false;
+            eventLog("WARNING", "Non-existant username stored in session: " . $isLoggedIn, false, true);
         }
     }
   

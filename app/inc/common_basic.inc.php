@@ -75,7 +75,7 @@ if (count(get_included_files()) == 1) {
         writes an eventmessage ($msg) of category ($cat, eg ERROR, WARNING, ...) to the event log file
         when optional $fatal is true it will stop all further code execution.
         when optional $mail is true it will send an email to the sysadmin; or if set to an valid address to this address
-        !! returns false (if not fatal)!!
+        !! returns $msg !!
 
 **************************************************************************************************************************/
 
@@ -630,7 +630,7 @@ function eventLog($cat, $msg, $fatal = false, $mail = false)
     if ($fatal) {
         die(strtoupper($cat).": ".$msg);
     }
-    return false;
+    return $msg;
 }
 
 

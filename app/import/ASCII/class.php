@@ -43,7 +43,7 @@ class ImportASCII
                 fclose($handle);
             } else {
                 // error opening the file
-                eventLog("ERROR", "Error in opening the ASCII data.", false);
+                $this->error = eventLog("WARNING", "ASCII import: could not open the source file: " . $file);
             }
         } else {
             foreach ($file as $line) {
@@ -82,7 +82,8 @@ class ImportASCII
                     return array_slice($line, 0, 2);
                 }
             } // inconsisten data: return false but and log warning
-            return eventLog("WARNING", "Inconsistent ASCII data.", false);
+            $this->error = eventLog("WARNING", "Inconsistent ASCII data.");
+            return false;
         } // comment line: return false but no warning
         return false;
     }
