@@ -694,3 +694,88 @@ function bulmaColorModifier($color, $colorList, $default = null)
      // non-existing color (and default color): null
      return null;
  }
+
+
+ /**
+ * selectConvertorClass(): select an export or import convertor based on the supplied datatype and format
+ * 
+ * It reads the import.json or export.json configuration file and searches the listed convertors based on
+ * the two criteria: datatype and format. Searching happens in the order the convertors
+ * are listed in the file, and only the first hit will be reported.
+ * 
+ * The format can be a file extension, or a downloadconverted library setting item in the form of "[convertor:[datatype:]]extension".
+ * 
+ * The optional $parameters array contains convertor parameters, as can be supplied in the CSV
+ * metadata files ("_import:jcamp-dx:template" --> $parameters = $meta["_import"]), and will be
+ * supplemented with parameters defined in the import.json/export.json file for the given extension and datatype.
+ * If the same parameter with different value is defined in multiple places, than the value defined
+ * in the metadata wins over the value in extension, which in turn wins over the value in datatype.
+ * 
+ * If a convertor is found, this function returns an associative array; the first item (with key "convertor")
+ * contains the name of the convertor. Next items are the parameters for this convertor 
+ * (eg $parameters["template"] = "Raman785.dxt").
+ * If no convertor is found, an empty array is returned.
+ */
+function selectConvertorClass($convertors, $datatype, $format, $parameters = array())
+{
+    // cleanup parameters
+    $datatype = trim(strtolower($datatype));
+    $format = trim(trim(strtolower($format), "."));
+
+    $format = explode(":", $format, 3);
+    $format_ext = end($format);
+    if (count($format) == 3) {
+        $format_conv = $format[0];
+        $format_type = $format[1];
+    } elseif (count($format) == 2) {
+        $format_conv = $format[0];
+    }
+
+    // search the convertors array until we find a convertor that fits the requirements (datatype and extension)
+    foreach ($convertors as $key => $requirements) {
+        $condition = true;
+        if (isset($format_conv)) {
+            $condition = ($condition and ($key == $format_conv));
+        }
+        if (isset($format_type)) {
+            $condition = ($condition and ($datatype == $format_type));
+        }
+        if (isset($requirements["datatypes"])) {
+            $condition = ($condition and isset($requirements["datatypes"][$datatype]));
+        }  
+        if (isset($requirements["extensions"])) {
+            $condition = ($condition and isset($requirements["extensions"][$format_ext]));
+        }
+        if ($condition) {
+            $convertor = $key;
+            break;
+        }
+    }
+    
+    // evaluate convertor parameters. these can be supplied for specific datatypes, specific file extensions or supplied in the uploaded metadata
+    // return array with first key "convertor", followed by the parameters for this convertor
+    if (isset($convertor)) {
+        $parameters = array_change_key_case($parameters, CASE_LOWER);
+        if (isset($parameters[$convertor])) {
+            // only keep the parameters for this convertor
+            $parameters = $parameters[$convertor];
+        }
+        else {
+            $parameters = array();
+        }
+        // add parameters from the extension (if they are not already set by the metadata)
+        if (isset($convertors[$convertor]["extensions"][$format_ext])) {
+            $parameters = array_merge($convertors[$convertor]["extensions"][$format_ext], $parameters);
+        }
+        // add parameters from the datatype (if they are not already set by the metadata or extension)
+        if (isset($convertors[$convertor]["datatypes"][$datatype])) {
+            $parameters = array_merge($convertors[$convertor]["datatypes"][$datatype], $parameters);
+        }
+        
+        return array("convertor" => $convertor) + $parameters; 
+    }
+    else {
+        // if no suitable convertor found: return false
+        return false;
+    }
+}

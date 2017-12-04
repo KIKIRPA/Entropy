@@ -90,7 +90,7 @@ if ($f == "set") {
                      "news" => 3,
                      "references" => 3,
                      "listcolumns" => 4,
-                     "downloadconverted" => 5,
+                     "downloadconverted" => 4,
                      "downloadbinary" => 5
                    );
 

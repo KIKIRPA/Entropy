@@ -67,24 +67,17 @@ if (    (!$isLoggedIn and $MODULES["lib"]["download"]["public"])
     
     $viewDownloadButtons = array();
     // convert from json data files
-    //    TODO: integrate convert-framework (check if we are able to convert to $format, preferably replacing the switch by a function)
     foreach ($LIBS[$showLib]["downloadconverted"] as $format) {
-        $code = false;
-        switch (strtoupper($format)) {
-            case "JCAMP-DX":
-                if (isset($meta["jcampdxtemplate"]) and file_exists(LIB_PATH . $showLib . "/templates/" . $meta["jcampdxtemplate"])) {
-                    $code = encode("conv=" . $format);
-                }
-                break;
-            case "TXT":
-                $code = encode("conv=" . $format);
-                break;
-        }
-        if ($code) {
+        // check if this format "[convertor:[datatype:]]extension" is allowed for this datatype (returns array if found, false if not found)
+        $result = selectConvertorClass($EXPORT, $viewTags["Type"], $format);
+        if ($result) {
+            $caption = strtoupper($result["convertor"]) . " (" . strtolower(end(explode(":", $format, 3))) . ")";
+            $format = encode("conv=" . $format);
+
             if ($viewShowModal) {
-                $viewDownloadButtons[$format] = "class=\"button <?= $viewColor ?> modal-button\" data-target=\"dlmodal\" onclick=\"document.getElementById('dl').value = '" . $code . "';\"";
+                $viewDownloadButtons[$caption] = "class=\"button <?= $viewColor ?> modal-button\" data-target=\"dlmodal\" onclick=\"document.getElementById('dl').value = '" . $format . "';\"";
             } else {
-                $viewDownloadButtons[$format] = "class=\"button <?= $viewColor ?>\" href=\"" . $_SERVER["PHP_SELF"] . "?lib=". $showLib . "&id=" . $showID . "&ds=" . $showDS . "&dl=" . $code . "\"";
+                $viewDownloadButtons[$caption] = "class=\"button <?= $viewColor ?>\" href=\"" . $_SERVER["PHP_SELF"] . "?lib=". $showLib . "&id=" . $showID . "&ds=" . $showDS . "&dl=" . $format . "\"";
             }
         }
     }
@@ -92,18 +85,17 @@ if (    (!$isLoggedIn and $MODULES["lib"]["download"]["public"])
     // binary uploaded files
     $prefix = LIB_PATH . $showLib . "/" . $transaction . "/" . $showID . (($showDS == 'default')?"":"__".$showDS);
     $binfiles = glob($prefix . "__*");  //by using "__*" we exclude the original (converted) data files, json data files and annotations
-    foreach ($binfiles as $f) {
+    foreach ($binfiles as $file) {
         // button caption = EXT (ORIG BIN FILENAME)
-        $format = strtoupper(pathinfo($f, PATHINFO_EXTENSION));
+        $caption = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
         if (    (in_array($format, $LIBS[$showLib]["downloadbinary"]) or in_array("_ALL", $LIBS[$showLib]["downloadbinary"]))
             and !in_array("_NONE", $LIBS[$showLib]["downloadbinary"])) {
-
-                $format .= "(" . str_replace("_", " ", pathinfo(str_replace($prefix, '', $f), PATHINFO_FILENAME)) . ")";
+                $caption .= "(" . str_replace("_", " ", pathinfo(str_replace($prefix, '', $file), PATHINFO_FILENAME)) . ")";
                 // <a> tag
                 if ($viewShowModal) {
-                    $viewDownloadButtons[$format] = "class=\"button <?= $viewColor ?> is-inverted modal-button\" data-target=\"dlmodal\" onclick=\"document.getElementById('dl').value = '" . encode("bin=" . $f) . "';\"";
+                    $viewDownloadButtons[$caption] = "class=\"button <?= $viewColor ?> is-inverted modal-button\" data-target=\"dlmodal\" onclick=\"document.getElementById('dl').value = '" . encode("bin=" . $file) . "';\"";
                 } else {
-                    $viewDownloadButtons[$format] = "class=\"button <?= $viewColor ?> is-inverted\" href=\"" . $_SERVER["PHP_SELF"] . "?lib=". $showLib . "&id=" . $showID . "&ds=" . $showDS . "&dl=" . encode("bin=" . $f) . "\"";
+                    $viewDownloadButtons[$caption] = "class=\"button <?= $viewColor ?> is-inverted\" href=\"" . $_SERVER["PHP_SELF"] . "?lib=". $showLib . "&id=" . $showID . "&ds=" . $showDS . "&dl=" . encode("bin=" . $file) . "\"";
                 }
         }
     }

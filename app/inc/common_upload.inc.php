@@ -9,7 +9,7 @@ if (count(get_included_files()) == 1) {
 
 // load import php classes
 foreach ($IMPORT as $class => $temp) {
-    include_once(PRIVPATH . 'import/' . $class . '/class.php');
+    include_once(PRIVPATH . 'import/' . strtolower($class) . '/class.php');
 }
 
 
@@ -110,72 +110,6 @@ function checkMultiUpload($upload, $updir, $prefix = "")
     }
     
     return false;
-}
-
-/**
- * selectImportHelper(): select an import helper based on the supplied datatype and extension
- * 
- * It read the import.json configuration file and searches the listed import helpers based on
- * the two criteria: datatype and extension. Searching happens in the order the import helpers
- * are listed in the file, and only the first hit will be reported.
- * 
- * The optional $parameters array contains import helper parameters, as can be supplied in the CSV
- * metadata files ("_import:jcamp-dx:template" --> $parameters = $meta["_import"]), and will be
- * supplemented with parameters defined in the import.json file for the given extension and datatype.
- * If the same parameter with different value is defined in multiple places, than the value defined
- * in the metadata wins over the value in extension, which in turn wins over the value in datatype.
- * 
- * If a filter is found, this function returns an associative array; the first item (with key "helper")
- * contains the name of the helper, which can be used to include the helper php file. Next items
- * are the parameters for this helper (eg $parameters["template"] = "Raman785.dxt").
- * If no filter is found, an empty array is returned.
- */
-function selectImportHelper($import, $datatype, $extension, $parameters = array())
-{
-    // cleanup parameters
-    $datatype = trim(strtolower($datatype));
-    $extension = trim(trim(strtolower($extension), "."));
-
-    // search the import helpers until we find a helper that fits the requirements (datatype and extension)
-    foreach ($import as $key => $requirements) {
-        $condition = true;
-        if (isset($requirements["datatypes"])) {
-            $condition = ($condition and isset($requirements["datatypes"][$datatype]));
-        }
-        if (isset($requirements["extensions"])) {
-            $condition = ($condition and isset($requirements["extensions"][$extension]));
-        }
-        if ($condition) {
-            $helper = $key;
-            break;
-        }
-    }
-    
-    // evaluate helper parameters. these can be supplied for specific datatypes, specific file extensions or supplied in the uploaded metadata
-    // return array with first key "helper", followed by the parameters for this helper
-    if (isset($helper)) {
-        $parameters = array_change_key_case($parameters, CASE_LOWER);
-        if (isset($parameters[$helper])) {
-            // only keep the parameters for this helper
-            $parameters = $parameters[$helper];
-        }
-        else {
-            $parameters = array();
-        }
-        // add parameters from the extension (if they are not already set by the metadata)
-        if (isset($import[$helper]["extensions"][$extension])) {
-            $parameters = array_merge($import[$helper]["extensions"][$extension], $parameters);
-        }
-        // add parameters from the datatype (if they are not already set by the metadata or extension)
-        if (isset($import[$helper]["datatypes"][$datatype])) {
-            $parameters = array_merge($import[$helper]["datatypes"][$datatype], $parameters);
-        }
-         return array("helper" => $helper) + $parameters; 
-    }
-    else {
-        // if no suitable helper found: return false
-        return false;
-    }
 }
 
 

@@ -1,5 +1,5 @@
 {
-    "ASCII": {
+    "ascii": {
         "datatypes": {
             "raman": {},
             "ftir": {},
@@ -13,7 +13,7 @@
             "rruff": {}
         }    
     },
-    "JCAMP-DX": {
+    "jcamp-dx": {
         "datatypes": {
             "raman": {},
             "ftir": {},
@@ -24,7 +24,7 @@
             "jdx": {}
         }    
     },
-    "Annotations": {
+    "annotations": {
         "extensions": {
             "anno": {}
         }    

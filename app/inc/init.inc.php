@@ -28,6 +28,7 @@ $DATATYPES = readJSONfile(DATATYPES_FILE, true);
 $COLORS    = readJSONfile(COLORS_FILE, true);
 
 $IMPORT = readJSONfile(IMPORT_FILE, true);
+$EXPORT = readJSONfile(EXPORT_FILE, true);
 
 
 /***********************************************************************************
