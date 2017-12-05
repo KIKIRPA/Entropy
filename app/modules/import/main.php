@@ -692,9 +692,11 @@ STEP3:
         $columns = $LIBS[$_REQUEST["lib"]]["listcolumns"];
         $list =  array();
         foreach ($measurements as $id => $measurement) {
-            $measurement = overrideMeta($measurement); //fold "meta:" metadata together with direct metadata
-            foreach ($columns as $column) {
-                $list[$id][$column] = getMeta($measurement, $column, "; ", false);
+            if ($id != "_datasets") {
+                $measurement = overrideMeta($measurement); //fold "meta:" metadata together with direct metadata
+                foreach ($columns as $column) {
+                    $list[$id][$column] = getMeta($measurement, $column, "; ", false);
+                }       
             }
         }
           
