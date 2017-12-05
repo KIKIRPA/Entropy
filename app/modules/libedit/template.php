@@ -353,18 +353,19 @@ if (count(get_included_files()) == 1) {
 <?php                         foreach ($EXPORT as $datatype => $value): ?>
 <?php                          if ($i != "Annotations"): ?>
                                 <p class="control">
-                                <strong><?= $datatype ?>:</strong><br>
+                                <strong><?= strtoupper($datatype) ?>:</strong><br>
 <?php                             foreach ($value["extensions"] as $extension => $temp): ?>
+<?php                               $format = sanitizeStr($datatype . ":". $extension, "_", false, 1);?>
                                     <label class="checkbox">
-                                        <input type="checkbox" id="le_conv" name="downloadconverted[]" value="<?= $datatype . ":". $extension ?>"<?= (in_array($i, $preset["downloadconverted"]) ? " checked" : "") ?>>
-                                        <?= strtoupper($extension) ?>
+                                        <input type="checkbox" id="le_conv" name="downloadconverted[]" value="<?= $format ?>"<?= (in_array($format, $preset["downloadconverted"]) ? " checked" : "") ?>>
+                                        .<?= $extension ?>
                                     </label><br>
 <?php                             endforeach; ?>
                                 </p>
 <?php                          endif; ?>
 <?php                         endforeach; ?>                                   
                                 <p class="help">
-                                    Allow the user to download data files in the following formats with on-the-fly conversion.
+                                    Allow the user to download data files in specific formats with on-the-fly conversion.
                                 </p>
                             </div>
                         </div>
