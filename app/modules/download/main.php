@@ -42,6 +42,17 @@ try {
         if (!in_array($code[1], $LIBS[$showLib]["downloadconverted"])) {
             throw new Exception("Download failed: conversion to ". $code[1] ." not allowed.");
         }
+        
+        // separate metadata, data and export-parameters
+        $meta = overrideMeta($data, $showDS);
+        //$data = $data["dataset"][$showDS]["data"];
+        //$units
+
+        if (isset($data["_export"])) $parameters = $meta["_export"];
+        else                         $parameters = array(); 
+
+        // remove metadata starting with underscore from meta
+
     } else {
         throw new Exception("Error in download code");
     }
@@ -115,13 +126,56 @@ if (LOG_DL) {
 
 // 2. prepare download
 if ($code[0] == "conv") {
-    //TODO: integrate convert-framework (check if we are able to convert to $format, preferably replacing the switch by a function)
-    //$export = export($data["dataset"][$ds], $code, $EXPORT)
-    $filename = $showID . (($showDS == 'default') ? "" : "_" . $showDS) . "." . $code[1];
+    
+    echo 'BUILD <br>'; 
+    
+    // select convertor and assemble all export parameters
+    $parameters = selectConvertorClass($EXPORT, findDataType($data["type"], $DATATYPES), $code[1], $parameters);
 
-    echo $filename . "<br>";
-    echo "Conversion is not implemented yet!";
+    // echo "<br><pre>";
+    // print_r($parameters);
+    // echo "</pre><br><br>";
+
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+
+    if (isset($parameters["convertor"])) {
+        echo "CONVERT: " . $parameters["convertor"]; //DEBUG
+
+        // create convertor 
+        $class = "Export" . sanitizeStr($parameters["convertor"], "", "-+:^", 2); // remove illegal symbols from class name (e.g. jcamp-dx -> JCAMPDX)
+        unset($parameters["convertor"]);
+        $export = new $class($data, $meta, $parameters);
+        $filehandle = $export->getFile();
+        
+        if ($filehandle) {
+            while (($line = fgets($filehandle)) !== false) {
+                echo $line;
+            }
+        } else {
+            echo "no output from export!<br>";
+        }
+
+        $error = $export->getError();
+        if ($error) {
+            //eventLog("WARNING", $error . " File: " . $_FILES["dataUp" . $key]['name'] . " [" . $class . "]");
+            echo "FATAL ERROR: ". $error . "<br>"; //DEBUG
+            die();
+        }
+    }
+
+
+
+
+
+
+    // filename for the downloaded blob
+    $code[1] = explode(":", $code[1]);
+    $filename = $showID . (($showDS == 'default') ? "" : "_" . $showDS) . "." . end($code[1]);
+    echo "FILENAME: " . $filename . "<br>"; //DEBUG
     die();
+
+
 } elseif ($code[0] == "bin") {
     $filename = basename($code[1]);
     $filename = end(explode("__", $filename));  //download the binary files with the original filename (= part following the last "__")
@@ -144,8 +198,8 @@ if ($code[0] == "bin") {
     header('Content-Length: ' . filesize($code[1]));
     readfile($code[1]);
 } elseif ($code[0] == "conv") {
-    header('Content-Length: ' . strlen($export));
-    echo $export;
+    header('Content-Length: ' . strlen($file));
+    echo $file;
 }
 
 exit;
