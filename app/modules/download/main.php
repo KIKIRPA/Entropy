@@ -23,17 +23,19 @@ try {
     if ($code == "") {
         throw new Exception("Download failed: nothing to download");
     }
+    echo "CODE: " . $code . "<br>";
 
     $code = explode("=", $code);
     if (count($code) != 2) {
         throw new Exception("Download failed: error in download code");
     }
 
-    if ($code[0] == "bin") { 
+    if ($code[0] == "bin") {
+        $extension = strtolower(pathinfo($code[1], PATHINFO_EXTENSION));
         if (!file_exists($code[1])) { // search the binary file
             throw new Exception("Download failed: binary file not found.");
         }
-        elseif (!(in_array($code[1], $LIBS[$showLib]["downloadbinary"]) or in_array("_ALL", $LIBS[$showLib]["downloadbinary"])) or in_array("_NONE", $LIBS[$showLib]["downloadbinary"])) {
+        elseif (!(in_array($extension, $LIBS[$showLib]["downloadbinary"]) or in_array("_ALL", $LIBS[$showLib]["downloadbinary"])) or in_array("_NONE", $LIBS[$showLib]["downloadbinary"])) {
             throw new Exception("Download failed: binary download not allowed.");
         }
     } elseif ($code[0] == "conv") { // is conversion allowed in library file?  TODO: is allowed in conversion settings json?
@@ -72,6 +74,7 @@ try {
 } catch (Exception $e) {
     $errormsg = $e->getMessage();
     eventLog("WARNING", $errormsg  . " [download]");
+    echo "ERROR: " . $errormsg . "<br>"; //DEBUG
 
     // FALLBACK TO VIEW MODULE
     require_once(PRIVPATH . 'modules/view/main.php');
@@ -114,24 +117,14 @@ if (LOG_DL) {
 if ($code[0] == "conv") {
     //TODO: integrate convert-framework (check if we are able to convert to $format, preferably replacing the switch by a function)
     //$export = export($data["dataset"][$ds], $code, $EXPORT)
-    $filename = $showID . (($showDS == 'default')?"":"__".$showDS) . "." . $code[1];
+    $filename = $showID . (($showDS == 'default') ? "" : "_" . $showDS) . "." . $code[1];
 
-    /*
-    switch ($code[1]) {
-        case "dx":
-        case "jdx":
-            $file = ;
-            break;
-        case "ascii":
-        case "txt":
-
-            break;
-    }
-    */
+    echo $filename . "<br>";
     echo "Conversion is not implemented yet!";
     die();
 } elseif ($code[0] == "bin") {
     $filename = basename($code[1]);
+    $filename = end(explode("__", $filename));  //download the binary files with the original filename (= part following the last "__")
 }
 
 
