@@ -69,15 +69,16 @@ if (    (!$isLoggedIn and $MODULES["lib"]["download"]["public"])
     // convert from json data files
     foreach ($LIBS[$showLib]["downloadconverted"] as $format) {
         // check if this format "[convertor:[datatype:]]extension" is allowed for this datatype (returns array if found, false if not found)
-        $result = selectConvertorClass($EXPORT, $viewTags["Type"], $format);
+        $datatype = findDataType($viewTags["Type"], $DATATYPES);
+        $result = selectConvertorClass($EXPORT, $datatype, $format);
         if ($result) {
-            $caption = strtoupper($result["convertor"]) . " (" . strtolower(end(explode(":", $format, 3))) . ")";
+            $caption = strtoupper($result["convertor"]) . " (." . strtolower(end(explode(":", $format, 3))) . ")";
             $format = encode("conv=" . $format);
 
             if ($viewShowModal) {
-                $viewDownloadButtons[$caption] = "class=\"button <?= $viewColor ?> modal-button\" data-target=\"dlmodal\" onclick=\"document.getElementById('dl').value = '" . $format . "';\"";
+                $viewDownloadButtons[$caption] = "class=\"button " . $viewColor . " modal-button\" data-target=\"dlmodal\" onclick=\"document.getElementById('dl').value = '" . $format . "';\"";
             } else {
-                $viewDownloadButtons[$caption] = "class=\"button <?= $viewColor ?>\" href=\"" . $_SERVER["PHP_SELF"] . "?lib=". $showLib . "&id=" . $showID . "&ds=" . $showDS . "&dl=" . $format . "\"";
+                $viewDownloadButtons[$caption] = "class=\"button " . $viewColor . "\" href=\"" . $_SERVER["PHP_SELF"] . "?lib=". $showLib . "&id=" . $showID . "&ds=" . $showDS . "&dl=" . $format . "\"";
             }
         }
     }
@@ -87,15 +88,16 @@ if (    (!$isLoggedIn and $MODULES["lib"]["download"]["public"])
     $binfiles = glob($prefix . "__*");  //by using "__*" we exclude the original (converted) data files, json data files and annotations
     foreach ($binfiles as $file) {
         // button caption = EXT (ORIG BIN FILENAME)
-        $caption = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
-        if (    (in_array($format, $LIBS[$showLib]["downloadbinary"]) or in_array("_ALL", $LIBS[$showLib]["downloadbinary"]))
+        $caption = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+        if (    (in_array($caption, $LIBS[$showLib]["downloadbinary"]) or in_array("_ALL", $LIBS[$showLib]["downloadbinary"]))
             and !in_array("_NONE", $LIBS[$showLib]["downloadbinary"])) {
-                $caption .= "(" . str_replace("_", " ", pathinfo(str_replace($prefix, '', $file), PATHINFO_FILENAME)) . ")";
+                $tooltip = pathinfo(str_replace($prefix . "__", '', $file), PATHINFO_FILENAME) . "." . $caption;
+                $caption = "OTHER (." . $caption . ")";
                 // <a> tag
                 if ($viewShowModal) {
-                    $viewDownloadButtons[$caption] = "class=\"button <?= $viewColor ?> is-inverted modal-button\" data-target=\"dlmodal\" onclick=\"document.getElementById('dl').value = '" . encode("bin=" . $file) . "';\"";
+                    $viewDownloadButtons[$caption] = "class=\"button " . $viewColor . " is-outlined modal-button\" data-target=\"dlmodal\" onclick=\"document.getElementById('dl').value = '" . encode("bin=" . $file) . "';\" title=\"" . $tooltip . "\"";
                 } else {
-                    $viewDownloadButtons[$caption] = "class=\"button <?= $viewColor ?> is-inverted\" href=\"" . $_SERVER["PHP_SELF"] . "?lib=". $showLib . "&id=" . $showID . "&ds=" . $showDS . "&dl=" . encode("bin=" . $file) . "\"";
+                    $viewDownloadButtons[$caption] = "class=\"button " . $viewColor . " is-outlined\" href=\"" . $_SERVER["PHP_SELF"] . "?lib=". $showLib . "&id=" . $showID . "&ds=" . $showDS . "&dl=" . encode("bin=" . $file) . "\" title=\"" . $tooltip . "\"";
                 }
         }
     }

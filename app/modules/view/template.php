@@ -55,7 +55,7 @@ if (count(get_included_files()) == 1) {
                         <div class="box">
                             <h1 class="title is-5">Download</h1>
                             <hr>
-                            <div class="has-text-centered">
+                            <div class="buttons has-text-centered">
 <?php                         foreach ($viewDownloadButtons as $key => $value): ?>
                                 <a <?= $value ?>>
                                     <span class="icon is-small"><i class="fa fa-download"></i></span>
