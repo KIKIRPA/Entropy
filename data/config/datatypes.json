@@ -17,7 +17,7 @@
                  {
                     "json": "Raman shift (cm-1)",
                     "html": "Raman shift (cm<sup>-1<\/sup>)",
-                    "jcamp-dx": "Raman shift (cm-1)",
+                    "jcampdx": "Raman shift (cm-1)",
                     "other1": "Raman shift (1/cm)",
                     "other2": "Wavenumber (cm-1)",
                     "other3": "Wavenumber (1/cm)"
@@ -27,7 +27,7 @@
                 {
                     "json": "Intensity (Arbitrary Units)",
                     "html": "Intensity (Arbitrary Units)",
-                    "jcamp-dx": "Intensity (Arbitrary Units)",
+                    "jcampdx": "Intensity (Arbitrary Units)",
                     "other1": "Counts"
                 }
             ]

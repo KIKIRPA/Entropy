@@ -311,7 +311,7 @@ STEP2:
       
         // interpret CSV header
         $line = fgets($handle);
-        list($line, $enc) = detect_bom_encoding($line);     // detect encoding using the UTF byte order mark, and return string without encoding
+        list($line, $enc) = detectBomEncoding($line);   // detect BOM encoding
         $line = mb_convert_encoding($line, "UTF-8", $enc);  // convert to UTF-8
         $delimiter = false;
         $delimiters = array(",", ";", "\t", "|");

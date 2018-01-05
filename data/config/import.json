@@ -13,7 +13,7 @@
             "rruff": {}
         }    
     },
-    "jcamp-dx": {
+    "jcampdx": {
         "datatypes": {
             "raman": {},
             "ftir": {},

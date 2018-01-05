@@ -12,11 +12,7 @@ if (count(get_included_files()) == 1) {
 
     logout()                              close session
 
-    sanitizeStr($string, $replaceby = "_", $others = False, $case = 0)
-        sanitize string, removes all characters, html-tags... that should not be there
-        eg. string to be used as a part of a filename, or for loose string comparisons
-        $others is other characters to replace, e.g. "-+:^"
-        $case: 1 lowercase, 2 uppercase, 0 and everything else: do nothing
+
 
     calcPermMod($permtable, [$lib])
         returns the allowed modules for a given user.
@@ -86,7 +82,13 @@ function logout()
     session_destroy();
 }
 
-
+/**
+ *     sanitizeStr($string, $replaceby = "_", $others = False, $case = 0)
+ *     sanitize string, removes all characters, html-tags... that should not be there
+ *     eg. string to be used as a part of a filename, or for loose string comparisons
+ *     $others is other characters to replace, e.g. "-+:^"
+*      $case: 1 lowercase, 2 uppercase, 0 and everything else: do nothing
+ */
 function sanitizeStr($string, $replaceby = "_", $others = false, $case = 0)
 {
     $replace = str_split(" _!\"#$%&'()*,/;<=>?@[\\]`{}~");
@@ -111,8 +113,8 @@ function sanitizeStr($string, $replaceby = "_", $others = false, $case = 0)
     return filter_var($string, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
 }
 
-
-function detect_bom_encoding($str)
+/** detect encoding using the UTF byte order mark, and return string without encoding */
+function detectBomEncoding($str)
 {
     if ($str[0] == chr(0xEF) && $str[1] == chr(0xBB) && $str[2] == chr(0xBF)) {
         return array(substr($str, 3), 'UTF-8');
@@ -485,14 +487,16 @@ function overrideMeta($metadata, $dataset = false)
  */
 function findDataType($type, $datatypes, $returnAlias = false) 
 {
-    $type = trim(strtolower($type));
-    $type = str_replace(" ", "", $type);
+    //$type = trim(strtolower($type));
+    //$type = str_replace(" ", "", $type);
+    $type = sanitizeStr($type, "", "+-:^", 1);
     
     foreach ($datatypes as $generic => $array) {
         if (isset($array["alias"])) {
             foreach ($array["alias"] as $alias) {
-                $clean = trim(strtolower($alias));
-                $clean = str_replace(" ", "", $clean);
+                //$clean = trim(strtolower($alias));
+                //$clean = str_replace(" ", "", $clean);
+                $clean = sanitizeStr($alias, "", "+-:^", 1);
                 
                 if ($type == $clean) {
                     return ($returnAlias ? $alias : $generic);

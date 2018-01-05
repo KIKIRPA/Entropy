@@ -1,13 +1,8 @@
 <?php
 
-// prevent direct access to this file (thus only when included)
-if (count(get_included_files()) == 1) {
-    header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
-    header("Status: 404 Not Found");
-    exit("Direct access not permitted.");
-}
+namespace Convert\Export;
 
-class ExportASCII
+class Ascii
 {
     public $data = array();
     public $meta = array();
@@ -67,7 +62,6 @@ class ExportASCII
             if (isset($parameters["templatefile"])) {
                 $this->templateFile = $parameters["templatefile"];
             }
-
         } else {
             $this->error = eventLog("WARNING", "Metadata is not in the correct format");
         }
@@ -86,9 +80,9 @@ class ExportASCII
             // build metadata
             if ($getMeta) {
                 if ($this->templateFile != null) {
-                    fwrite($handle, _metaTemplate($this->templateFile));
+                    fwrite($handle, $this->_metaTemplate($this->templateFile));
                 } else {
-                    fwrite($handle, _meta());
+                    fwrite($handle, $this->_meta());
                 }
                 fwrite($handle, "\r\n");
             }
@@ -99,7 +93,7 @@ class ExportASCII
             }
 
             //build data
-            fwrite($handle, _data());
+            fwrite($handle, $this->_data());
         } catch (Exception $e) {
             $this->error = eventLog("WARNING", $e->getMessage());
             fclose($handle); // this removes the file
@@ -115,7 +109,7 @@ class ExportASCII
     {
         $array = array();
         foreach ($this->data as $pair) {
-            $array[] = $this->wrapSymbol . $pair[0] . $this->$wrapSymbol . $this->intraSeparator . $this->wrapSymbol . $pair[1] . $this->wrapSymbol;
+            $array[] = $this->wrapSymbol . $pair[0] . $this->wrapSymbol . $this->intraSeparator . $this->wrapSymbol . $pair[1] . $this->wrapSymbol;
         }
         
         return implode($this->interSeparator, $array);
@@ -127,10 +121,10 @@ class ExportASCII
         $array = array();
         
         foreach ($flat as $key => $value) {
-            $array[] = $commentSymbol . $key . " = " . $value . "\r\n";
+            $array[] = $this->commentSymbol . $key . " = " . $value;
         }
 
-        return $array;
+        return implode("\r\n", $array);
     }
 
     private function _metaTemplate($filename)
@@ -143,7 +137,7 @@ class ExportASCII
                 // read the template file line by line
                 while (($line = fgets($handle)) !== false) {
                     // find {codes} and replace them
-                    $codes = _findCodesInTemplate($line);
+                    $codes = $this->_findCodesInTemplate($line);
                     foreach ($codes as $code) {
                         $search = "{" . $code . "}";
                         $replace = getMeta($this->meta, $code);
@@ -160,10 +154,10 @@ class ExportASCII
             } 
 
         } else {
-            $this->error =  eventLog("WARNING", "ASCII export template not found: " . $filename);
+            $this->error = eventLog("WARNING", "ASCII export template not found: " . $filename);
         }
 
-        return $array;
+        return implode("\r\n", $array);
     }
 
     private function _findCodesInTemplate($string, $openTag = "{", $closeTag = "}")

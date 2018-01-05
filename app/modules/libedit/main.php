@@ -121,8 +121,8 @@ if ($f == "set") {
                         }
                     }
                     break;
-                case 4: // arrays that need sanitizeStr
-                case 5: // arrays that need sanitizeStr, or can be  _ALL and _NONE
+                case 4: // arrays that need sanitizeStr, lowercase
+                case 5: // arrays that need sanitizeStr, lowercase or _ALL or _NONE
                     if (!is_array($_REQUEST[$item])) {
                         $_REQUEST[$item] = explode("|", $_REQUEST[$item]);
                     }
