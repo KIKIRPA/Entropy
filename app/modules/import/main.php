@@ -311,7 +311,7 @@ STEP2:
       
         // interpret CSV header
         $line = fgets($handle);
-        list($line, $enc) = detect_bom_encoding($line);     // detect encoding using the UTF byte order mark, and return string without encoding
+        list($line, $enc) = detectBomEncoding($line);   // detect BOM encoding
         $line = mb_convert_encoding($line, "UTF-8", $enc);  // convert to UTF-8
         $delimiter = false;
         $delimiters = array(",", ";", "\t", "|");
@@ -692,9 +692,11 @@ STEP3:
         $columns = $LIBS[$_REQUEST["lib"]]["listcolumns"];
         $list =  array();
         foreach ($measurements as $id => $measurement) {
-            $measurement = overrideMeta($measurement); //fold "meta:" metadata together with direct metadata
-            foreach ($columns as $column) {
-                $list[$id][$column] = getMeta($measurement, $column, "; ", false);
+            if ($id != "_datasets") {
+                $measurement = overrideMeta($measurement); //fold "meta:" metadata together with direct metadata
+                foreach ($columns as $column) {
+                    $list[$id][$column] = getMeta($measurement, $column, "; ", false);
+                }       
             }
         }
           
@@ -978,12 +980,11 @@ STEP7:
 
                 // convert file
                 $data = false;
-                $parameters = selectImportHelper($IMPORT, findDataType($json["type"], $DATATYPES), $ext, $parameters);
-                if (isset($parameters["helper"])) {
-                    // create helper class 
-                    $class = "Import" . $parameters["helper"];
-                    $class = sanitizeStr($class, "", "-+:^"); // remove illegal symbols from class name (e.g. JCAMP-DX -> JCAMPDX)
-                    unset($parameters["helper"]);
+                $parameters = selectConvertorClass($IMPORT, findDataType($json["type"], $DATATYPES), $ext, $parameters);
+                if (isset($parameters["convertor"])) {
+                    // create convertor 
+                    $class = "Import" . sanitizeStr($parameters["convertor"], "", "-+:^", 2); // remove illegal symbols from class name (e.g. jcamp-dx -> JCAMPDX)
+                    unset($parameters["convertor"]);
                     $imported = new $class($trdir . $fn . $ext, $parameters);
                     $data = $imported->getData();
                     $error = $imported->getError();
@@ -1025,7 +1026,7 @@ STEP7:
                     throw new RuntimeException($error);
                 }
 
-                // create import helper class
+                // create import convertor class
                 $viewer = $DATATYPES[findDataType($json["type"], $DATATYPES)]["viewer"];
                 $imported = new ImportAnnotations($trdir . $fn . $ext, $viewer);
                 $data = $imported->getAnno();

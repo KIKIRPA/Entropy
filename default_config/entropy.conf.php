@@ -10,6 +10,7 @@ if (count(get_included_files()) == 1) {
 const CONFIG_PATH    = PRIVPATH . "data/config/";
 const LIB_PATH       = PRIVPATH . "data/libs/";
 const LOG_PATH       = PRIVPATH . "data/logs/";
+const TEMPLATES_PATH = PRIVPATH . "data/templates/";
 
 // webapp properties
 const APP_NAME      = "Entropy";

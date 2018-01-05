@@ -7,18 +7,19 @@ if (count(get_included_files()) == 1) {
 }
 
 
-/* ***************
-    I. conditions
-   ***************
-
-   1. evaluate $_REQUEST[lib & id & ds]   --> TODO: move from
-   2. evaluate download code
-   3. evaluate download logging (via login, cookie or form)
-   => if conditions are not met, fallback to view module, with error notification
-*/
 
 try {
-    // 2. evaluate download code
+    /* ************
+        conditions
+       ************
+    
+       - evaluate $_REQUEST[lib & id & ds]   --> TODO: move from
+       - evaluate download code
+       - evaluate download logging (via login, cookie or form)
+       => if conditions are not met, fallback to view module, with error notification
+    */
+
+    // evaluate download code
     $code = decode($_REQUEST["dl"]);
     if ($code == "") {
         throw new Exception("Download failed: nothing to download");
@@ -29,28 +30,40 @@ try {
         throw new Exception("Download failed: error in download code");
     }
 
-    if ($code[0] == "bin") { 
+    if ($code[0] == "bin") {
+        $extension = strtolower(pathinfo($code[1], PATHINFO_EXTENSION));
         if (!file_exists($code[1])) { // search the binary file
             throw new Exception("Download failed: binary file not found.");
         }
-        elseif (!(in_array($code[1], $LIBS[$showLib]["downloadbinary"]) or in_array("_ALL", $LIBS[$showLib]["downloadbinary"])) or in_array("_NONE", $LIBS[$showLib]["downloadbinary"])) {
+        elseif (!(in_array($extension, $LIBS[$showLib]["downloadbinary"]) or in_array("_ALL", $LIBS[$showLib]["downloadbinary"])) or in_array("_NONE", $LIBS[$showLib]["downloadbinary"])) {
             throw new Exception("Download failed: binary download not allowed.");
         }
     } elseif ($code[0] == "conv") { // is conversion allowed in library file?  TODO: is allowed in conversion settings json?
         if (!in_array($code[1], $LIBS[$showLib]["downloadconverted"])) {
             throw new Exception("Download failed: conversion to ". $code[1] ." not allowed.");
         }
+        
+        // separate metadata, data and export-parameters
+        $meta = overrideMeta($data, $showDS);
+        $data = $data["dataset"][$showDS]["data"];
+        //$units
+
+        if (isset($data["_export"])) $parameters = $meta["_export"];
+        else                         $parameters = array(); 
+
+        // remove metadata starting with underscore from meta
+
     } else {
         throw new Exception("Error in download code");
     }
 
-    // 3. evaluate download logging (via login, cookie or form)
+    // evaluate download logging (via login, cookie or form)
     if (LOG_DL) {
         if ($isLoggedIn) {
-            $log = array($USERS[$isLoggedIn]["name"], $USERS[$isLoggedIn]["institution"], $USERS[$isLoggedIn]["email"], "login");
+            $downloadLogEntry = array($USERS[$isLoggedIn]["name"], $USERS[$isLoggedIn]["institution"], $USERS[$isLoggedIn]["email"], "login");
         } elseif (isset($_COOKIE[COOKIE_NAME])) {
             if (verifycookie($_COOKIE[COOKIE_NAME])) {
-                $log = array($USERS[$isLoggedIn]["name"], $USERS[$isLoggedIn]["institution"], $USERS[$isLoggedIn]["email"], "cookie");
+                $downloadLogEntry = array($USERS[$isLoggedIn]["name"], $USERS[$isLoggedIn]["institution"], $USERS[$isLoggedIn]["email"], "cookie");
             } else {
                 removecookie();   // remove invalid cookie
                 throw new Exception("Download failed: invalid cookie.");
@@ -58,7 +71,7 @@ try {
         } elseif (isset($_REQUEST["name"]) and isset($_REQUEST["institution"]) and isset($_REQUEST["email"])) {
             $cookie = verifycookie($_REQUEST["name"], $_REQUEST["institution"], $_REQUEST["email"]);
             if ($cookie) {
-                $log = array($_REQUEST["name"], $_REQUEST["institution"], $_REQUEST["email"], "form");
+                $downloadLogEntry = array($_REQUEST["name"], $_REQUEST["institution"], $_REQUEST["email"], "form");
                 if (isset($_REQUEST["cookie"])) {
                     $cookie = makecookie($cookie);
                 } // set cookie, if the user checked the checkbox
@@ -69,90 +82,98 @@ try {
             throw new Exception("Download failed: no identification.");
         }
     }
+
+    
+    /* ******************
+        prepare download
+       ****************** */
+    
+    // CONVERSION
+    if ($code[0] == "conv") {
+        // filename for the download (extension: the last part of $code[1])
+        $fileName = $showID . (($showDS == 'default') ? "" : "_" . $showDS) . "." . end(explode(":", $code[1]));
+
+        // select convertor and assemble all export parameters
+        $parameters = selectConvertorClass($EXPORT, findDataType($meta["type"], $DATATYPES), $code[1], $parameters);
+    
+        if (isset($parameters["convertor"])) {
+            // create convertor        
+            $className = "Convert\\Export\\" . ucfirst(strtolower($parameters["convertor"]));
+            $export = new $className($data, $meta, $parameters);
+            $fileHandle = $export->getFile();
+            $error = $export->getError();
+
+            if ($error or !$fileHandle) {
+                throw new Exception("Failed to create " . $fileName);
+            }
+        } else {
+            throw new Exception("Failed to create " . $fileName . ": no convertor found.");
+        }
+    
+    
+    // BINARY
+    } elseif ($code[0] == "bin") {
+        // filename for the download
+        $fileName = basename($code[1]);
+        $fileName = end(explode("__", $fileName));  //download the binary files with the original filename (= part following the last "__")
+
+        // open the binary file as a handle
+        $fileHandle = fopen($code[1], "r");
+    
+        if (!$fileHandle) {
+            throw new Exception("Failed to fetch " . $fileName);
+        }
+    }
+    
+    // file size from the open handle
+    $stat = fstat($fileHandle);
+    $fileSize = $stat["size"];
+
 } catch (Exception $e) {
     $errormsg = $e->getMessage();
-    eventLog("WARNING", $errormsg  . " [download]");
+    eventLog("ERROR", $errormsg  . " [download]");
 
     // FALLBACK TO VIEW MODULE
     require_once(PRIVPATH . 'modules/view/main.php');
 }
 
 
+/* ***************
+    download log
+   *************** */
 
-/* ******************
-    II. calculations
-   ******************
-
-   1. download log (if enabled)
-   2. prepare download
-*/
-
-// 1. download log (if enabled)
 // CSV columns: timestamp | name | institution | email | source | IP | library | measurement | dataset | conv/bin | format/target | RESERVED*
 //  (*) reserved for (optional) conversion rules (eg TXT: tabulated, comma separated, eg SPC: old format), stored in $code[2]  --> TODO
 if (LOG_DL) {
-    array_unshift($log, date('Y-m-d H:i'));
-    array_push($log, $_SERVER['REMOTE_ADDR'], $showLib, $showID, $showDS, $code[0], $code[1], "");
+    array_unshift($downloadLogEntry, date('Y-m-d H:i'));
+    array_push($downloadLogEntry, $_SERVER['REMOTE_ADDR'], $showLib, $showID, $showDS, $code[0], $code[1], "");
 
     // open or create download.csv and append line
-    $handle = fopen(LOG_DL_FILE, "a");
-    if ($handle) {
-        $success = fputcsv($handle, $log);
+    $logHandle = fopen(LOG_DL_FILE, "a");
+    
+    if ($logHandle) {
+        $success = fputcsv($logHandle, $downloadLogEntry);
     } else {
         $success = false;
     }
-    if ($success) {
-        $success = fclose($handle);
-    }
+    
+    fclose($logHandle);
 
     if (!$success) {
         eventLog("WARNING", "could not write to download log [download]", false, true);
     }
 }
 
-// 2. prepare download
-if ($code[0] == "conv") {
-    //TODO: integrate convert-framework (check if we are able to convert to $format, preferably replacing the switch by a function)
-    //$export = export($data["dataset"][$ds], $code, $EXPORT)
-    $filename = $showID . (($showDS == 'default')?"":"__".$showDS) . "." . $code[1];
 
-    /*
-    switch ($code[1]) {
-        case "dx":
-        case "jdx":
-            $file = ;
-            break;
-        case "ascii":
-        case "txt":
+/* ********
+output
+******** */
 
-            break;
-    }
-    */
-    echo "Conversion is not implemented yet!";
-    die();
-} elseif ($code[0] == "bin") {
-    $filename = basename($code[1]);
-}
+// echo "DEBUG OUTPUT<br><br>";
+// echo "filename = " . $fileName . "<br>";
+// echo "filesize = " . $fileSize . "<br><br>";
+// fpassthru($fileHandle);
+// fclose($fileHandle);
+// die();
 
-
-
-/* *************
-    III. output
-   ************* */
-
-header('Content-Description: File Transfer');
-header('Content-Type: application/octet-stream');
-header('Content-Disposition: attachment; filename="'.$filename.'"');
-header('Expires: 0');
-header('Cache-Control: must-revalidate');
-header('Pragma: public');
-
-if ($code[0] == "bin") {
-    header('Content-Length: ' . filesize($code[1]));
-    readfile($code[1]);
-} elseif ($code[0] == "conv") {
-    header('Content-Length: ' . strlen($export));
-    echo $export;
-}
-
-exit;
+require_once(__DIR__ . '/template.php');

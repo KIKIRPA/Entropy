@@ -12,11 +12,7 @@ if (count(get_included_files()) == 1) {
 
     logout()                              close session
 
-    sanitizeStr($string, $replaceby = "_", $others = False, $case = 0)
-        sanitize string, removes all characters, html-tags... that should not be there
-        eg. string to be used as a part of a filename, or for loose string comparisons
-        $others is other characters to replace, e.g. "-+:^"
-        $case: 1 lowercase, 2 uppercase, 0 and everything else: do nothing
+
 
     calcPermMod($permtable, [$lib])
         returns the allowed modules for a given user.
@@ -75,7 +71,7 @@ if (count(get_included_files()) == 1) {
         writes an eventmessage ($msg) of category ($cat, eg ERROR, WARNING, ...) to the event log file
         when optional $fatal is true it will stop all further code execution.
         when optional $mail is true it will send an email to the sysadmin; or if set to an valid address to this address
-        !! returns false (if not fatal)!!
+        !! returns $msg !!
 
 **************************************************************************************************************************/
 
@@ -86,7 +82,13 @@ function logout()
     session_destroy();
 }
 
-
+/**
+ *     sanitizeStr($string, $replaceby = "_", $others = False, $case = 0)
+ *     sanitize string, removes all characters, html-tags... that should not be there
+ *     eg. string to be used as a part of a filename, or for loose string comparisons
+ *     $others is other characters to replace, e.g. "-+:^"
+*      $case: 1 lowercase, 2 uppercase, 0 and everything else: do nothing
+ */
 function sanitizeStr($string, $replaceby = "_", $others = false, $case = 0)
 {
     $replace = str_split(" _!\"#$%&'()*,/;<=>?@[\\]`{}~");
@@ -111,8 +113,8 @@ function sanitizeStr($string, $replaceby = "_", $others = false, $case = 0)
     return filter_var($string, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
 }
 
-
-function detect_bom_encoding($str)
+/** detect encoding using the UTF byte order mark, and return string without encoding */
+function detectBomEncoding($str)
 {
     if ($str[0] == chr(0xEF) && $str[1] == chr(0xBB) && $str[2] == chr(0xBF)) {
         return array(substr($str, 3), 'UTF-8');
@@ -485,14 +487,16 @@ function overrideMeta($metadata, $dataset = false)
  */
 function findDataType($type, $datatypes, $returnAlias = false) 
 {
-    $type = trim(strtolower($type));
-    $type = str_replace(" ", "", $type);
+    //$type = trim(strtolower($type));
+    //$type = str_replace(" ", "", $type);
+    $type = sanitizeStr($type, "", "+-:^", 1);
     
     foreach ($datatypes as $generic => $array) {
         if (isset($array["alias"])) {
             foreach ($array["alias"] as $alias) {
-                $clean = trim(strtolower($alias));
-                $clean = str_replace(" ", "", $clean);
+                //$clean = trim(strtolower($alias));
+                //$clean = str_replace(" ", "", $clean);
+                $clean = sanitizeStr($alias, "", "+-:^", 1);
                 
                 if ($type == $clean) {
                     return ($returnAlias ? $alias : $generic);
@@ -630,7 +634,7 @@ function eventLog($cat, $msg, $fatal = false, $mail = false)
     if ($fatal) {
         die(strtoupper($cat).": ".$msg);
     }
-    return false;
+    return $msg;
 }
 
 
@@ -694,3 +698,88 @@ function bulmaColorModifier($color, $colorList, $default = null)
      // non-existing color (and default color): null
      return null;
  }
+
+
+ /**
+ * selectConvertorClass(): select an export or import convertor based on the supplied datatype and format
+ * 
+ * It reads the import.json or export.json configuration file and searches the listed convertors based on
+ * the two criteria: datatype and format. Searching happens in the order the convertors
+ * are listed in the file, and only the first hit will be reported.
+ * 
+ * The format can be a file extension, or a downloadconverted library setting item in the form of "[convertor:[datatype:]]extension".
+ * 
+ * The optional $parameters array contains convertor parameters, as can be supplied in the CSV
+ * metadata files ("_import:jcamp-dx:template" --> $parameters = $meta["_import"]), and will be
+ * supplemented with parameters defined in the import.json/export.json file for the given extension and datatype.
+ * If the same parameter with different value is defined in multiple places, than the value defined
+ * in the metadata wins over the value in extension, which in turn wins over the value in datatype.
+ * 
+ * If a convertor is found, this function returns an associative array; the first item (with key "convertor")
+ * contains the name of the convertor. Next items are the parameters for this convertor 
+ * (eg $parameters["template"] = "Raman785.dxt").
+ * If no convertor is found, an empty array is returned.
+ */
+function selectConvertorClass($convertors, $datatype, $format, $parameters = array())
+{
+    // cleanup parameters
+    $datatype = trim(strtolower($datatype));
+    $format = trim(trim(strtolower($format), "."));
+
+    $format = explode(":", $format, 3);
+    $format_ext = end($format);
+    if (count($format) == 3) {
+        $format_conv = $format[0];
+        $format_type = $format[1];
+    } elseif (count($format) == 2) {
+        $format_conv = $format[0];
+    }
+
+    // search the convertors array until we find a convertor that fits the requirements (datatype and extension)
+    foreach ($convertors as $key => $requirements) {
+        $condition = true;
+        if (isset($format_conv)) {
+            $condition = ($condition and ($key == $format_conv));
+        }
+        if (isset($format_type)) {
+            $condition = ($condition and ($datatype == $format_type));
+        }
+        if (isset($requirements["datatypes"])) {
+            $condition = ($condition and isset($requirements["datatypes"][$datatype]));
+        }  
+        if (isset($requirements["extensions"])) {
+            $condition = ($condition and isset($requirements["extensions"][$format_ext]));
+        }
+        if ($condition) {
+            $convertor = $key;
+            break;
+        }
+    }
+    
+    // evaluate convertor parameters. these can be supplied for specific datatypes, specific file extensions or supplied in the uploaded metadata
+    // return array with first key "convertor", followed by the parameters for this convertor
+    if (isset($convertor)) {
+        $parameters = array_change_key_case($parameters, CASE_LOWER);
+        if (isset($parameters[$convertor])) {
+            // only keep the parameters for this convertor
+            $parameters = $parameters[$convertor];
+        }
+        else {
+            $parameters = array();
+        }
+        // add parameters from the extension (if they are not already set by the metadata)
+        if (isset($convertors[$convertor]["extensions"][$format_ext])) {
+            $parameters = array_merge($convertors[$convertor]["extensions"][$format_ext], $parameters);
+        }
+        // add parameters from the datatype (if they are not already set by the metadata or extension)
+        if (isset($convertors[$convertor]["datatypes"][$datatype])) {
+            $parameters = array_merge($convertors[$convertor]["datatypes"][$datatype], $parameters);
+        }
+        
+        return array("convertor" => $convertor) + $parameters; 
+    }
+    else {
+        // if no suitable convertor found: return false
+        return false;
+    }
+}
