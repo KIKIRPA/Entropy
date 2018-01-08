@@ -5,12 +5,6 @@ if (count(get_included_files()) == 1) {
     header("Status: 404 Not Found");
     exit("Direct access not permitted.");
 }
-  
-
-// load import php classes
-foreach ($IMPORT as $class => $temp) {
-    include_once(PRIVPATH . 'import/' . strtolower($class) . '/class.php');
-}
 
 
 /**

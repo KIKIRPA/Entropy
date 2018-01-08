@@ -982,12 +982,11 @@ STEP7:
                 $data = false;
                 $parameters = selectConvertorClass($IMPORT, findDataType($json["type"], $DATATYPES), $ext, $parameters);
                 if (isset($parameters["convertor"])) {
-                    // create convertor 
-                    $class = "Import" . sanitizeStr($parameters["convertor"], "", "-+:^", 2); // remove illegal symbols from class name (e.g. jcamp-dx -> JCAMPDX)
-                    unset($parameters["convertor"]);
-                    $imported = new $class($trdir . $fn . $ext, $parameters);
-                    $data = $imported->getData();
-                    $error = $imported->getError();
+                    // create convertor        
+                    $className = "Convert\\Import\\" . ucfirst(strtolower($parameters["convertor"]));
+                    $import = new $className($trdir . $fn . $ext, $parameters);
+                    $data = $import->getData();
+                    $error = $import->getError();
                     if ($error) {
                         eventLog("WARNING", $error . " File: " . $_FILES["dataUp" . $key]['name'] . " [" . $class . "]");
                     }
@@ -1011,10 +1010,10 @@ STEP7:
                 // TODO: create a way to read those from the uploaded data (via the importfilters)
                 // TODO: create a way to change them in the data upload form
                 $json["dataset"][$ds]["units"] = findDataTypeUnits( $measurements[$_REQUEST["id"]]["type"], 
-                                                                $DATATYPES, 
-                                                                "json",
-                                                                isset($json["dataset"][$ds]["units"]) ? $json["dataset"][$ds]["units"] : null
-                                                              );
+                                                                    $DATATYPES, 
+                                                                    "json",
+                                                                    isset($json["dataset"][$ds]["units"]) ? $json["dataset"][$ds]["units"] : null
+                                                                  );
             }
         
             // 2.2 process annotations
@@ -1026,11 +1025,12 @@ STEP7:
                     throw new RuntimeException($error);
                 }
 
-                // create import convertor class
+                // create import convertor class for annotations
                 $viewer = $DATATYPES[findDataType($json["type"], $DATATYPES)]["viewer"];
-                $imported = new ImportAnnotations($trdir . $fn . $ext, $viewer);
-                $data = $imported->getAnno();
-                $error = $imported->getError();
+                $import = new Convert\Import\Annotations($trdir . $fn . $ext, $viewer);
+                $data = $import->getData();
+                $error = $import->getError();
+
                 if ($error) {
                     eventLog("WARNING", $error . " File: " . $_FILES["annoUp" . $key]['name'] . " [" . $class . "]");
                 }
