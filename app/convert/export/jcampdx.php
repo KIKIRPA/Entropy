@@ -4,15 +4,18 @@ namespace Convert\Export;
 
 class Jcampdx
 {
+    public $id;
     public $data = array();
     public $meta = array();
     public $error = false;  // last error msg
+
+    public $datatypes;      // TODO: remove this dependency by using a static datatypes class, and accessing it directly!!!
 
     // parameters
     public $dataEncoding = "(X++(Y..Y))";
     public $templateFile = "default.dx";
     public $wordWrap = 80;
-    public $softwareString = "ENTROPY 20180108";
+    public $softwareString = "ENTROPY 20180116";
     public $normalizeX = 0;
     public $normalizeY = 32767;
     public $forceEqualSpacing = false;
@@ -25,7 +28,7 @@ class Jcampdx
 
 
     /**
-     * __construct($data, $meta = array(), $options = array())
+     * __construct($id, $data, $meta = array(), $options = array(), $datatypes = array())
      * 
      * Reads data and metadata for conversion
      * - supported parameters:
@@ -46,8 +49,11 @@ class Jcampdx
      * @param array $meta metadata array
      * @param array $options Specific parameters for this convertor
      */
-    function __construct($data, $meta = array(), $options = array())
+    function __construct($id, $data, $meta = array(), $options = array(), $datatypes = array())
     {
+        $this->id = $id;
+        $this->datatypes = $datatypes;
+
         if (is_array($data) and !empty($data)) {
             $this->data = $data;
         } else {
@@ -180,14 +186,23 @@ class Jcampdx
 
     private function _metaTemplate()
     {
-        $result = fillTemplateWithMeta(TEMPLATES_PATH . $this->templateFile, $this->meta);
+        $specificCodes = array(
+            "_id"               => $this->id,
+            "_datatype"         => findDataType($this->meta["type"], $this->datatypes, "jcampdx"),
+            "_license"          => "",
+            "_softwarestring"   => $this->softwareString,
+            "_xunits"           => "1/CM",              //TODO: findDataTypeUnits($this->meta["type"], $this->datatypes, "jcampdx", $this->units), // there is no $this->units yet; damn, I need that measurement class!
+            "_yunits"           => "RELATIVE INTENSITY" //TODO
+        );
+        
+        $lines = fillTemplateWithMeta(TEMPLATES_PATH . $this->templateFile, $this->meta, $specificCodes);
 
-        if (!$result) {
+        if (!$lines) {
             $this->error = eventLog("WARNING", "Failed to export to JCAMP-DX because of error in reading the metadata template file");
             return "";
         }
 
-        return $result;
+        return $lines;
     }
 
 
@@ -311,7 +326,7 @@ class Jcampdx
         // check wordwrap (debug - to be commented out after testing?)
         $tooLong = 0;
         foreach ($lines as $line) 
-            if (strlen($line) > $dataWW + 2) $tooLong++;
+            if (strlen($line) > $dataWW + 2) $tooLong++;    // +2 because we don't count \r\n in $dataWW
         if ($tooLong) 
             eventLog("WARNING", $tooLong . " data line(s) exceed the wordwrap limit.", false);
     

@@ -55,15 +55,6 @@ if (count(get_included_files()) == 1) {
         "meta:", and optionally with metadata specific to a dataset
         returns merged metadata (analytical data is stripped)
 
-    findDataTypeUnits($type, $datatypes, $key = "json", $search = Null)
-        extracts a list of axis units/names for a given datatype ($type) from the $DATATYPES json resource.
-        Includes searching for parent datatype
-        By default it returns the json-names, other names (or invert booleans) can be requested with the $key.
-        In absence of $search, the default (first listed) entries for each axis will be returned.
-        $search is a list of one alternative name per axis to search for; if found, the function
-        will return the corresponding axis name. If one of the altnames in $altnamelist is Null or
-        False, it will return the default axis name for that entry.
-
     mdate($format, $microtime)            outputs timestamp with a optionally supplied $format (default 'Y-m-d H:i:s.u')
                                             optional takes another microtime
 
@@ -480,31 +471,38 @@ function overrideMeta($metadata, $dataset = false)
 }
 
 /**
- * findDataType($type, $datatypes, $returnAlias = false) 
+ * findDataType($type, $datatypes, $key = false) 
  * 
- * finds the generic or corrected alias for a datatype
+ * finds the generic or key name for a datatype
+ * (if $key=="alias", the corrected alias name will be returned)
  * returns false if not found
  */
-function findDataType($type, $datatypes, $returnAlias = false) 
+function findDataType($type, $datatypes, $key = false) 
 {
-    //$type = trim(strtolower($type));
-    //$type = str_replace(" ", "", $type);
     $type = sanitizeStr($type, "", "+-:^", 1);
     
-    foreach ($datatypes as $generic => $array) {
-        if (isset($array["alias"])) {
-            foreach ($array["alias"] as $alias) {
-                //$clean = trim(strtolower($alias));
-                //$clean = str_replace(" ", "", $clean);
-                $clean = sanitizeStr($alias, "", "+-:^", 1);
-                
-                if ($type == $clean) {
-                    return ($returnAlias ? $alias : $generic);
-                }
-            }
+    foreach ($datatypes as $genericName => $datatypeArray) {
+        // make a list of aliasses, add the generic name to it, and all predefined aliasses
+        $aliasList = array($genericName);
+        if (isset($datatypeArray["alias"])) {
+            $aliasList = array_merge($aliasList, $datatypeArray["alias"]);
         }
-        elseif ($type == $generic) {
-            return $generic;
+
+        foreach ($aliasList as $alias) {
+            $clean = sanitizeStr($alias, "", "+-:^", 1);
+            
+            if ($type == $clean) {
+                if (strtolower($key) === "alias") {
+                    return $alias;
+                } elseif (isset($datatypeArray[strtolower($key)])) {
+                    if (is_string($datatypeArray[strtolower($key)])) {
+                        return $datatypeArray[strtolower($key)];
+                    }
+                }
+
+                // if $key is false, or $key was not found/is no string:
+                return $genericName;
+            }
         }
     }
 
@@ -513,7 +511,17 @@ function findDataType($type, $datatypes, $returnAlias = false)
     return false;
 }
 
-
+/**
+ * findDataTypeUnits($type, $datatypes, $key = "json", $search = Null)
+ * 
+ * extracts a list of axis units/names for a given datatype ($type) from the $DATATYPES json resource.
+ * Includes searching for parent datatype
+ * By default it returns the json-names, other names (or invert booleans) can be requested with the $key.
+ * In absence of $search, the default (first listed) entries for each axis will be returned.
+ * $search is a list of one alternative name per axis to search for; if found, the function
+ * will return the corresponding axis name. If one of the altnames in $search is Null or
+ * False, it will return the default axis name for that entry.
+ */
 function findDataTypeUnits($type, $datatypes, $key = "json", $search = null)
 {
     $results = array();

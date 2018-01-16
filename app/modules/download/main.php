@@ -104,7 +104,7 @@ try {
         if (isset($exportOptions["convertor"])) {
             // create convertor        
             $className = "Convert\\Export\\" . ucfirst(strtolower($exportOptions["convertor"]));
-            $export = new $className($data, $meta, $exportOptions);
+            $export = new $className($showID, $data, $meta, $exportOptions, $DATATYPES);
             $fileHandle = $export->getFile();
             $error = $export->getError();
 

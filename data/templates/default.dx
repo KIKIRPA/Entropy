@@ -1,6 +1,6 @@
-##TITLE={id}
-##JCAMP-DX=5.01 $$ {software}
-##DATA TYPE={type}
+##TITLE={_id}
+##JCAMP-DX=5.01 $$ {_softwarestring}
+##DATA TYPE={_datatype}
 ##APPLICATION=
 ##ORIGIN=
 ##OWNER=SPECTRUM COPYRIGHT (C) {measurement:date^year} by the Royal Institute for Cultural Heritage (KIK/IRPA)
@@ -32,6 +32,5 @@
 ##STATE=
 ##CROSS REFERENCE=	
 ##=
-
-##XUNITS=1/CM
-##YUNITS=RELATIVE INTENSITY
+##XUNITS={_xunits}
+##YUNITS={_yunits}

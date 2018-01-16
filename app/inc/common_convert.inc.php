@@ -11,7 +11,7 @@ if (count(get_included_files()) == 1) {
 /**
  * fillTemplateWithMeta($filepath, $meta)
  */
-function fillTemplateWithMeta($filepath, $meta, $preserveEmptyLines = false)
+function fillTemplateWithMeta($filepath, $meta, $otherCodes = array(), $preserveEmptyLines = false)
 {
     $array = array();
 
@@ -24,7 +24,12 @@ function fillTemplateWithMeta($filepath, $meta, $preserveEmptyLines = false)
                 $codes = findCodes($line);
                 foreach ($codes as $code) {
                     $search = "{" . $code . "}";
-                    $replace = getMeta($meta, $code, "; ", false);
+                    // search this code in $otherCodes first, then try to find it in the metadata ($meta)
+                    if (isset($otherCodes[strtolower($code)])) {
+                        $replace = $otherCodes[strtolower($code)];
+                    } else {
+                        $replace = getMeta($meta, $code, "; ", false);
+                    }
                     $line = str_replace($search, $replace, $line);
                 }          
                 // only save lines that contain more than whitespace                

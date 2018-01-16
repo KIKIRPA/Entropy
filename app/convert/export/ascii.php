@@ -4,6 +4,7 @@ namespace Convert\Export;
 
 class Ascii
 {
+    public $id;
     public $data = array();
     public $meta = array();
     public $error = false;  // last error msg
@@ -17,7 +18,7 @@ class Ascii
 
     
     /**
-     * __construct($data, $meta = array(), $options = array())
+     * __construct($id, $data, $meta = array(), $options = array(), $datatypes = array())
      * 
      * Reads data and metadata for conversion
      * - supported parameters:
@@ -27,12 +28,16 @@ class Ascii
      *     - commentsymbol (default: "# ")      symbols indicating a comment line
      *     - templatefile (default: null)       use template file for metadata
      * 
+     * $datatypes is not used in Convert\Export\Ascii, but is required for compatibility
+     * 
      * @param array $data data array
      * @param array $meta metadata array
      * @param array $options Specific parameters for this convertor
      */
-    function __construct($data, $meta = array(), $options = array())
+    function __construct($id, $data, $meta = array(), $options = array(), $datatypes = array())
     {
+        $this->id = $id;
+
         if (is_array($data) and !empty($data)) {
             $this->data = $data;
         } else {
@@ -137,10 +142,14 @@ class Ascii
 
     private function _metaTemplate()
     {
-        $result = fillTemplateWithMeta(TEMPLATES_PATH . $this->templateFile, $this->meta);
+        $specificCodes = array(
+            "_id" => $this->id,
+        );
+        
+        $lines = fillTemplateWithMeta(TEMPLATES_PATH . $this->templateFile, $this->meta, $specificCodes);
 
-        if (is_array($result)) {
-            return implode("", $result);
+        if (is_array($lines)) {
+            return implode("", $lines);
         } else {
             $this->error = eventLog("WARNING", "Failed to export to ASCII because of error in reading the metadata template file");
             return "";

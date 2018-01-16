@@ -520,7 +520,7 @@ STEP3:
             switch ($param_sani) {
                 case "type":
                     //check if type is set and exists in datatypes.json!!
-                    $val_sani = findDataType(sanitizeStr($value, "", "-+:^", 1), $DATATYPES, true);
+                    $val_sani = findDataType(sanitizeStr($value, "", "-+:^", 1), $DATATYPES, "alias");
                     if (!$val_sani) { // type in CSV does not exist! (findDataType() returned false)
                         $c++;
                         $col = "red";
@@ -570,7 +570,7 @@ STEP3:
             // check dataset fields jcampdxtemplate and type
             if (substr($param_sani, 0, 8) === "dataset:") {
                 if (substr($param_sani, -10) === ":meta:type") {
-                    $val_sani = findDataType(sanitizeStr($value, "", "-+:^", 1), $DATATYPES, true);
+                    $val_sani = findDataType(sanitizeStr($value, "", "-+:^", 1), $DATATYPES, "alias");
                     if (!$val_sani) { // type in CSV does not exist! (findDataType() returned false)
                         $c++;
                         $col = "red";
