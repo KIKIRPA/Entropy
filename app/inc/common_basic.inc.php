@@ -366,7 +366,7 @@ function getMeta($metadata, $get, $concatenate = "; ", $description = ": ")
     //formatting: add descriptions (eg "age: 1900") and formatting options (eg. date^year)
     foreach ($metadata as $id => $value) {
         $id2 = explode(":", $id);    //break down the flattened description, and only keep the last part
-        $id2 = $id[count($id2) - 1];  // eg. "sample:age" --> "age"
+        $id2 = end($id2);            // eg. "sample:age" --> "age"
 
         // formatting options, eg for timestamps
         if (array_key_exists(strtolower($id2), $formats) and !is_null($value)) {
@@ -399,7 +399,7 @@ function getMeta($metadata, $get, $concatenate = "; ", $description = ": ")
     
         // descriptions
         if ($description != false) {
-            $value = ucfirst($id2) . $description . $value;
+            $value = nameMeta($id) . $description . $value;
         }
     
         $metadata[$id] = $value;
@@ -709,18 +709,18 @@ function bulmaColorModifier($color, $colorList, $default = null)
  * 
  * The format can be a file extension, or a downloadconverted library setting item in the form of "[convertor:[datatype:]]extension".
  * 
- * The optional $parameters array contains convertor parameters, as can be supplied in the CSV
- * metadata files ("_import:jcamp-dx:template" --> $parameters = $meta["_import"]), and will be
- * supplemented with parameters defined in the import.json/export.json file for the given extension and datatype.
+ * The optional $options array contains convertor options, as can be supplied in the CSV
+ * metadata files ("options:import:jcampdx:templatefile" --> $options = $meta["options"]["import"]), and will be
+ * supplemented with options defined in the import.json/export.json file for the given extension and datatype.
  * If the same parameter with different value is defined in multiple places, than the value defined
  * in the metadata wins over the value in extension, which in turn wins over the value in datatype.
  * 
  * If a convertor is found, this function returns an associative array; the first item (with key "convertor")
- * contains the name of the convertor. Next items are the parameters for this convertor 
- * (eg $parameters["template"] = "Raman785.dxt").
+ * contains the name of the convertor. Next items are the options for this convertor 
+ * (eg $options["templatefile"] = "Raman785.dxt").
  * If no convertor is found, an empty array is returned.
  */
-function selectConvertorClass($convertors, $datatype, $format, $parameters = array())
+function selectConvertorClass($convertors, $datatype, $format, $options = array())
 {
     // cleanup parameters
     $datatype = trim(strtolower($datatype));
@@ -756,27 +756,27 @@ function selectConvertorClass($convertors, $datatype, $format, $parameters = arr
         }
     }
     
-    // evaluate convertor parameters. these can be supplied for specific datatypes, specific file extensions or supplied in the uploaded metadata
-    // return array with first key "convertor", followed by the parameters for this convertor
+    // evaluate convertor options. these can be supplied for specific datatypes, specific file extensions or supplied in the uploaded metadata
+    // return array with first key "convertor", followed by the options for this convertor
     if (isset($convertor)) {
-        $parameters = array_change_key_case($parameters, CASE_LOWER);
-        if (isset($parameters[$convertor])) {
-            // only keep the parameters for this convertor
-            $parameters = $parameters[$convertor];
+        $options = array_change_key_case($options, CASE_LOWER);
+        if (isset($options[$convertor])) {
+            // only keep the options for this convertor
+            $options = $options[$convertor];
         }
         else {
-            $parameters = array();
+            $options = array();
         }
-        // add parameters from the extension (if they are not already set by the metadata)
+        // add options from the extension (if they are not already set by the metadata)
         if (isset($convertors[$convertor]["extensions"][$format_ext])) {
-            $parameters = array_merge($convertors[$convertor]["extensions"][$format_ext], $parameters);
+            $options = array_merge($convertors[$convertor]["extensions"][$format_ext], $options);
         }
-        // add parameters from the datatype (if they are not already set by the metadata or extension)
+        // add options from the datatype (if they are not already set by the metadata or extension)
         if (isset($convertors[$convertor]["datatypes"][$datatype])) {
-            $parameters = array_merge($convertors[$convertor]["datatypes"][$datatype], $parameters);
+            $options = array_merge($convertors[$convertor]["datatypes"][$datatype], $options);
         }
         
-        return array("convertor" => $convertor) + $parameters; 
+        return array("convertor" => $convertor) + $options; 
     }
     else {
         // if no suitable convertor found: return false

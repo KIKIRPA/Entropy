@@ -9,7 +9,7 @@ class Ascii
     public $error = false;
     
     /**
-     * __construct($file, $parameters = array())
+     * __construct($file, $options = array())
      * 
      * Converts an ascii-array into a 2D-array
      * - each line contains coordinates, many (repeated) delimiters supported
@@ -19,9 +19,9 @@ class Ascii
      * - supported parameters: none
      * 
      * @param string $file Or a filename (including path), or an array of lines. 
-     * @param array $parameters Specific parameters for this convertor
+     * @param array $options Specific parameters for this convertor
      */
-    function __construct($file, $parameters = array())
+    function __construct($file, $options = array())
     {
         // if $file is a filename, open it as handle and read line by line
         // if $file is an array, foreach through it
@@ -49,6 +49,9 @@ class Ascii
                 }
             }
         }
+
+        // sort data
+        if (!orderData($this->data)) eventLog("WARNING", "ASCII import: could not sort the data: " . $file);
     }
 
     public function getData()

@@ -32,7 +32,7 @@
             "type"
         ],
         "downloadconverted": [
-            "txt"
+            "ascii:txt"
         ],
         "downloadbinary": [
             "_NONE"

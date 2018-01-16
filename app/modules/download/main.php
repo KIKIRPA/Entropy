@@ -6,7 +6,7 @@ if (count(get_included_files()) == 1) {
     exit("Direct access not permitted.");
 }
 
-
+require_once(PRIVPATH . 'inc/common_convert.inc.php');
 
 try {
     /* ************
@@ -22,39 +22,41 @@ try {
     // evaluate download code
     $code = decode($_REQUEST["dl"]);
     if ($code == "") {
-        throw new Exception("Download failed: nothing to download");
+        throw new \Exception("Download failed: nothing to download");
     }
 
     $code = explode("=", $code);
     if (count($code) != 2) {
-        throw new Exception("Download failed: error in download code");
+        throw new \Exception("Download failed: error in download code");
     }
 
     if ($code[0] == "bin") {
         $extension = strtolower(pathinfo($code[1], PATHINFO_EXTENSION));
         if (!file_exists($code[1])) { // search the binary file
-            throw new Exception("Download failed: binary file not found.");
+            throw new \Exception("Download failed: binary file not found.");
         }
         elseif (!(in_array($extension, $LIBS[$showLib]["downloadbinary"]) or in_array("_ALL", $LIBS[$showLib]["downloadbinary"])) or in_array("_NONE", $LIBS[$showLib]["downloadbinary"])) {
-            throw new Exception("Download failed: binary download not allowed.");
+            throw new \Exception("Download failed: binary download not allowed.");
         }
     } elseif ($code[0] == "conv") { // is conversion allowed in library file?  TODO: is allowed in conversion settings json?
         if (!in_array($code[1], $LIBS[$showLib]["downloadconverted"])) {
-            throw new Exception("Download failed: conversion to ". $code[1] ." not allowed.");
+            throw new \Exception("Download failed: conversion to ". $code[1] ." not allowed.");
         }
         
-        // separate metadata, data and export-parameters
+        // separate metadata, data and export-options
         $meta = overrideMeta($data, $showDS);
         $data = $data["dataset"][$showDS]["data"];
         //$units
 
-        if (isset($data["_export"])) $parameters = $meta["_export"];
-        else                         $parameters = array(); 
+        if (isset($data["options"]["import"])) 
+            $exportOptions = $meta["_export"];
+        else
+            $exportOptions = array(); 
 
         // remove metadata starting with underscore from meta
 
     } else {
-        throw new Exception("Error in download code");
+        throw new \Exception("Error in download code");
     }
 
     // evaluate download logging (via login, cookie or form)
@@ -62,11 +64,13 @@ try {
         if ($isLoggedIn) {
             $downloadLogEntry = array($USERS[$isLoggedIn]["name"], $USERS[$isLoggedIn]["institution"], $USERS[$isLoggedIn]["email"], "login");
         } elseif (isset($_COOKIE[COOKIE_NAME])) {
-            if (verifycookie($_COOKIE[COOKIE_NAME])) {
-                $downloadLogEntry = array($USERS[$isLoggedIn]["name"], $USERS[$isLoggedIn]["institution"], $USERS[$isLoggedIn]["email"], "cookie");
+            $cookie = verifycookie($_COOKIE[COOKIE_NAME]);
+            if ($cookie) {
+                $downloadLogEntry = $cookie;
+                $downloadLogEntry[] = "cookie";
             } else {
                 removecookie();   // remove invalid cookie
-                throw new Exception("Download failed: invalid cookie.");
+                throw new \Exception("Download failed: invalid cookie.");
             }
         } elseif (isset($_REQUEST["name"]) and isset($_REQUEST["institution"]) and isset($_REQUEST["email"])) {
             $cookie = verifycookie($_REQUEST["name"], $_REQUEST["institution"], $_REQUEST["email"]);
@@ -76,10 +80,10 @@ try {
                     $cookie = makecookie($cookie);
                 } // set cookie, if the user checked the checkbox
             } else {
-                throw new Exception("Download failed: invalid name, institution or e-mail address.");
+                throw new \Exception("Download failed: invalid name, institution or e-mail address.");
             }
         } else {
-            throw new Exception("Download failed: no identification.");
+            throw new \Exception("Download failed: no identification.");
         }
     }
 
@@ -91,23 +95,24 @@ try {
     // CONVERSION
     if ($code[0] == "conv") {
         // filename for the download (extension: the last part of $code[1])
-        $fileName = $showID . (($showDS == 'default') ? "" : "_" . $showDS) . "." . end(explode(":", $code[1]));
+        $temp = explode(":", $code[1]);
+        $fileName = $showID . (($showDS == 'default') ? "" : "_" . $showDS) . "." . end($temp);
 
-        // select convertor and assemble all export parameters
-        $parameters = selectConvertorClass($EXPORT, findDataType($meta["type"], $DATATYPES), $code[1], $parameters);
-    
-        if (isset($parameters["convertor"])) {
+        // select convertor and assemble all export options
+        $exportOptions = selectConvertorClass($EXPORT, findDataType($meta["type"], $DATATYPES), $code[1], $exportOptions);
+                
+        if (isset($exportOptions["convertor"])) {
             // create convertor        
-            $className = "Convert\\Export\\" . ucfirst(strtolower($parameters["convertor"]));
-            $export = new $className($data, $meta, $parameters);
+            $className = "Convert\\Export\\" . ucfirst(strtolower($exportOptions["convertor"]));
+            $export = new $className($data, $meta, $exportOptions);
             $fileHandle = $export->getFile();
             $error = $export->getError();
 
             if ($error or !$fileHandle) {
-                throw new Exception("Failed to create " . $fileName);
+                throw new \Exception("Failed to create " . $fileName);
             }
         } else {
-            throw new Exception("Failed to create " . $fileName . ": no convertor found.");
+            throw new \Exception("Failed to create " . $fileName . ": no convertor found.");
         }
     
     
@@ -121,7 +126,7 @@ try {
         $fileHandle = fopen($code[1], "r");
     
         if (!$fileHandle) {
-            throw new Exception("Failed to fetch " . $fileName);
+            throw new \Exception("Failed to fetch " . $fileName);
         }
     }
     
@@ -129,7 +134,7 @@ try {
     $stat = fstat($fileHandle);
     $fileSize = $stat["size"];
 
-} catch (Exception $e) {
+} catch (\Exception $e) {
     $errormsg = $e->getMessage();
     eventLog("ERROR", $errormsg  . " [download]");
 

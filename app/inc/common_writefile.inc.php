@@ -8,7 +8,6 @@ if (count(get_included_files()) == 1) {
 }
   
 
-
 function writeJSONfile($file, $content)
 {
     // writes (and if necessary backups) a json file
@@ -27,12 +26,11 @@ function writeJSONfile($file, $content)
     //backup old file (if it exists)
     if (backupFile(pathinfo($file, PATHINFO_DIRNAME) . "/", pathinfo($file, PATHINFO_BASENAME))) {
         //(over)write file
-    if (file_put_contents($file, $content)) {
-        return false;
-    }  // = no error!
-    else {
-        return "could not write file";
-    }
+        if (file_put_contents($file, $content)) {
+            return false;
+        } else {
+            return "could not write file";
+        }
     } else {
         return "failed to make backup";
     }

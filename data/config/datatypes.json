@@ -8,6 +8,7 @@
             "Raman 633nm",
             "Raman 1064nm"
         ],
+        "jcampdx": "RAMAN SPECTRUM",
         "viewer": "xy",
         "graph": {
             "xy": "line"
@@ -17,7 +18,7 @@
                  {
                     "json": "Raman shift (cm-1)",
                     "html": "Raman shift (cm<sup>-1<\/sup>)",
-                    "jcampdx": "Raman shift (cm-1)",
+                    "jcampdx": "1/CM",
                     "other1": "Raman shift (1/cm)",
                     "other2": "Wavenumber (cm-1)",
                     "other3": "Wavenumber (1/cm)"
@@ -27,7 +28,7 @@
                 {
                     "json": "Intensity (Arbitrary Units)",
                     "html": "Intensity (Arbitrary Units)",
-                    "jcampdx": "Intensity (Arbitrary Units)",
+                    "jcampdx": "RELATIVE INTENSITY",
                     "other1": "Counts"
                 }
             ]
@@ -37,6 +38,7 @@
         "alias": [
             "FTIR"
         ],
+        "jcampdx": "INFRARED SPECTRUM",
         "viewer": "xy",
         "graph": {
             "xy": "line"
@@ -46,19 +48,21 @@
                 {
                     "json": "Wavenumber (cm-1)",
                     "html": "Wavenumber (cm<sup>-1<\/sup>)",
+                    "jcampdx": "1/CM",
                     "other1": "Wavenumber (1/cm)",
                     "invert": true
                 }
             ],
             "y": [
                 {
-                   "json": "Absorbance (Relative intensity)",
-                    "html": "Absorbance (Relative intensity)"
+                    "json": "Absorbance (Relative intensity)",
+                    "html": "Absorbance (Relative intensity)",
+                    "jcampdx": "ABSORBANCE"
                 },
                 {
                     "json": "Transmission (%)",
                     "html": "Transmission (%)",
-                    "other1": "Transmission"
+                    "jcampdx": "TRANSMISSION"
                 }
             ]
         }
@@ -68,6 +72,7 @@
             "MS",
             "Mass spectrum"
         ],
+        "jcampdx": "MASS SPECTRUM",
         "viewer": "xy",
         "graph": {
             "xy": "bar"
@@ -76,13 +81,15 @@
             "x": [
                 {
                     "json": "m/z",
-                    "html": "m\/z"
+                    "html": "m\/z",
+                    "jcampdx": "m/z"
                 }
             ],
             "y": [
                 {
                     "json": "Relative intensity",
-                    "html": "Relative intensity"
+                    "html": "Relative intensity",
+                    "jcampdx": "Relative Abundance"
                 }
             ]
         }
