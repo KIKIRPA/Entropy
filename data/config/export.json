@@ -9,15 +9,24 @@
             "txt": {},
             "asc": {},
             "ascii": {},
-            "csv": {},
-            "rruff": {}
+            "csv": {
+                "wrapsymbol": "\"",
+                "intraseparator": ",",
+                "commentsymbol": "#"
+            },
+            "rruff": {
+                "intraseparator": ", ",
+                "templatefile": "default.rruff"
+            }
         }    
     },
     "jcampdx": {
         "datatypes": {
             "raman": {},
             "ftir": {},
-            "ms": {}
+            "ms": {
+                "dataencoding": "(XY..XY)"
+            }
         },
         "extensions": {
             "dx": {},

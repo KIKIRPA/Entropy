@@ -55,15 +55,6 @@ if (count(get_included_files()) == 1) {
         "meta:", and optionally with metadata specific to a dataset
         returns merged metadata (analytical data is stripped)
 
-    findDataTypeUnits($type, $datatypes, $key = "json", $search = Null)
-        extracts a list of axis units/names for a given datatype ($type) from the $DATATYPES json resource.
-        Includes searching for parent datatype
-        By default it returns the json-names, other names (or invert booleans) can be requested with the $key.
-        In absence of $search, the default (first listed) entries for each axis will be returned.
-        $search is a list of one alternative name per axis to search for; if found, the function
-        will return the corresponding axis name. If one of the altnames in $altnamelist is Null or
-        False, it will return the default axis name for that entry.
-
     mdate($format, $microtime)            outputs timestamp with a optionally supplied $format (default 'Y-m-d H:i:s.u')
                                             optional takes another microtime
 
@@ -366,7 +357,7 @@ function getMeta($metadata, $get, $concatenate = "; ", $description = ": ")
     //formatting: add descriptions (eg "age: 1900") and formatting options (eg. date^year)
     foreach ($metadata as $id => $value) {
         $id2 = explode(":", $id);    //break down the flattened description, and only keep the last part
-        $id2 = $id[count($id2) - 1];  // eg. "sample:age" --> "age"
+        $id2 = end($id2);            // eg. "sample:age" --> "age"
 
         // formatting options, eg for timestamps
         if (array_key_exists(strtolower($id2), $formats) and !is_null($value)) {
@@ -399,7 +390,7 @@ function getMeta($metadata, $get, $concatenate = "; ", $description = ": ")
     
         // descriptions
         if ($description != false) {
-            $value = ucfirst($id2) . $description . $value;
+            $value = nameMeta($id) . $description . $value;
         }
     
         $metadata[$id] = $value;
@@ -480,31 +471,38 @@ function overrideMeta($metadata, $dataset = false)
 }
 
 /**
- * findDataType($type, $datatypes, $returnAlias = false) 
+ * findDataType($type, $datatypes, $key = false) 
  * 
- * finds the generic or corrected alias for a datatype
+ * finds the generic or key name for a datatype
+ * (if $key=="alias", the corrected alias name will be returned)
  * returns false if not found
  */
-function findDataType($type, $datatypes, $returnAlias = false) 
+function findDataType($type, $datatypes, $key = false) 
 {
-    //$type = trim(strtolower($type));
-    //$type = str_replace(" ", "", $type);
     $type = sanitizeStr($type, "", "+-:^", 1);
     
-    foreach ($datatypes as $generic => $array) {
-        if (isset($array["alias"])) {
-            foreach ($array["alias"] as $alias) {
-                //$clean = trim(strtolower($alias));
-                //$clean = str_replace(" ", "", $clean);
-                $clean = sanitizeStr($alias, "", "+-:^", 1);
-                
-                if ($type == $clean) {
-                    return ($returnAlias ? $alias : $generic);
-                }
-            }
+    foreach ($datatypes as $genericName => $datatypeArray) {
+        // make a list of aliasses, add the generic name to it, and all predefined aliasses
+        $aliasList = array($genericName);
+        if (isset($datatypeArray["alias"])) {
+            $aliasList = array_merge($aliasList, $datatypeArray["alias"]);
         }
-        elseif ($type == $generic) {
-            return $generic;
+
+        foreach ($aliasList as $alias) {
+            $clean = sanitizeStr($alias, "", "+-:^", 1);
+            
+            if ($type == $clean) {
+                if (strtolower($key) === "alias") {
+                    return $alias;
+                } elseif (isset($datatypeArray[strtolower($key)])) {
+                    if (is_string($datatypeArray[strtolower($key)])) {
+                        return $datatypeArray[strtolower($key)];
+                    }
+                }
+
+                // if $key is false, or $key was not found/is no string:
+                return $genericName;
+            }
         }
     }
 
@@ -513,7 +511,17 @@ function findDataType($type, $datatypes, $returnAlias = false)
     return false;
 }
 
-
+/**
+ * findDataTypeUnits($type, $datatypes, $key = "json", $search = Null)
+ * 
+ * extracts a list of axis units/names for a given datatype ($type) from the $DATATYPES json resource.
+ * Includes searching for parent datatype
+ * By default it returns the json-names, other names (or invert booleans) can be requested with the $key.
+ * In absence of $search, the default (first listed) entries for each axis will be returned.
+ * $search is a list of one alternative name per axis to search for; if found, the function
+ * will return the corresponding axis name. If one of the altnames in $search is Null or
+ * False, it will return the default axis name for that entry.
+ */
 function findDataTypeUnits($type, $datatypes, $key = "json", $search = null)
 {
     $results = array();
@@ -709,18 +717,18 @@ function bulmaColorModifier($color, $colorList, $default = null)
  * 
  * The format can be a file extension, or a downloadconverted library setting item in the form of "[convertor:[datatype:]]extension".
  * 
- * The optional $parameters array contains convertor parameters, as can be supplied in the CSV
- * metadata files ("_import:jcamp-dx:template" --> $parameters = $meta["_import"]), and will be
- * supplemented with parameters defined in the import.json/export.json file for the given extension and datatype.
+ * The optional $options array contains convertor options, as can be supplied in the CSV
+ * metadata files ("options:import:jcampdx:templatefile" --> $options = $meta["options"]["import"]), and will be
+ * supplemented with options defined in the import.json/export.json file for the given extension and datatype.
  * If the same parameter with different value is defined in multiple places, than the value defined
  * in the metadata wins over the value in extension, which in turn wins over the value in datatype.
  * 
  * If a convertor is found, this function returns an associative array; the first item (with key "convertor")
- * contains the name of the convertor. Next items are the parameters for this convertor 
- * (eg $parameters["template"] = "Raman785.dxt").
+ * contains the name of the convertor. Next items are the options for this convertor 
+ * (eg $options["templatefile"] = "Raman785.dxt").
  * If no convertor is found, an empty array is returned.
  */
-function selectConvertorClass($convertors, $datatype, $format, $parameters = array())
+function selectConvertorClass($convertors, $datatype, $format, $options = array())
 {
     // cleanup parameters
     $datatype = trim(strtolower($datatype));
@@ -756,27 +764,27 @@ function selectConvertorClass($convertors, $datatype, $format, $parameters = arr
         }
     }
     
-    // evaluate convertor parameters. these can be supplied for specific datatypes, specific file extensions or supplied in the uploaded metadata
-    // return array with first key "convertor", followed by the parameters for this convertor
+    // evaluate convertor options. these can be supplied for specific datatypes, specific file extensions or supplied in the uploaded metadata
+    // return array with first key "convertor", followed by the options for this convertor
     if (isset($convertor)) {
-        $parameters = array_change_key_case($parameters, CASE_LOWER);
-        if (isset($parameters[$convertor])) {
-            // only keep the parameters for this convertor
-            $parameters = $parameters[$convertor];
+        $options = array_change_key_case($options, CASE_LOWER);
+        if (isset($options[$convertor])) {
+            // only keep the options for this convertor
+            $options = $options[$convertor];
         }
         else {
-            $parameters = array();
+            $options = array();
         }
-        // add parameters from the extension (if they are not already set by the metadata)
+        // add options from the extension (if they are not already set by the metadata)
         if (isset($convertors[$convertor]["extensions"][$format_ext])) {
-            $parameters = array_merge($convertors[$convertor]["extensions"][$format_ext], $parameters);
+            $options = array_merge($convertors[$convertor]["extensions"][$format_ext], $options);
         }
-        // add parameters from the datatype (if they are not already set by the metadata or extension)
+        // add options from the datatype (if they are not already set by the metadata or extension)
         if (isset($convertors[$convertor]["datatypes"][$datatype])) {
-            $parameters = array_merge($convertors[$convertor]["datatypes"][$datatype], $parameters);
+            $options = array_merge($convertors[$convertor]["datatypes"][$datatype], $options);
         }
         
-        return array("convertor" => $convertor) + $parameters; 
+        return array("convertor" => $convertor) + $options; 
     }
     else {
         // if no suitable convertor found: return false

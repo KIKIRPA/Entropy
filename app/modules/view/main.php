@@ -72,7 +72,8 @@ if (    (!$isLoggedIn and $MODULES["lib"]["download"]["public"])
         $datatype = findDataType($viewTags["Type"], $DATATYPES);
         $result = selectConvertorClass($EXPORT, $datatype, $format);
         if ($result) {
-            $caption = strtoupper($result["convertor"]) . " (." . strtolower(end(explode(":", $format, 3))) . ")";
+            $temp = explode(":", $format, 3);
+            $caption = strtoupper($result["convertor"]) . " (." . strtolower(end($temp)) . ")";
             $format = encode("conv=" . $format);
 
             if ($viewShowModal) {

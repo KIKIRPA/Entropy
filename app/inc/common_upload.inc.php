@@ -5,12 +5,6 @@ if (count(get_included_files()) == 1) {
     header("Status: 404 Not Found");
     exit("Direct access not permitted.");
 }
-  
-
-// load import php classes
-foreach ($IMPORT as $class => $temp) {
-    include_once(PRIVPATH . 'import/' . strtolower($class) . '/class.php');
-}
 
 
 /**
@@ -112,24 +106,3 @@ function checkMultiUpload($upload, $updir, $prefix = "")
     return false;
 }
 
-
-/**
- * getSpectrumValues($spectrum)
- * $spectrum is a (part of) delimited spectral data (line or complete spectrum)
- * returns an array of values
- */
-function getSpectrumValues($spectrum) 
-{
-    // non-whitespace delimiters; lets hope "," was not used as decimal separator!
-    $delimiters = array(",", ";", ":", "|");
-
-    // replace non-whitespece delimiters by spaces
-    $spectrum = str_replace($delimiters, " ", $spectrum);
-    // replace (single or multiple) whitespaces (space, tab, newline) with a single space
-    $spectrum = preg_replace('/\s+/', ' ', $spectrum);
-    // some implementations put "" around the fields, which seems not necessary for our stuff
-    $spectrum = str_replace("\"", "", $spectrum);
-
-    // spilt line into an array, which we return
-    return explode(" ", $spectrum);
-}

@@ -7,6 +7,7 @@ if (count(get_included_files()) == 1) {
 }
 
 require_once(PRIVPATH . 'inc/common_upload.inc.php');
+require_once(PRIVPATH . 'inc/common_convert.inc.php');
 
 
 /****************************
@@ -46,18 +47,18 @@ try {
         if (isset($transactions[$_REQUEST["op"]])) {
             $tr = $_REQUEST["op"];
         } else {
-            throw new RuntimeException('Invalid transaction ID ' . $tr);
+            throw new Runtime\Exception('Invalid transaction ID ' . $tr);
         }
     
         // check if this user permission
         if (!$user["permissions"]["admin"] and ($transactions[$tr]["user"] != $isLoggedIn)) {
-            throw new RuntimeException('Unauthorised access to transaction ' . $tr);
+            throw new Runtime\Exception('Unauthorised access to transaction ' . $tr);
         }
     
         // check if the transaction dir exists
         $trdir = LIB_PATH . $_REQUEST["lib"] . "/" . $tr . "/";
         if (!file_exists($trdir)) {
-            throw new RuntimeException('Upload directory was not found for '. $tr);
+            throw new Runtime\Exception('Upload directory was not found for '. $tr);
         }
     
         // delete
@@ -66,7 +67,7 @@ try {
             unset($transactions[$tr]);
             $error = writeJSONfile(LIB_PATH . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
             if ($error) {
-                throw new RuntimeException($error);
+                throw new Runtime\Exception($error);
             }
             goto STEP1;
         }
@@ -75,7 +76,7 @@ try {
         if (in_array($transactions[$tr]["action"], array("append", "update", "replace"))) {
             $action = $transactions[$tr]["action"];
         } else {
-            throw new RuntimeException('No valid action for transaction ' . $tr);
+            throw new Runtime\Exception('No valid action for transaction ' . $tr);
         }
     } else {
         // create a new transaction
@@ -88,7 +89,7 @@ try {
         //don't write transactions_open.json at this time, it will create an empty transaction each
     //time STEP1 is opened
     }
-} catch (RuntimeException $e) {
+} catch (Runtime\Exception $e) {
     $errormsg = $e->getMessage();
     eventLog("ERROR", $errormsg  . " [module_import: COMMON]");
     echo "    <span style='color:red'>ERROR: " . $errormsg . "</span><br><br>";
@@ -136,7 +137,6 @@ if ($step <= 2) {
 } elseif ($step == 9) {
     $measurements = readJSONfile($trdir . "_4_transaction.json", false);
 }
-//echo "DEBUG step: " . $step . "<br>";
 
 switch ($step) {
 default:
@@ -301,12 +301,12 @@ STEP2:
         // check and move uploaded file
         $error = checkUpload('upfile', $trdir, "_1_" . $action . ".csv");
         if ($error) {
-            throw new RuntimeException($error);
+            throw new Runtime\Exception($error);
         }
       
         // read CSV file
         if (($handle = fopen($trdir . "_1_" . $action . ".csv", "r")) == false) {
-            throw new RuntimeException('Could not open the CSV file.');
+            throw new Runtime\Exception('Could not open the CSV file.');
         }
       
         // interpret CSV header
@@ -329,7 +329,7 @@ STEP2:
             }
         }
         if (!$delimiter) {
-            throw new RuntimeException('Could not interpret the CSV file (could not find all required fields: ' . implode(', ', $required) . ').');
+            throw new Runtime\Exception('Could not interpret the CSV file (could not find all required fields: ' . implode(', ', $required) . ').');
         }
 
         // Read all measurements into an array
@@ -355,7 +355,7 @@ STEP2:
                     $measurements[$id] = $temp;
                 }   //add this line to the measurements
                 else {
-                    throw new RuntimeException('Error in the CSV file: ' . $key . ' "' . $id . '" occurs more than once.');
+                    throw new Runtime\Exception('Error in the CSV file: ' . $key . ' "' . $id . '" occurs more than once.');
                 }
             }
             unset($id);
@@ -371,7 +371,7 @@ STEP2:
         // Save .json
         $error = writeJSONfile($trdir . "_2_flat.json", $measurements);
         if ($error) {
-            throw new RuntimeException($error);
+            throw new Runtime\Exception($error);
         }
       
         // Update transactions_open.json
@@ -379,9 +379,9 @@ STEP2:
         $transactions[$tr]["step"] = 3;
         $error = writeJSONfile(LIB_PATH . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
         if ($error) {
-            throw new RuntimeException($error);
+            throw new Runtime\Exception($error);
         }
-    } catch (RuntimeException $e) {
+    } catch (Runtime\Exception $e) {
         $errormsg = $e->getMessage();
         eventLog("ERROR", $errormsg . " [module_import: STEP2]");
         echo "    <span style='color:red'>ERROR: " . $errormsg . "</span><br><br>";
@@ -520,7 +520,7 @@ STEP3:
             switch ($param_sani) {
                 case "type":
                     //check if type is set and exists in datatypes.json!!
-                    $val_sani = findDataType(sanitizeStr($value, "", "-+:^", 1), $DATATYPES, true);
+                    $val_sani = findDataType(sanitizeStr($value, "", "-+:^", 1), $DATATYPES, "alias");
                     if (!$val_sani) { // type in CSV does not exist! (findDataType() returned false)
                         $c++;
                         $col = "red";
@@ -570,7 +570,7 @@ STEP3:
             // check dataset fields jcampdxtemplate and type
             if (substr($param_sani, 0, 8) === "dataset:") {
                 if (substr($param_sani, -10) === ":meta:type") {
-                    $val_sani = findDataType(sanitizeStr($value, "", "-+:^", 1), $DATATYPES, true);
+                    $val_sani = findDataType(sanitizeStr($value, "", "-+:^", 1), $DATATYPES, "alias");
                     if (!$val_sani) { // type in CSV does not exist! (findDataType() returned false)
                         $c++;
                         $col = "red";
@@ -685,7 +685,7 @@ STEP3:
         // Save inflated $measurements as .json
         $error = writeJSONfile($trdir . "_3_inflated.json", $measurements);
         if ($error) {
-            throw new RuntimeException($error);
+            throw new Runtime\Exception($error);
         }
       
         //make $list with keys from $columns and values retrieved from $measurements
@@ -703,16 +703,16 @@ STEP3:
         //save list
         $error = writeJSONfile($trdir . "_4_transaction.json", $list);
         if ($error) {
-            throw new RuntimeException($error);
+            throw new Runtime\Exception($error);
         }
       
         // Update transactions_open.json
         $transactions[$tr]["step"] = 5;
         $error = writeJSONfile(LIB_PATH . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
         if ($error) {
-            throw new RuntimeException($error);
+            throw new Runtime\Exception($error);
         }
-    } catch (RuntimeException $e) {
+    } catch (Runtime\Exception $e) {
         $errormsg = $e->getMessage();
         eventLog("ERROR", $errormsg . " [module_import: STEP4]");
         echo "    <span style='color:red'>ERROR: " . $errormsg . "</span><br><br>";
@@ -930,7 +930,7 @@ STEP7:
 {
     $datasets = array_keys($measurements[$_REQUEST["id"]]["dataset"]); //array of dataset names
     $build = false;  // rebuild a data json file
-    
+
     try {
         // 1. check our information
         //    are we updating or creating a new file?
@@ -938,7 +938,7 @@ STEP7:
             //we require a data file for each dataset
             foreach ($datasets as $key => $ds) {
                 if (($_REQUEST["dataUpRadio" . $key] != "new") or (!is_uploaded_file($_FILES["dataUp" . $key]['tmp_name']))) {
-                    throw new RuntimeException('No data file for dataset ' . $ds);
+                    throw new Runtime\Exception('No data file for dataset ' . $ds);
                 }
             }
             
@@ -953,7 +953,7 @@ STEP7:
         } else { // 1.2 UPDATE EXISTING
             // open JSON data file
             if (!file_exists($trdir . $_REQUEST["id"] . ".json")) {
-                throw new RuntimeException('JSON data file not found.');
+                throw new Runtime\Exception('JSON data file not found.');
             } else {
                 $json = readJSONfile($trdir . $_REQUEST["id"] . ".json", false);
             }
@@ -969,31 +969,30 @@ STEP7:
                 $ext = "." . strtolower(pathinfo($_FILES["dataUp" . $key]['name'], PATHINFO_EXTENSION));
                 $error = checkUpload("dataUp" . $key, $trdir, $fn . $ext);
                 if ($error) {
-                    throw new RuntimeException($error);
+                    throw new Runtime\Exception($error);
                 }
                 
-                // fetch import parameters from the metadata (if any)
-                $parameters = array();
-                if (isset($json["_import"])) {
-                    $parameters = $json["_import"];
+                // fetch import options from the metadata (if any)
+                $importOptions = array();
+                if (isset($json["options"]["import"])) {
+                    $importOptions = $json["options"]["import"];
                 } 
 
                 // convert file
                 $data = false;
-                $parameters = selectConvertorClass($IMPORT, findDataType($json["type"], $DATATYPES), $ext, $parameters);
-                if (isset($parameters["convertor"])) {
-                    // create convertor 
-                    $class = "Import" . sanitizeStr($parameters["convertor"], "", "-+:^", 2); // remove illegal symbols from class name (e.g. jcamp-dx -> JCAMPDX)
-                    unset($parameters["convertor"]);
-                    $imported = new $class($trdir . $fn . $ext, $parameters);
-                    $data = $imported->getData();
-                    $error = $imported->getError();
+                $importOptions = selectConvertorClass($IMPORT, findDataType($json["type"], $DATATYPES), $ext, $importOptions);
+                if (isset($importOptions["convertor"])) {
+                    // create convertor        
+                    $className = "Convert\\Import\\" . ucfirst(strtolower($importOptions["convertor"]));
+                    $import = new $className($trdir . $fn . $ext, $importOptions);
+                    $data = $import->getData();
+                    $error = $import->getError();
                     if ($error) {
                         eventLog("WARNING", $error . " File: " . $_FILES["dataUp" . $key]['name'] . " [" . $class . "]");
                     }
                 }
                 if (!$data) {
-                    throw new RuntimeException('Failed to convert ' . $_FILES["dataUp" . $key]['name'] . ': ' .$error);
+                    throw new Runtime\Exception('Failed to convert ' . $_FILES["dataUp" . $key]['name'] . ': ' .$error);
                 }
           
                 // merge with metadata, update original $measurements and set $build
@@ -1011,10 +1010,10 @@ STEP7:
                 // TODO: create a way to read those from the uploaded data (via the importfilters)
                 // TODO: create a way to change them in the data upload form
                 $json["dataset"][$ds]["units"] = findDataTypeUnits( $measurements[$_REQUEST["id"]]["type"], 
-                                                                $DATATYPES, 
-                                                                "json",
-                                                                isset($json["dataset"][$ds]["units"]) ? $json["dataset"][$ds]["units"] : null
-                                                              );
+                                                                    $DATATYPES, 
+                                                                    "json",
+                                                                    isset($json["dataset"][$ds]["units"]) ? $json["dataset"][$ds]["units"] : null
+                                                                  );
             }
         
             // 2.2 process annotations
@@ -1023,19 +1022,20 @@ STEP7:
                 $ext = ".anno";
                 $error = checkUpload("annoUp" . $key, $trdir, $fn . $ext);
                 if ($error) {
-                    throw new RuntimeException($error);
+                    throw new Runtime\Exception($error);
                 }
 
-                // create import convertor class
+                // create import convertor class for annotations
                 $viewer = $DATATYPES[findDataType($json["type"], $DATATYPES)]["viewer"];
-                $imported = new ImportAnnotations($trdir . $fn . $ext, $viewer);
-                $data = $imported->getAnno();
-                $error = $imported->getError();
+                $import = new Convert\Import\Annotations($trdir . $fn . $ext, $viewer);
+                $data = $import->getData();
+                $error = $import->getError();
+
                 if ($error) {
                     eventLog("WARNING", $error . " File: " . $_FILES["annoUp" . $key]['name'] . " [" . $class . "]");
                 }
                 if (!$data) {
-                    throw new RuntimeException('Failed to convert ' . $_FILES["annoUp" . $key]['name'] . ': ' . $error);
+                    throw new Runtime\Exception('Failed to convert ' . $_FILES["annoUp" . $key]['name'] . ': ' . $error);
                 }
           
                 // merge with metadata, $measurements and set $build
@@ -1057,7 +1057,7 @@ STEP7:
                 foreach ($_FILES["binUp" . $key]['name'] as $file) {
                     $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
                     if (in_array($ext, $arr)) {
-                        throw new RuntimeException($ext . ' files cannot be uploaded as binary files.');
+                        throw new Runtime\Exception($ext . ' files cannot be uploaded as binary files.');
                     }
                 }
             
@@ -1073,7 +1073,7 @@ STEP7:
                         }
                     }
                 } else {
-                    throw new RuntimeException($error);
+                    throw new Runtime\Exception($error);
                 }
             
                 $build = true;
@@ -1085,7 +1085,7 @@ STEP7:
             // build JSON data file
             $error = writeJSONfile($trdir . $_REQUEST["id"] . ".json", $json);
             if ($error) {
-                throw new RuntimeException($error);
+                throw new Runtime\Exception($error);
             }
         
             // set _built field in $measurements
@@ -1098,12 +1098,12 @@ STEP7:
             // rebuild JSON measurements_inflated file
             $error = writeJSONfile($trdir . "_3_inflated.json", $measurements);
             if ($error) {
-                throw new RuntimeException($error);
+                throw new Runtime\Exception($error);
             }
         }
       
         goto STEP5;
-    } catch (RuntimeException $e) {
+    } catch (Runtime\Exception $e) {
         $errormsg = $e->getMessage();
         eventLog("ERROR", $errormsg  . " [module_import: STEP7]");
         echo "    <span style='color:red'>ERROR: " . $errormsg . "</span><br><br>";
@@ -1128,18 +1128,18 @@ STEP8:
             $fn = $_REQUEST["id"] . (($ds == 'default')?"":"__".$ds) . "__" . $_REQUEST["f"];
             $success = unlink($trdir . $fn);
             if (!$success) {
-                throw new RuntimeException("Could not remove " . $_REQUEST["f"]);
+                throw new Runtime\Exception("Could not remove " . $_REQUEST["f"]);
             }
         
             // log in inflated json
             unset($measurements[$_REQUEST["id"]]["dataset"][$ds]["_bin"][$i]);
             $error = writeJSONfile($trdir . "_3_inflated.json", $measurements);
             if ($error) {
-                throw new RuntimeException($error);
+                throw new Runtime\Exception($error);
             }
         }
         goto STEP6;
-    } catch (RuntimeException $e) {
+    } catch (Runtime\Exception $e) {
         $errormsg = $e->getMessage();
         eventLog("ERROR", $errormsg  . " [module_import: STEP8]");
         echo "    <span style='color:red'>ERROR: " . $errormsg . "</span><br><br>";
@@ -1173,7 +1173,7 @@ STEP9:
         } elseif ($action == "replace") {
             $result = array();
         } else {
-            throw new RuntimeException("Unknown action " . $action . " in transaction " . $tr);
+            throw new Runtime\Exception("Unknown action " . $action . " in transaction " . $tr);
         }
       
         // walk through our measurements that need to be added or updated
@@ -1192,7 +1192,7 @@ STEP9:
         $path = $trdir . "_5_result_" . date("YmdHis") . ".json";
         $error = writeJSONfile($path, $result);
         if ($error) {
-            throw new RuntimeException($error);
+            throw new Runtime\Exception($error);
         }
         if (file_exists($libdir . "measurements.json")) {
             unlink($libdir . "measurements.json");
@@ -1201,7 +1201,7 @@ STEP9:
         if ($success) {
             echo "<strong>Published</strong> library file<br><br>\n";
         } else {
-            throw new RuntimeException("Could not publish the data into the library!");
+            throw new Runtime\Exception("Could not publish the data into the library!");
         }
       
         // some administration in transactions_open and transactions_closed.json
@@ -1213,7 +1213,7 @@ STEP9:
         writeJSONfile($libdir . "transactions_open.json", $transactions);
       
         echo "      <span style='color:red'>Data successfully merged into library ". $_REQUEST["lib"] ."</span><br>\n";
-    } catch (RuntimeException $e) {
+    } catch (Runtime\Exception $e) {
         $errormsg = $e->getMessage();
         $errormsg .= " PLEASE CHECK THE STATUS OF LIBRARY " . $_REQUEST["lib"] ;
         eventLog("ERROR", $errormsg  . " [module_import: STEP9]", false, true);  //don't exit, but send alertmail

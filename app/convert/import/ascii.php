@@ -1,20 +1,15 @@
 <?php
 
-// prevent direct access to this file (thus only when included)
-if (count(get_included_files()) == 1) {
-    header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
-    header("Status: 404 Not Found");
-    exit("Direct access not permitted.");
-}
+namespace Convert\Import;
 
-class ImportASCII
+class Ascii
 {
     public $data = array();
     public $meta = array();
     public $error = false;
     
     /**
-     * __construct($file, $parameters = array())
+     * __construct($file, $options = array())
      * 
      * Converts an ascii-array into a 2D-array
      * - each line contains coordinates, many (repeated) delimiters supported
@@ -24,9 +19,9 @@ class ImportASCII
      * - supported parameters: none
      * 
      * @param string $file Or a filename (including path), or an array of lines. 
-     * @param array $parameters Specific parameters for this convertor
+     * @param array $options Specific parameters for this convertor
      */
-    function __construct($file, $parameters = array())
+    function __construct($file, $options = array())
     {
         // if $file is a filename, open it as handle and read line by line
         // if $file is an array, foreach through it
@@ -54,6 +49,9 @@ class ImportASCII
                 }
             }
         }
+
+        // sort data
+        if (!orderData($this->data)) eventLog("WARNING", "ASCII import: could not sort the data: " . $file);
     }
 
     public function getData()

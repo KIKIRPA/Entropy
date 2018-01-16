@@ -4,6 +4,7 @@ namespace Convert\Export;
 
 class Ascii
 {
+    public $id;
     public $data = array();
     public $meta = array();
     public $error = false;  // last error msg
@@ -17,7 +18,7 @@ class Ascii
 
     
     /**
-     * __construct($data, $meta = array(), $parameters = array())
+     * __construct($id, $data, $meta = array(), $options = array(), $datatypes = array())
      * 
      * Reads data and metadata for conversion
      * - supported parameters:
@@ -27,12 +28,16 @@ class Ascii
      *     - commentsymbol (default: "# ")      symbols indicating a comment line
      *     - templatefile (default: null)       use template file for metadata
      * 
+     * $datatypes is not used in Convert\Export\Ascii, but is required for compatibility
+     * 
      * @param array $data data array
      * @param array $meta metadata array
-     * @param array $parameters Specific parameters for this convertor
+     * @param array $options Specific parameters for this convertor
      */
-    function __construct($data, $meta = array(), $parameters = array())
+    function __construct($id, $data, $meta = array(), $options = array(), $datatypes = array())
     {
+        $this->id = $id;
+
         if (is_array($data) and !empty($data)) {
             $this->data = $data;
         } else {
@@ -45,38 +50,44 @@ class Ascii
             $this->error = eventLog("WARNING", "Metadata is not in the correct format");
         }
 
-        if (is_array($parameters)) {
-            $parameters = array_change_key_case($parameters, CASE_LOWER);
-            if (isset($parameters["wrapsymbol"])) {
-                $this->wrapSymbol = $parameters["wrapsymbol"];
+        if (is_array($options)) {
+            $options = array_change_key_case($options, CASE_LOWER);
+            if (isset($options["wrapsymbol"])) {
+                $this->wrapSymbol = $options["wrapsymbol"];
             }
-            if (isset($parameters["intraseparator"])) {
-                $this->intraSeparator = $parameters["intraseparator"];
+            if (isset($options["intraseparator"])) {
+                $this->intraSeparator = $options["intraseparator"];
             }
-            if (isset($parameters["interseparator"])) {
-                $this->interSeparator = $parameters["interseparator"];
+            if (isset($options["interseparator"])) {
+                $this->interSeparator = $options["interseparator"];
             }
-            if (isset($parameters["commentsymbol"])) {
-                $this->commentSymbol = $parameters["commentsymbol"];
+            if (isset($options["commentsymbol"])) {
+                $this->commentSymbol = $options["commentsymbol"];
             }
-            if (isset($parameters["templatefile"])) {
-                $this->templateFile = $parameters["templatefile"];
+            if (isset($options["templatefile"])) {
+                // locate template
+                if (file_exists(TEMPLATES_PATH . $options["templatefile"])) {
+                    $this->templateFile = $options["templatefile"];
+                } else {
+                    $this->error = eventLog("WARNING", "ASCII template could not be not found: " . $options["templatefile"]);
+                }
             }
         } else {
             $this->error = eventLog("WARNING", "Metadata is not in the correct format");
         }
     }
 
-    public function getFile($getMeta = true) {
+    public function getFile($getMeta = true)
+    {
         try {
-            //open a temporary file
-            $handle = tmpfile();
-
             // don't even start if the __construct gave an error
             if ($this->error) {
-                throw new Exception("Failed to export to ASCII because of incorrect data");
+                throw new \Exception("Failed to export to ASCII because of incorrect data");
             }
 
+            //open a temporary file
+            $handle = tmpfile();
+            
             // build metadata
             if ($getMeta) {
                 if ($this->templateFile != null) {
@@ -86,17 +97,19 @@ class Ascii
                 }
                 fwrite($handle, "\r\n");
             }
-
+            
             // stop if the metadata export went wrong
             if ($this->error) {
-                throw new Exception("Failed to export to ASCII because of error in generating the metadata");
+                throw new \Exception("Failed to export to ASCII because of error in generating the metadata");
             }
 
             //build data
             fwrite($handle, $this->_data());
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
+            echo "CATCH<br>";
             $this->error = eventLog("WARNING", $e->getMessage());
-            fclose($handle); // this removes the file
+            if (isset($handle))             
+                fclose($handle); // this removes the file
             return false;
         }
         
@@ -127,63 +140,22 @@ class Ascii
         return implode("\r\n", $array);
     }
 
-    private function _metaTemplate($filename)
+    private function _metaTemplate()
     {
-        $array = array();
+        $specificCodes = array(
+            "_id" => $this->id,
+        );
+        
+        $lines = fillTemplateWithMeta(TEMPLATES_PATH . $this->templateFile, $this->meta, $specificCodes);
 
-        if (file_exists(TEMPLATES_PATH . $filename)) {
-            $handle = fopen(TEMPLATES_PATH . $filename, "r");
-            if ($handle) {
-                // read the template file line by line
-                while (($line = fgets($handle)) !== false) {
-                    // find {codes} and replace them
-                    $codes = $this->_findCodesInTemplate($line);
-                    foreach ($codes as $code) {
-                        $search = "{" . $code . "}";
-                        $replace = getMeta($this->meta, $code);
-                        $line = str_replace($search, $replace, $line);
-                    }          
-                    // only save lines that contain more than whitespace
-                    if (trim($line) != "") {
-                        $array[] = $line;
-                    }
-                }
-                fclose($handle);
-            } else {
-                $this->error = eventLog("WARNING", "ASCII export template could not be read: " . $filename);
-            } 
-
+        if (is_array($lines)) {
+            return implode("", $lines);
         } else {
-            $this->error = eventLog("WARNING", "ASCII export template not found: " . $filename);
+            $this->error = eventLog("WARNING", "Failed to export to ASCII because of error in reading the metadata template file");
+            return "";
         }
-
-        return implode("\r\n", $array);
     }
 
-    private function _findCodesInTemplate($string, $openTag = "{", $closeTag = "}")
-    {
-        $close = 0;
-        $codes = array();
-
-        // loop over the string and find all openTags
-        do {
-            $open = stripos($string, $openTag, $close);
-            if ($open !== false)
-            {
-                // if an opentag is found at position 'open', find a closeTag starting from that position
-                $close = stripos($string, $closeTag, $open);
-                if ($close !== false) {
-                    // if closetag is found, add the contents between openTag and closeTag to codes array
-                    $codes[] = substr($string, $open + 1, $close - $open - 1);
-                } else {
-                    // if closeTag is not found, break loop
-                    break;
-                }
-            }
-        } while ($open !== false); // if an openTag was found, try to find another; if not, stop loop
-
-        return $codes;
-    }
 
     public function getError()
     {
