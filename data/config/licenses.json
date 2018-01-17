@@ -1,40 +1,56 @@
 {
     "ccbyncnd": {
+        "short": "CC by-nc-nd 4.0",
+        "long": "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License",
         "icon": "https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png",
         "html": "<a rel='license' href='http://creativecommons.org/licenses/by-nc-nd/4.0/'><img alt='Creative Commons License' style='border-width:0' src='https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png' /></a><br />This dataset is licensed under a <a rel='license' href='http://creativecommons.org/licenses/by-nc-nd/4.0/'>Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.",
         "jcampdx": "This dataset is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License (http://creativecommons.org/licenses/by-nc-nd/4.0/)"
     },
     "ccbyncsa": {
+        "short": "CC by-nc-sa 4.0",
+        "long": "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License",
         "icon": "https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png",
         "html": "<a rel='license' href='http://creativecommons.org/licenses/by-nc-sa/4.0/'><img alt='Creative Commons License' style='border-width:0' src='https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png' /></a><br />This dataset is licensed under a <a rel='license' href='http://creativecommons.org/licenses/by-nc-sa/4.0/'>Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.",
         "jcampdx": "This dataset is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (http://creativecommons.org/licenses/by-nc-sa/4.0/)"
     },
     "ccbync": {
+        "short": "CC by-nc 4.0",
+        "long": "Creative Commons Attribution-NonCommercial 4.0 International License",
         "icon": "https://i.creativecommons.org/l/by-nc/4.0/88x31.png",
         "html": "<a rel='license' href='http://creativecommons.org/licenses/by-nc/4.0/'><img alt='Creative Commons License' style='border-width:0' src='https://i.creativecommons.org/l/by-nc/4.0/88x31.png' /></a><br />This dataset is licensed under a <a rel='license' href='http://creativecommons.org/licenses/by-nc/4.0/'>Creative Commons Attribution-NonCommercial 4.0 International License</a>.",
         "jcampdx": "This dataset is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License (http://creativecommons.org/licenses/by-nc/4.0/)"
     },
     "ccbynd": {
+        "short": "CC by-nd 4.0",
+        "long": "Creative Commons Attribution-NoDerivatives 4.0 International License",
         "icon": "https://i.creativecommons.org/l/by-nd/4.0/88x31.png",
         "html": "<a rel='license' href='http://creativecommons.org/licenses/by-nd/4.0/'><img alt='Creative Commons License' style='border-width:0' src='https://i.creativecommons.org/l/by-nd/4.0/88x31.png' /></a><br />This dataset is licensed under a <a rel='license' href='http://creativecommons.org/licenses/by-nd/4.0/'>Creative Commons Attribution-NoDerivatives 4.0 International License</a>.",
         "jcampdx": "This dataset is licensed under a Creative Commons Attribution-NoDerivatives 4.0 International License (http://creativecommons.org/licenses/by-nd/4.0/)"
     },
     "ccbysa": {
+        "short": "CC by-sa 4.0",
+        "long": "Creative Commons Attribution-ShareAlike 4.0 International License",
         "icon": "https://i.creativecommons.org/l/by-sa/4.0/88x31.png",
         "html": "<a rel='license' href='http://creativecommons.org/licenses/by-sa/4.0/'><img alt='Creative Commons License' style='border-width:0' src='https://i.creativecommons.org/l/by-sa/4.0/88x31.png' /></a><br />This dataset is licensed under a <a rel='license' href='http://creativecommons.org/licenses/by-sa/4.0/'>Creative Commons Attribution-ShareAlike 4.0 International License</a>.",
         "jcampdx": "This dataset is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License (http://creativecommons.org/licenses/by-sa/4.0/)"
     },
     "ccby": {
+        "short": "CC by 4.0",
+        "long": "Creative Commons Attribution 4.0 International License",
         "icon": "https://i.creativecommons.org/l/by/4.0/88x31.png",
         "html": "<a rel='license' href='http://creativecommons.org/licenses/by/4.0/'><img alt='Creative Commons License' style='border-width:0' src='https://i.creativecommons.org/l/by/4.0/88x31.png' /></a><br />This dataset is licensed under a <a rel='license' href='http://creativecommons.org/licenses/by/4.0/'>Creative Commons Attribution 4.0 International License</a>.",
         "jcampdx": "This dataset is licensed under a Creative Commons Attribution 4.0 International License (http://creativecommons.org/licenses/by/4.0/)"
     },
     "cc0": {
+        "short": "CC0",
+        "long": "Creative Commons CC0 1.0 public domain waiver",
         "icon": "https://i.creativecommons.org/p/zero/1.0/88x31.png",
         "html": "<a rel='license' href='http://creativecommons.org/publicdomain/zero/1.0/'><img src='http://i.creativecommons.org/p/zero/1.0/88x31.png' style='border-style: none;' alt='CC0' /></a><br />To the extent possible under law, the person who associated CC0 with this dataset has waived all copyright and related or neighboring rights to this dataset.</p>",
         "jcampdx": "To the extent possible under law, the person who associated CC0 with this dataset has waived all copyright and related or neighboring rights to this dataset (http://creativecommons.org/publicdomain/zero/1.0/)"
     },
     "ccmark": {
+        "short": "CC PDM",
+        "long": "Creative Commons public domain mark",
         "icon": "https://i.creativecommons.org/p/mark/1.0/88x31.png",
         "html": "<a rel='license' href='http://creativecommons.org/publicdomain/mark/1.0/'><img src='http://i.creativecommons.org/p/mark/1.0/88x31.png' style='border-style: none;' alt='Public Domain Mark' /></a><br />This dataset is free of known copyright restrictions.",
         "jcampdx": "This dataset is free of known copyright restrictions. (http://creativecommons.org/publicdomain/mark/1.0/)"
