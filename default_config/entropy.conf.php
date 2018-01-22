@@ -34,6 +34,7 @@ const DATATYPES_FILE = CONFIG_PATH . "datatypes.json";
 const COLORS_FILE    = CONFIG_PATH . "colors.json";
 const IMPORT_FILE    = CONFIG_PATH . "import.json";
 const EXPORT_FILE    = CONFIG_PATH . "export.json";
+const LICENSES_FILE  = CONFIG_PATH . "licenses.json";
 
 // repository storage
 const LIB_FILE       = LIB_PATH . "libraries.json";

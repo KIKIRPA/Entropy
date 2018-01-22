@@ -397,6 +397,37 @@ if (count(get_included_files()) == 1) {
                         </div>
                     </div>
                     <br>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label" for="le_lic">Default license</label>
+                        </div>
+                        <div class="field-body">
+                            <div class="field">
+
+
+
+
+                            
+                                <div id="dynamicInputBin">
+<?php                             foreach ($preset["downloadbinary"] as $item): ?>
+                                    <div class="control">
+                                        <input type="text" id="le_bin" name="downloadbinary[]" maxlength=12 class="input" value="<?= $item ?>"><br><br>
+                                    </div>
+<?php                             endforeach; ?>
+                                </div>
+                                <p class="control">
+                                    <button type="button" class="button is-small" onClick="addBin('dynamicInputBin');">
+                                        <span class="icon is-small"><i class="fa fa-plus-circle" aria-hidden="true"></i></span>
+                                        <span>Add item</span>
+                                    </button>
+                                </p>
+                                <p class="help">
+                                    Allow the user to download specific binary file formats (uploaded as such). The format of the file is determined by its file extension.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
 <?php             endif; ?>
 
                     <div class="field is-horizontal">

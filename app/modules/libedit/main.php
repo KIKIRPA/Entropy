@@ -91,7 +91,8 @@ if ($f == "set") {
                      "references" => 3,
                      "listcolumns" => 4,
                      "downloadconverted" => 4,
-                     "downloadbinary" => 5
+                     "downloadbinary" => 5,
+                     "license" => 1
                    );
 
     foreach ($params as $item => $category) {
@@ -171,7 +172,8 @@ if (($f == "edit") or ($f == "set") or ($f == "warning")) {
                      "references" => array(),
                      "listcolumns" => array(),
                      "downloadconverted" => array(),
-                     "downloadbinary" => array()
+                     "downloadbinary" => array(),
+                     "license" => ""
     );
 
     // load preset data from unsaved $_REQUEST[] in case of $f==warning
