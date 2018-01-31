@@ -35,8 +35,6 @@ if (isset($_REQUEST["set"])) {
     } else {
         $f="warning";
         $notifications[] = array("warning", "Some data is missing: (requires a unique identifier" . ($startPage ? "" : ", name, navigation menu caption") . " and viewabililty setting)");
-        echo "lib " . $_REQUEST["lib"] . "<br>";
-        echo "view " . $_REQUEST["view"] . "<br>";
     }
 } else {
     $f="edit";
@@ -77,7 +75,7 @@ if ($startPage) {
 ********************************************************* */
 
 if ($f == "set") {
-    // make array and fill it with (corrected) $_REQUEST parameters in logical order (1=strings, 2=colors, 3=arrays, 4=arrays that need sanitizeStr) 
+    // make array and fill it with (corrected) $_REQUEST parameters in logical order (1=strings, 2=colors, 3=arrays, 4/5=arrays that need sanitizeStr, 6=special case for license) 
     $newLib = array();
     $params = array( "name" => 1,
                      "navmenucaption" => 1,
@@ -92,7 +90,7 @@ if ($f == "set") {
                      "listcolumns" => 4,
                      "downloadconverted" => 4,
                      "downloadbinary" => 5,
-                     "license" => 1
+                     "license" => 6
                    );
 
     foreach ($params as $item => $category) {
@@ -136,6 +134,18 @@ if ($f == "set") {
                         }
                     }
                     break;
+                case 6: // special case for license
+                    switch ($_REQUEST[$item]) {
+                        case "_NONE":
+                            break;  // don't even create an empty license setting
+                        case "_OTHER":
+                            if (isset($_REQUEST["otherlicense"]))
+                                $newLib[$item] = trim($_REQUEST["otherlicense"]);
+                            break;
+                        default:
+                            $newLib[$item] = $_REQUEST[$item];
+                            break;
+                    }
             }
         }
     }
@@ -173,7 +183,8 @@ if (($f == "edit") or ($f == "set") or ($f == "warning")) {
                      "listcolumns" => array(),
                      "downloadconverted" => array(),
                      "downloadbinary" => array(),
-                     "license" => ""
+                     "license" => "",
+                     "otherlicense" => ""
     );
 
     // load preset data from unsaved $_REQUEST[] in case of $f==warning
@@ -189,6 +200,26 @@ if (($f == "edit") or ($f == "set") or ($f == "warning")) {
         foreach ($LIBS[$libeditId] as $i => $item) {
             $preset[$i] = $item;
         }
+    }
+
+    // fetch licenses for template
+    $licenseList = array();
+    $licenseList["_NONE"] = "None";
+    $licenseList += \Core\Config\Licenses::getList("long");
+    $licenseList["_OTHER"] = "Other";
+
+    // check actual license if set: none, predefined or other license
+    if (!empty($preset["license"])) {
+        $actualLicense = \Core\Config\Licenses::searchForNeedle($preset["license"]);
+        
+        if ($actualLicense) { // if predefined license, make sure we call it by its id
+            $preset["license"] = $actualLicense;
+        } else {              // if other license, put it in the otherlicense preset
+            $preset["otherlicense"] = $preset["license"];
+            $preset["license"] = "_OTHER";
+        }
+    } else {
+        $preset["license"] = "_NONE";
     }
 }
 

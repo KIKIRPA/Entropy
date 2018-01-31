@@ -206,7 +206,7 @@ function readJSONfile($path, $dieOnError = false)
     }
     
     if (empty($array)) {
-        eventLog("WARNING", "Could not read " . pathinfo($path, PATHINFO_FILENAME) . " file", true, $dieOnError);
+        eventLog("WARNING", "Could not read " . $path . " file", $dieOnError, $dieOnError);
     }
 
     return $array;

@@ -2,7 +2,7 @@
 
 namespace Core\Config;
 
-class License
+class Licenses
 {
     /**
      * Construct won't be called inside this class and is uncallable from
@@ -36,7 +36,7 @@ class License
         self::init();
         $array = array();
 
-        foreach (self::$config as $id -> $types) {
+        foreach (self::$config as $id => $types) {
             if (!is_null($type)) {
                 if (isset($types[$type])) {
                     $array[$id] = $types[$type];
