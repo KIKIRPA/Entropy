@@ -48,8 +48,8 @@ try {
         $data = $data["dataset"][$showDS]["data"];
         //$units
 
-        if (isset($data["options"]["import"])) 
-            $exportOptions = $meta["_export"];
+        if (isset($data["options"]["export"])) 
+            $exportOptions = $data["options"]["export"];
         else
             $exportOptions = array(); 
 
