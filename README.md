@@ -19,7 +19,7 @@ Although Entropy is considered relatively stable (beta), the authors cannot be h
 - ~~File conversion from/to common file formats for Raman spectroscopy~~
 - ~~Flexible file-based data storage (database-less)~~
 - ~~Mass import of data (metadata supplied as comma-separated-values file)~~
-- Terms of usage / licensing on measurement, library and repository levels
+- ~~Terms of usage / licensing on measurement, library and repository levels~~
 
 ### M2
 - Multi-user (user and permission management)
