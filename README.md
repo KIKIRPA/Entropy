@@ -1,6 +1,6 @@
 [![PHP: 7.0 7.1](https://img.shields.io/badge/PHP-7.0%207.1-green.svg)](http://www.php.net)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![stability-testing](https://img.shields.io/badge/stability-testing-yellow.svg)]
+![stability-testing](https://img.shields.io/badge/stability-testing-yellow.svg)
 
 # Entropy
 Analytical data repository for Cultural Heritage laboratories
