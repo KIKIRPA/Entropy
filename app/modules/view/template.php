@@ -42,15 +42,15 @@ if (count(get_included_files()) == 1) {
 <?php                  require_once(PRIVPATH . "viewers/" .  $viewer . "/main.php"); ?>
                     </div>
                     <div class="column is-one-quarter">
+<?php                 if ($viewLicense): ?>
                         <div class="box">
                             <h1 class="title is-5">License</h1>
                             <hr>
                             <div class="is-size-7 has-text-centered">
-                                <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Dataset" property="dct:title" rel="dct:type">
-                                    <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
-                                </span>
+                                <?= $viewLicense ?>
                             </div>
                         </div>
+<?php                 endif; ?>
 <?php                 if ($viewDownloadEnabled): ?>
                         <div class="box">
                             <h1 class="title is-5">Download</h1>

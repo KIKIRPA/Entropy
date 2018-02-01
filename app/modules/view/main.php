@@ -111,6 +111,28 @@ if (    (!$isLoggedIn and $MODULES["lib"]["download"]["public"])
 unset ($cookie, $code, $format, $prefix, $binfiles);
 
 
+/* ********
+  license
+  ******** */
+
+$viewLicense = false;
+
+// search license in data file, library or system settings
+if (isset($meta["license"])) {
+    $viewLicense = $meta["license"];
+} elseif (isset($LIBS[$showLib]["license"])) {
+    $viewLicense = $LIBS[$showLib]["license"];
+} elseif (!empty(DEFAULT_LICENSE)) {
+    $viewLicense = DEFAULT_LICENSE;
+}
+
+// if the license is a predefined one, replace it with the html version
+if ($viewLicense) {
+    $viewLicenseHtml = \Core\Config\Licenses::searchForNeedle($viewLicense, "html");
+    if ($viewLicenseHtml) {
+        $viewLicense = $viewLicenseHtml;
+    }
+}
 
 /* ********
   viewer
@@ -136,7 +158,7 @@ if (isset($data["dataset"][$showDS]["anno"])) {
    ********** */
 
 $viewMetadata = array();
-$metaNoShow = array("type", "jcampdxtemplate");
+$metaNoShow = array("id", "type", "units", "annotations", "attachements", "options", "data", "linkeddata");
 $i = 0;
 foreach ($meta as $key => $item) {
     if (!in_array($key, $metaNoShow)) {

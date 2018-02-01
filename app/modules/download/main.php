@@ -48,12 +48,28 @@ try {
         $data = $data["dataset"][$showDS]["data"];
         //$units
 
-        if (isset($data["options"]["import"])) 
-            $exportOptions = $meta["_export"];
+        if (isset($data["options"]["export"])) 
+            $exportOptions = $data["options"]["export"];
         else
             $exportOptions = array(); 
 
-        // remove metadata starting with underscore from meta
+        // remove things from meta that are not metadata (in a broad sense: keep units, type, id)
+        unset($meta["annotations"], $meta["attachements"], $meta["options"], $meta["data"], $meta["linkeddata"]);
+
+        // set/adjust license
+        if (!isset($meta["license"])) { // if no license in data file, search license in library or system settings
+            if (isset($LIBS[$showLib]["license"])) {
+                $meta["license"] = $LIBS[$showLib]["license"];
+            } elseif (!empty(DEFAULT_LICENSE)) {
+                $meta["license"] = DEFAULT_LICENSE;
+            }
+        }
+        if (isset($meta["license"])) { // if the license is a predefined one, replace it with the textonly version
+            $textonly = \Core\Config\Licenses::searchForNeedle($viewLicense, "textonly");
+            if ($textonly) {
+                $meta["license"] = $textonly;
+            }
+        }
 
     } else {
         throw new \Exception("Error in download code");

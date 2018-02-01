@@ -24,6 +24,7 @@ const HEADER_FILE    = PRIVPATH . 'inc/header.inc.php';
 const FOOTER_FILE    = PRIVPATH . 'inc/footer.inc.php';
 const FOOTER_BOX     = "<p><strong>Footer text box</strong></p><p>Link to privacy policy</p>";
 const MAIL_ADMIN     = "";
+const DEFAULT_LICENSE = "CC by-nc-nd 4.0";
 
 // json configuration files
 const USERS_FILE     = CONFIG_PATH . "users.json";
@@ -33,6 +34,7 @@ const DATATYPES_FILE = CONFIG_PATH . "datatypes.json";
 const COLORS_FILE    = CONFIG_PATH . "colors.json";
 const IMPORT_FILE    = CONFIG_PATH . "import.json";
 const EXPORT_FILE    = CONFIG_PATH . "export.json";
+const LICENSES_FILE  = CONFIG_PATH . "licenses.json";
 
 // repository storage
 const LIB_FILE       = LIB_PATH . "libraries.json";

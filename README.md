@@ -1,24 +1,25 @@
 [![PHP: 7.0 7.1](https://img.shields.io/badge/PHP-7.0%207.1-green.svg)](http://www.php.net)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![stability-experimental](https://img.shields.io/badge/stability-experimental-orange.svg)](https://github.com/emersion/stability-badges#experimental)
+![stability-testing](https://img.shields.io/badge/stability-testing-yellow.svg)
 
 # Entropy
 Analytical data repository for Cultural Heritage laboratories
 
 ## Status
 
-EXPERIMENTAL - UNSTABLE
+BETA / TESTING
 
-Entropy is under heavy development and may or may not function. Expect it to fail, destroy all your irreplaceable data, vaporize your server, kill your dog and start a world-wide nuclear war. THERE IS NO WARRANTY WHATSOEVER FOR THE PROGRAM. You have been warned!
+Although Entropy is considered relatively stable (beta), the authors cannot be held accountable for any damage that is caused by installing or operating this software. THERE IS NO WARRANTY WHATSOEVER FOR THE PROGRAM.
 
 ## Planned milestones
 
 ### M1
 - ~~Single user (more users are possible, but no front-end)~~
 - ~~Twodimensional data (spectra)~~
-- File conversion ~~from~~/to common file formats for Raman spectroscopy
+- ~~File conversion from/to common file formats for Raman spectroscopy~~
 - ~~Flexible file-based data storage (database-less)~~
 - ~~Mass import of data (metadata supplied as comma-separated-values file)~~
+- ~~Terms of usage / licensing on measurement, library and repository levels~~
 
 ### M2
 - Multi-user (user and permission management)

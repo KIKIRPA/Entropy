@@ -19,7 +19,7 @@ require_once(PRIVPATH . 'inc/common_basic.inc.php');
     - datatypes.json  --> $DATATYPES
   ***********************************************************************************/
 
-$BLACKLIST = readJSONfile(BLACKLIST_FILE, false);
+$BLACKLIST = readJSONfile(BLACKLIST_FILE);
 $USERS     = readJSONfile(USERS_FILE);
 
 $MODULES   = readJSONfile(MODULES_FILE, true);
