@@ -84,7 +84,7 @@
         },
         "usermgmt": {
             "caption": "User management",
-            "navMenuShow": true,
+            "navMenuShow": false,
             "public": false
         },
         "log": {
@@ -94,7 +94,7 @@
         },
         "config": {
             "caption": "Configuration",
-            "navMenuShow": true,
+            "navMenuShow": false,
             "public": false
         },
         "specformat": {
@@ -104,7 +104,7 @@
         },
         "user": {
             "caption": "My details",
-            "navMenuShow": true,
+            "navMenuShow": false,
             "public": false
         },
         "admin": {
