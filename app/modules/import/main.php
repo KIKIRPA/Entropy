@@ -47,18 +47,18 @@ try {
         if (isset($transactions[$_REQUEST["op"]])) {
             $tr = $_REQUEST["op"];
         } else {
-            throw new Runtime\Exception('Invalid transaction ID ' . $tr);
+            throw new \Exception('Invalid transaction ID ' . $tr);
         }
     
         // check if this user permission
         if (!$user["permissions"]["admin"] and ($transactions[$tr]["user"] != $isLoggedIn)) {
-            throw new Runtime\Exception('Unauthorised access to transaction ' . $tr);
+            throw new \Exception('Unauthorised access to transaction ' . $tr);
         }
     
         // check if the transaction dir exists
         $trdir = LIB_PATH . $_REQUEST["lib"] . "/" . $tr . "/";
         if (!file_exists($trdir)) {
-            throw new Runtime\Exception('Upload directory was not found for '. $tr);
+            throw new \Exception('Upload directory was not found for '. $tr);
         }
     
         // delete
@@ -67,7 +67,7 @@ try {
             unset($transactions[$tr]);
             $error = writeJSONfile(LIB_PATH . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
             if ($error) {
-                throw new Runtime\Exception($error);
+                throw new \Exception($error);
             }
             goto STEP1;
         }
@@ -76,7 +76,7 @@ try {
         if (in_array($transactions[$tr]["action"], array("append", "update", "replace"))) {
             $action = $transactions[$tr]["action"];
         } else {
-            throw new Runtime\Exception('No valid action for transaction ' . $tr);
+            throw new \Exception('No valid action for transaction ' . $tr);
         }
     } else {
         // create a new transaction
@@ -89,7 +89,7 @@ try {
         //don't write transactions_open.json at this time, it will create an empty transaction each
     //time STEP1 is opened
     }
-} catch (Runtime\Exception $e) {
+} catch (\Exception $e) {
     $errormsg = $e->getMessage();
     eventLog("ERROR", $errormsg  . " [module_import: COMMON]");
     echo "    <span style='color:red'>ERROR: " . $errormsg . "</span><br><br>";
@@ -301,12 +301,12 @@ STEP2:
         // check and move uploaded file
         $error = checkUpload('upfile', $trdir, "_1_" . $action . ".csv");
         if ($error) {
-            throw new Runtime\Exception($error);
+            throw new \Exception($error);
         }
       
         // read CSV file
         if (($handle = fopen($trdir . "_1_" . $action . ".csv", "r")) == false) {
-            throw new Runtime\Exception('Could not open the CSV file.');
+            throw new \Exception('Could not open the CSV file.');
         }
       
         // interpret CSV header
@@ -329,7 +329,7 @@ STEP2:
             }
         }
         if (!$delimiter) {
-            throw new Runtime\Exception('Could not interpret the CSV file (could not find all required fields: ' . implode(', ', $required) . ').');
+            throw new \Exception('Could not interpret the CSV file (could not find all required fields: ' . implode(', ', $required) . ').');
         }
 
         // Read all measurements into an array
@@ -355,7 +355,7 @@ STEP2:
                     $measurements[$id] = $temp;
                 }   //add this line to the measurements
                 else {
-                    throw new Runtime\Exception('Error in the CSV file: ' . $key . ' "' . $id . '" occurs more than once.');
+                    throw new \Exception('Error in the CSV file: ' . $key . ' "' . $id . '" occurs more than once.');
                 }
             }
             unset($id);
@@ -371,7 +371,7 @@ STEP2:
         // Save .json
         $error = writeJSONfile($trdir . "_2_flat.json", $measurements);
         if ($error) {
-            throw new Runtime\Exception($error);
+            throw new \Exception($error);
         }
       
         // Update transactions_open.json
@@ -379,9 +379,9 @@ STEP2:
         $transactions[$tr]["step"] = 3;
         $error = writeJSONfile(LIB_PATH . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
         if ($error) {
-            throw new Runtime\Exception($error);
+            throw new \Exception($error);
         }
-    } catch (Runtime\Exception $e) {
+    } catch (\Exception $e) {
         $errormsg = $e->getMessage();
         eventLog("ERROR", $errormsg . " [module_import: STEP2]");
         echo "    <span style='color:red'>ERROR: " . $errormsg . "</span><br><br>";
@@ -685,7 +685,7 @@ STEP3:
         // Save inflated $measurements as .json
         $error = writeJSONfile($trdir . "_3_inflated.json", $measurements);
         if ($error) {
-            throw new Runtime\Exception($error);
+            throw new \Exception($error);
         }
       
         //make $list with keys from $columns and values retrieved from $measurements
@@ -703,16 +703,16 @@ STEP3:
         //save list
         $error = writeJSONfile($trdir . "_4_transaction.json", $list);
         if ($error) {
-            throw new Runtime\Exception($error);
+            throw new \Exception($error);
         }
       
         // Update transactions_open.json
         $transactions[$tr]["step"] = 5;
         $error = writeJSONfile(LIB_PATH . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
         if ($error) {
-            throw new Runtime\Exception($error);
+            throw new \Exception($error);
         }
-    } catch (Runtime\Exception $e) {
+    } catch (\Exception $e) {
         $errormsg = $e->getMessage();
         eventLog("ERROR", $errormsg . " [module_import: STEP4]");
         echo "    <span style='color:red'>ERROR: " . $errormsg . "</span><br><br>";
@@ -938,7 +938,7 @@ STEP7:
             //we require a data file for each dataset
             foreach ($datasets as $key => $ds) {
                 if (($_REQUEST["dataUpRadio" . $key] != "new") or (!is_uploaded_file($_FILES["dataUp" . $key]['tmp_name']))) {
-                    throw new Runtime\Exception('No data file for dataset ' . $ds);
+                    throw new \Exception('No data file for dataset ' . $ds);
                 }
             }
             
@@ -953,7 +953,7 @@ STEP7:
         } else { // 1.2 UPDATE EXISTING
             // open JSON data file
             if (!file_exists($trdir . $_REQUEST["id"] . ".json")) {
-                throw new Runtime\Exception('JSON data file not found.');
+                throw new \Exception('JSON data file not found.');
             } else {
                 $json = readJSONfile($trdir . $_REQUEST["id"] . ".json", false);
             }
@@ -969,7 +969,7 @@ STEP7:
                 $ext = "." . strtolower(pathinfo($_FILES["dataUp" . $key]['name'], PATHINFO_EXTENSION));
                 $error = checkUpload("dataUp" . $key, $trdir, $fn . $ext);
                 if ($error) {
-                    throw new Runtime\Exception($error);
+                    throw new \Exception($error);
                 }
                 
                 // fetch import options from the metadata (if any)
@@ -992,7 +992,7 @@ STEP7:
                     }
                 }
                 if (!$data) {
-                    throw new Runtime\Exception('Failed to convert ' . $_FILES["dataUp" . $key]['name'] . ': ' .$error);
+                    throw new \Exception('Failed to convert ' . $_FILES["dataUp" . $key]['name'] . ': ' .$error);
                 }
           
                 // merge with metadata, update original $measurements and set $build
@@ -1022,7 +1022,7 @@ STEP7:
                 $ext = ".anno";
                 $error = checkUpload("annoUp" . $key, $trdir, $fn . $ext);
                 if ($error) {
-                    throw new Runtime\Exception($error);
+                    throw new \Exception($error);
                 }
 
                 // create import convertor class for annotations
@@ -1035,7 +1035,7 @@ STEP7:
                     eventLog("WARNING", $error . " File: " . $_FILES["annoUp" . $key]['name'] . " [" . $class . "]");
                 }
                 if (!$data) {
-                    throw new Runtime\Exception('Failed to convert ' . $_FILES["annoUp" . $key]['name'] . ': ' . $error);
+                    throw new \Exception('Failed to convert ' . $_FILES["annoUp" . $key]['name'] . ': ' . $error);
                 }
           
                 // merge with metadata, $measurements and set $build
@@ -1057,7 +1057,7 @@ STEP7:
                 foreach ($_FILES["binUp" . $key]['name'] as $file) {
                     $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
                     if (in_array($ext, $arr)) {
-                        throw new Runtime\Exception($ext . ' files cannot be uploaded as binary files.');
+                        throw new \Exception($ext . ' files cannot be uploaded as binary files.');
                     }
                 }
             
@@ -1073,7 +1073,7 @@ STEP7:
                         }
                     }
                 } else {
-                    throw new Runtime\Exception($error);
+                    throw new \Exception($error);
                 }
             
                 $build = true;
@@ -1085,7 +1085,7 @@ STEP7:
             // build JSON data file
             $error = writeJSONfile($trdir . $_REQUEST["id"] . ".json", $json);
             if ($error) {
-                throw new Runtime\Exception($error);
+                throw new \Exception($error);
             }
         
             // set _built field in $measurements
@@ -1098,12 +1098,12 @@ STEP7:
             // rebuild JSON measurements_inflated file
             $error = writeJSONfile($trdir . "_3_inflated.json", $measurements);
             if ($error) {
-                throw new Runtime\Exception($error);
+                throw new \Exception($error);
             }
         }
       
         goto STEP5;
-    } catch (Runtime\Exception $e) {
+    } catch (\Exception $e) {
         $errormsg = $e->getMessage();
         eventLog("ERROR", $errormsg  . " [module_import: STEP7]");
         echo "    <span style='color:red'>ERROR: " . $errormsg . "</span><br><br>";
@@ -1128,18 +1128,18 @@ STEP8:
             $fn = $_REQUEST["id"] . (($ds == 'default')?"":"__".$ds) . "__" . $_REQUEST["f"];
             $success = unlink($trdir . $fn);
             if (!$success) {
-                throw new Runtime\Exception("Could not remove " . $_REQUEST["f"]);
+                throw new \Exception("Could not remove " . $_REQUEST["f"]);
             }
         
             // log in inflated json
             unset($measurements[$_REQUEST["id"]]["dataset"][$ds]["_bin"][$i]);
             $error = writeJSONfile($trdir . "_3_inflated.json", $measurements);
             if ($error) {
-                throw new Runtime\Exception($error);
+                throw new \Exception($error);
             }
         }
         goto STEP6;
-    } catch (Runtime\Exception $e) {
+    } catch (\Exception $e) {
         $errormsg = $e->getMessage();
         eventLog("ERROR", $errormsg  . " [module_import: STEP8]");
         echo "    <span style='color:red'>ERROR: " . $errormsg . "</span><br><br>";
@@ -1173,7 +1173,7 @@ STEP9:
         } elseif ($action == "replace") {
             $result = array();
         } else {
-            throw new Runtime\Exception("Unknown action " . $action . " in transaction " . $tr);
+            throw new \Exception("Unknown action " . $action . " in transaction " . $tr);
         }
       
         // walk through our measurements that need to be added or updated
@@ -1192,7 +1192,7 @@ STEP9:
         $path = $trdir . "_5_result_" . date("YmdHis") . ".json";
         $error = writeJSONfile($path, $result);
         if ($error) {
-            throw new Runtime\Exception($error);
+            throw new \Exception($error);
         }
         if (file_exists($libdir . "measurements.json")) {
             unlink($libdir . "measurements.json");
@@ -1201,7 +1201,7 @@ STEP9:
         if ($success) {
             echo "<strong>Published</strong> library file<br><br>\n";
         } else {
-            throw new Runtime\Exception("Could not publish the data into the library!");
+            throw new \Exception("Could not publish the data into the library!");
         }
       
         // some administration in transactions_open and transactions_closed.json
@@ -1213,7 +1213,7 @@ STEP9:
         writeJSONfile($libdir . "transactions_open.json", $transactions);
       
         echo "      <span style='color:red'>Data successfully merged into library ". $_REQUEST["lib"] ."</span><br>\n";
-    } catch (Runtime\Exception $e) {
+    } catch (\Exception $e) {
         $errormsg = $e->getMessage();
         $errormsg .= " PLEASE CHECK THE STATUS OF LIBRARY " . $_REQUEST["lib"] ;
         eventLog("ERROR", $errormsg  . " [module_import: STEP9]", false, true);  //don't exit, but send alertmail
