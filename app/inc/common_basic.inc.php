@@ -570,12 +570,12 @@ function findDataTypeUnits($type, $datatypes, $key = "json", $search = null)
 
             // get the key-name if it exists, else the default key-name, or else the first name in the array
             if (isset($namelist[$key])) {
-                $result[$i] = $namelist[$key];
+                $results[$i] = $namelist[$key];
             } elseif (isset($namelist[$defaultkey])) {
-                $result[$i] = $namelist[$defaultkey];
+                $results[$i] = $namelist[$defaultkey];
             } else {
-                $return[$i] = reset($namelist);
-            } 
+                $results[$i] = reset($namelist);
+            }
         }
     }
             
