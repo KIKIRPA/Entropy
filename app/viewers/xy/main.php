@@ -6,6 +6,10 @@ if (count(get_included_files()) == 1) {
     exit("Direct access not permitted.");
 }
 
+// sort data
+$sortOrder = in_array("inverted", $DATATYPES[$parenttype]["graph"]["xy"]) ? SORT_DESC : SORT_ASC;
+orderData($data["dataset"][$showDS]["data"], $sortOrder);
+
 ?>
                         <div id="graph" style="width: 100%; height: 450px;"></div>          
                         <script type="text/javascript">

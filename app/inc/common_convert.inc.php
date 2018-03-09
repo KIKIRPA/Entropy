@@ -190,30 +190,6 @@ function makeEvenSpaced($data)
     return $newData;
 }
 
-/**
- * orderData(&$data, $sortOrder = null)
- * 
- * sorts a data array based on the first axis value
- * optional parameter $sortOrder can be set to constants SORT_ASC or SORT_DESC, if not set (null),
- * the order will be decided on the first and last x values.
- * 
- * the data array is passed by reference
- * the function returns true if the operation has succeeded, false if failed
- */
-function orderData(&$data, $sortOrder = null) {
-    
-    if (($sortOrder !== SORT_DESC) or ($sortOrder !== SORT_ASC)) {
-        $sortOrder = ($data[0][0] < $data[count($data) - 1][0]) ? SORT_ASC : SORT_DESC;
-    }
-    
-    $xValues = array();
-    foreach ($data as $couple) {
-        $xValues[] = $couple[0];
-    }
-
-    return array_multisort($xValues, $sortOrder, SORT_NUMERIC, $data);
-}
-
 
 /**
  * checkEvenSpaced($data)

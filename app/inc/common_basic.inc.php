@@ -516,7 +516,7 @@ function findDataType($type, $datatypes, $key = false)
  * 
  * extracts a list of axis units/names for a given datatype ($type) from the $DATATYPES json resource.
  * Includes searching for parent datatype
- * By default it returns the json-names, other names (or invert booleans) can be requested with the $key.
+ * By default it returns the json-names, other names can be requested with the $key.
  * In absence of $search, the default (first listed) entries for each axis will be returned.
  * $search is a list of one alternative name per axis to search for; if found, the function
  * will return the corresponding axis name. If one of the altnames in $search is Null or
@@ -525,12 +525,7 @@ function findDataType($type, $datatypes, $key = false)
 function findDataTypeUnits($type, $datatypes, $key = "json", $search = null)
 {
     $results = array();
-
-    if ($key == "invert") {
-        $defaultkey = false;
-    } else {
-        $defaultkey = "json";  // return json-name if the requested key does not exist.
-    }
+    $defaultkey = "json";  // return json-name if the requested key does not exist.
 
     // lowercase search array (keys and values)
     if (is_array($search)) {
@@ -580,6 +575,31 @@ function findDataTypeUnits($type, $datatypes, $key = "json", $search = null)
     }
             
     return $results;
+}
+
+
+/**
+ * orderData(&$data, $sortOrder = null)
+ * 
+ * sorts a data array based on the first axis value
+ * optional parameter $sortOrder can be set to constants SORT_ASC or SORT_DESC, if not set (null),
+ * the order will be decided on the first and last x values.
+ * 
+ * the data array is passed by reference
+ * the function returns true if the operation has succeeded, false if failed
+ */
+function orderData(&$data, $sortOrder = null) {
+    
+    if (($sortOrder !== SORT_DESC) and ($sortOrder !== SORT_ASC)) {
+        $sortOrder = ($data[0][0] < $data[count($data) - 1][0]) ? SORT_ASC : SORT_DESC;
+    }
+    
+    $xValues = array();
+    foreach ($data as $couple) {
+        $xValues[] = $couple[0];
+    }
+
+    return array_multisort($xValues, $sortOrder, SORT_NUMERIC, $data);
 }
 
 
