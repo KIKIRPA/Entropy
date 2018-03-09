@@ -25,6 +25,7 @@ const FOOTER_FILE    = PRIVPATH . 'inc/footer.inc.php';
 const FOOTER_BOX     = "<p><strong>Footer text box</strong></p><p>Link to privacy policy</p>";
 const MAIL_ADMIN     = "";
 const DEFAULT_LICENSE = "CC by-nc-nd 4.0";
+const MOTD_FILE      = PRIVPATH . "data/motd.php";
 
 // json configuration files
 const USERS_FILE     = CONFIG_PATH . "users.json";
