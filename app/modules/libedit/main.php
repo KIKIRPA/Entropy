@@ -87,7 +87,7 @@ if ($f == "set") {
                      "contact" => 1,
                      "news" => 3,
                      "references" => 3,
-                     "listcolumns" => 4,
+                     "listcolumns" => 3,
                      "downloadconverted" => 4,
                      "downloadbinary" => 5,
                      "license" => 6

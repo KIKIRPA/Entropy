@@ -11,15 +11,17 @@
         "jcampdx": "RAMAN SPECTRUM",
         "viewer": "xy",
         "graph": {
-            "xy": "line"
+            "xy": [
+                "line"
+            ]
         },
         "axis": {
             "x": [
                  {
-                    "json": "Raman shift (cm-1)",
+                    "json": "Raman shift (1/cm)",
                     "html": "Raman shift (cm<sup>-1<\/sup>)",
                     "jcampdx": "1/CM",
-                    "other1": "Raman shift (1/cm)",
+                    "other1": "Raman shift (cm-1)",
                     "other2": "Wavenumber (cm-1)",
                     "other3": "Wavenumber (1/cm)"
                 }
@@ -41,16 +43,18 @@
         "jcampdx": "INFRARED SPECTRUM",
         "viewer": "xy",
         "graph": {
-            "xy": "line"
+            "xy": [
+                "line",
+                "inverted"
+            ]
         },
         "axis": {
             "x": [
                 {
-                    "json": "Wavenumber (cm-1)",
+                    "json": "Wavenumber (1/cm)",
                     "html": "Wavenumber (cm<sup>-1<\/sup>)",
                     "jcampdx": "1/CM",
-                    "other1": "Wavenumber (1/cm)",
-                    "invert": true
+                    "other1": "Wavenumber (cm-1)"
                 }
             ],
             "y": [
@@ -75,7 +79,9 @@
         "jcampdx": "MASS SPECTRUM",
         "viewer": "xy",
         "graph": {
-            "xy": "bar"
+            "xy": [
+                "bar"
+            ]
         },
         "axis": {
             "x": [
@@ -101,8 +107,12 @@
         ],
         "viewer": "txy",
         "graph": {
-            "ty": "line",
-            "xy": "bar"
+            "ty": [
+                "line"
+            ],
+            "xy": [
+                "bar"
+            ]
         },
         "axis": {
             "t":[

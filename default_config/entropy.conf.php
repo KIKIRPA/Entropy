@@ -25,6 +25,7 @@ const FOOTER_FILE    = PRIVPATH . 'inc/footer.inc.php';
 const FOOTER_BOX     = "<p><strong>Footer text box</strong></p><p>Link to privacy policy</p>";
 const MAIL_ADMIN     = "";
 const DEFAULT_LICENSE = "CC by-nc-nd 4.0";
+const MOTD_FILE      = PRIVPATH . "data/motd.php";
 
 // json configuration files
 const USERS_FILE     = CONFIG_PATH . "users.json";
@@ -45,14 +46,14 @@ const LOG_EV_FILE    = LOG_PATH . "event.csv";
 
 // style and javascript sources
 const CSS_FA         = "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css";
-const CSS_BULMA      = "https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.min.css";
+const CSS_BULMA      = "https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css";
 const CSS_DT         = "./js/datatables.min.css";
 const CSS_DT_BULMA   = "./css/dataTables.bulma.min.css";
-const CSS_DYGRAPH    = "https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.css";
+const CSS_DYGRAPH    = "https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.css";
 const JS_JQUERY      = "https://code.jquery.com/jquery-2.2.4.min.js";
 const JS_DT          = "./js/datatables.min.js";
 const JS_DT_BULMA    = "./js/dataTables.bulma.min.js";
-const JS_DYGRAPH     = "https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.js";
+const JS_DYGRAPH     = "https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.js";
 
 // session properties
 const EXPIRE         = 7200;           //keep session opened for xxx seconds after last activity
