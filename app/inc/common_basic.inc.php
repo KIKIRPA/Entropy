@@ -8,73 +8,44 @@ if (count(get_included_files()) == 1) {
 }
 
 
-/* ****************************************************************************************************************************
-
-    logout()                              close session
-
-
-
-    calcPermMod($permtable, [$lib])
-        returns the allowed modules for a given user.
-        requires a user permissions table (array, part of users.json)
-        if a library id is given, it will output only the library-specific modules (array) to which a user has access (for that library)
-        if no library is given, it will output only the admin-specific modules (array) to which a user has access
-        !! if user is administrator it will return true (=access to all)
-        !! if user has no permissions at all (for that library), it will return false
-
-    calcPermLib($permtable, $mod, [$lib])
-        returns for a given module which libraries are allowed
-        requires a user permissions table (array, part of users.json)
-        if no library is given: outputs true for all libs, false for no libs or an array with the lib ids
-        if a library is given: outputs true or false
-
+/* FUNCTIONS:
+    logout()
+    sanitizeStr($string, $replaceby = "_", $others = False, $case = 0)
+    detectBomEncoding($str)
+    calcPermMod($permtable, $lib = false)
+    calcPermLib($permtable, $mod, $lib = false)
     readJSONfile($path, $dieOnError)
-        reads json file and outputs as an array
-        if something goes wrong (file does not exist, not readable or contains error)
-        it will output an empty array (in order to create new file
-        optional $dieOnError will in this case stop further code execution
-
-    inflateArray($array, $mode = -1, $keysep = ":", $fieldsep = "|")
-
-    flattenArray($array, $key = false, $mode = -1, $keysep = ":", $fieldsep = "|")
-
+    inflateArray($array, $mode = -1, $keysep = ":", $fieldsep = "|", $i = 0)
+    flattenArray($array, $multirecords = false, $mode = -1, $keysep = ":", $fieldsep = "|")
     getMeta($metadata, $get, $concatenate = "; ", $description = ": ")
-        retrieve metadata-item from (inflated) metadata array
-        $get is something like "sample:sample name", "samplesource:0:identifier+source", "measurement:date^long";
-        if multiple fields need to be concatenated, the concatenation symbol (default ;) can be supplied
-        in the concatenated outputs descriptions can be added if a $description symbol (default :) is supplied
-        (if set to false, a short notation will be used without descriptions)
-
     nameMeta($get)
-        get a nice name for a metadata retrieve query string
-        if $get is $get is something like "sample:sample name", "samplesource:0:identifier+source", "measurement:date^long"
-        output will be resp. "Sample name", "Samplesource 1" and "Date"
-
     overrideMeta($metadata, $dataset = False)
-        merge/override directly stored metadata, with metadata stored in
-        "meta:", and optionally with metadata specific to a dataset
-        returns merged metadata (analytical data is stripped)
-
-    mdate($format, $microtime)            outputs timestamp with a optionally supplied $format (default 'Y-m-d H:i:s.u')
-                                            optional takes another microtime
-
+    findDataType($type, $datatypes, $key = false)
+    findDataTypeUnits($type, $datatypes, $key = "json", $search = Null)
+    orderData(&$data, $sortOrder = null)
+    mdate($format, $microtime)
     eventLog($cat, $msg, $fatal = false, $mail = false)
-        writes an eventmessage ($msg) of category ($cat, eg ERROR, WARNING, ...) to the event log file
-        when optional $fatal is true it will stop all further code execution.
-        when optional $mail is true it will send an email to the sysadmin; or if set to an valid address to this address
-        !! returns $msg !!
-
-**************************************************************************************************************************/
+    bulmaColorModifier($color, $colorList, $default = null)
+    bulmaColorInt($color, $colorList, $default = null)
+    selectConvertorClass($convertors, $datatype, $format, $options = array())
+*/
 
 
+/** 
+ * logout() 
+ * 
+ * close session
+ */
 function logout()
 {
     $_SESSION = array();
     session_destroy();
 }
 
+
 /**
  *     sanitizeStr($string, $replaceby = "_", $others = False, $case = 0)
+ * 
  *     sanitize string, removes all characters, html-tags... that should not be there
  *     eg. string to be used as a part of a filename, or for loose string comparisons
  *     $others is other characters to replace, e.g. "-+:^"
@@ -82,7 +53,7 @@ function logout()
  */
 function sanitizeStr($string, $replaceby = "_", $others = false, $case = 0)
 {
-    $replace = str_split(" _!\"#$%&'()*,/;<=>?@[\\]`{}~");
+    $replace = str_split(" _!\"#$%&'()*,./;<=>?@[\\]`{}~");
     
     if ($others) {
         $replace = array_merge($replace, str_split($others));
@@ -103,6 +74,7 @@ function sanitizeStr($string, $replaceby = "_", $others = false, $case = 0)
     
     return filter_var($string, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
 }
+
 
 /** detect encoding using the UTF byte order mark, and return string without encoding */
 function detectBomEncoding($str)
@@ -129,6 +101,17 @@ function detectBomEncoding($str)
 }
 
 
+/**
+ * calcPermMod($permtable, $lib = false)
+ * 
+ * returns the allowed modules for a given user.
+ * requires a user permissions table (array, part of users.json)
+ * if a library id is given, it will output only the library-specific modules (array) to which a user has access (for that library)
+ * if no library is given, it will output only the admin-specific modules (array) to which a user has access
+ * 
+ * !! if user is administrator it will return true (=access to all)
+ * !! if user has no permissions at all (for that library), it will return false
+ */
 function calcPermMod($permtable, $lib = false)
 {
     if ($permtable["admin"]) {
@@ -163,6 +146,14 @@ function calcPermMod($permtable, $lib = false)
 }
 
 
+/**
+ * calcPermLib($permtable, $mod, $lib = false)
+ * 
+ * returns for a given module which libraries are allowed
+ * requires a user permissions table (array, part of users.json)
+ * if no library is given: outputs true for all libs, false for no libs or an array with the lib ids
+ * if a library is given: outputs true or false
+ */
 function calcPermLib($permtable, $mod, $lib = false)
 {
     if ($permtable["admin"]) {
@@ -197,6 +188,14 @@ function calcPermLib($permtable, $mod, $lib = false)
 }
 
 
+/**
+ * readJSONfile($path, $dieOnError)
+ * 
+ * reads json file and outputs as an array
+ * if something goes wrong (file does not exist, not readable or contains error)
+ * it will output an empty array (in order to create new file
+ * optional $dieOnError will in this case stop further code execution
+ */
 function readJSONfile($path, $dieOnError = false)
 {
     $array = array();
@@ -213,6 +212,18 @@ function readJSONfile($path, $dieOnError = false)
 }
 
 
+/**
+ * inflateArray($array, $mode = -1, $keysep = ":", $fieldsep = "|", $i = 0)
+ * 
+ * transform a flat array structure into a multidimensial array
+ * 
+ * - $multirecords (default false): first level keys are record id's and should not be flattened
+ * - $mode: 0            --> completely flat structure with keyseparation
+ *          1 (default)  --> completely flat structure with keyseparation and fieldseparation if integer keys on the deepest level
+ *          1, 2...      --> (possibly incomplete) keyseparation for 1, 2... iterations only
+ * - keyseparation:   <samplename:C.I. number>   --> $keysep default ":"
+ * - fieldseparation: <allowformats>spc|dx|txt   --> $fieldsep default "|"
+*/
 function inflateArray($array, $mode = -1, $keysep = ":", $fieldsep = "|", $i = 0)
 {
     $out = array();
@@ -254,19 +265,20 @@ function inflateArray($array, $mode = -1, $keysep = ":", $fieldsep = "|", $i = 0
 }
 
 
-
+/**
+ * flattenArray($array, $multirecords = false, $mode = -1, $keysep = ":", $fieldsep = "|")
+ * 
+ * flatten array: outputs array of records in which these records have a flat structure
+ * 
+ * - $multirecords (default false): first level keys are record id's and should not be flattened
+ * - $mode: 0            --> completely flat structure with keyseparation
+ *          1 (default)  --> completely flat structure with keyseparation and fieldseparation if integer keys on the deepest level
+ *          1, 2...      --> (possibly incomplete) keyseparation for 1, 2... iterations only
+ * - keyseparation:   <samplename:C.I. number>   --> $keysep default ":"
+ * - fieldseparation: <allowformats>spc|dx|txt   --> $fieldsep default "|"
+*/
 function flattenArray($array, $multirecords = false, $mode = -1, $keysep = ":", $fieldsep = "|")
 {
-    /*
-        flatten array: outputs array of records in which these records have a flat structure
-        - $multirecords (default false): first level keys are record id's and should not be flattened
-        - $mode: 0            --> completely flat structure with keyseparation
-                -1 (default) --> completely flat structure with keyseparation and fieldseparation if integer keys on the deepest level
-                1, 2...      --> (possibly incomplete) keyseparation for 1, 2... iterations only
-        - keyseparation: <samplename:C.I. number>   --> $keysep default ":"
-        - fieldseparation: <allowformats>spc|dx|txt --> $fieldsep default "|"
-    */
-    
     $i = 0;
     
     do {
@@ -312,21 +324,33 @@ function flattenArray($array, $multirecords = false, $mode = -1, $keysep = ":", 
 }
 
 
+/** 
+ * getMeta($metadata, $get, $concatenate = "; ", $description = ": ")
+ * 
+ * retrieve metadata-item from (inflated) metadata array
+ * $get is something like "sample:sample name", "samplesource:0:identifier+source", "measurement:date^long";
+ * if multiple fields need to be concatenated, the concatenation symbol (default ;) can be supplied
+ * in the concatenated outputs descriptions can be added if a $description symbol (default :) is supplied
+ * (if set to false, a short notation will be used without descriptions)
+ */
 function getMeta($metadata, $get, $concatenate = "; ", $description = ": ")
 {
+    //prepare $get for loose searching (lowercase, remove whitespaces and special characters, except :+^)
+    $get = sanitizeStr($get, "", "-", 1);
+    
     //split get-code into hierachical tree
     $tree = explode(":", $get);
     $n = count($tree);
     
     //split the "leaves" from the tree: the actual fields to be retrieved
-    $leafs = explode("+", $tree[$n - 1]);
+    $leaves = explode("+", $tree[$n - 1]);
     unset($tree[$n - 1]);
     
     //split the notation from the fields to be retrieved
-    foreach ($leafs as $id => $leaf) {
+    foreach ($leaves as $id => $leaf) {
         $arr = explode("^", $leaf);
         if (count($arr) > 1) {
-            $leafs[$id] = $arr[0];
+            $leaves[$id] = $arr[0];
             $formats[$arr[0]] = $arr[1]; //if $arr[2+] exist we'll neglect it; we can only have one notation
         } else {
             $formats[$id] = null;
@@ -337,24 +361,33 @@ function getMeta($metadata, $get, $concatenate = "; ", $description = ": ")
     //first the branch in the tree
     if (count($tree) > 0) {
         foreach ($tree as $branch) {
-            $metadata = $metadata[$branch];
+            // loose search if the branch is in the metadata
+            foreach ($metadata as $id => $value) {
+                if ($branch == sanitizeStr($id, "", "-", 1)) {
+                    // if so, only keep this branch of the metadata
+                    $metadata = $metadata[$id];
+                    break;
+                }
+            }
         }
     }
     
     //next the leaves
     $arr = array();
-    foreach ($leafs as $leaf) {
-        if (isset($metadata[$leaf])) {
-            $arr[$leaf] = $metadata[$leaf];
-        } else {
-            $arr[$leaf] = null;
+    foreach ($leaves as $leaf) {
+        $arr[$leaf] = null;
+        // loose search if the leaf exists in the metadata
+        foreach ($metadata as $id => $value) {
+            if ($leaf == sanitizeStr($id, "", "-", 1)) {
+                $arr[$leaf] = $metadata[$id];
+            }
         }
     }
     
     //flatten the resulting thing, even if the "leaves" itselve are arrays
     $metadata = flattenArray($arr, false, 0);
     
-    //formatting: add descriptions (eg "age: 1900") and formatting options (eg. date^year)
+    //create output: add descriptions (eg "age: 1900") and formatting options (eg. date^year)
     foreach ($metadata as $id => $value) {
         $id2 = explode(":", $id);    //break down the flattened description, and only keep the last part
         $id2 = end($id2);            // eg. "sample:age" --> "age"
@@ -401,6 +434,13 @@ function getMeta($metadata, $get, $concatenate = "; ", $description = ": ")
 }
 
 
+/** 
+ * nameMeta($get)
+ * 
+ * get a nice name for a metadata retrieve query string
+ * if $get is $get is something like "sample:sample name", "samplesource:0:identifier+source", "measurement:date^long"
+ * output will be resp. "Sample name", "Samplesource 1" and "Date" 
+ */
 function nameMeta($get)
 {
     //split get-code into hierachical tree
@@ -427,27 +467,35 @@ function nameMeta($get)
 
     //make it nice: replace underscores with spaces, first letter uppercase
     $name = str_replace('_', ' ', $name);
+    $name = ucfirst($name);
         
     //by default first letter uppercase, and some fancier hard-coded names
-    $name = str_replace("samplesource", "Sample source", $name);
-    switch (strtolower($name)) {
-        case "cinumber":
-        case "ci number":
-            $name = "CI number";
-            break;
-        case "casnumber":
-        case "cas number":
-            $name = "CAS number";
-            break;
-        default:
-            $name = ucfirst($name);
-            break;
-    }
+    // $name = str_replace("samplesource", "Sample source", $name);
+    // switch (strtolower($name)) {
+    //     case "cinumber":
+    //     case "ci number":
+    //         $name = "CI number";
+    //         break;
+    //     case "casnumber":
+    //     case "cas number":
+    //         $name = "CAS number";
+    //         break;
+    //     default:
+    //        $name = ucfirst($name);
+    //         break;
+    // }
 
     return $name;
 }
 
 
+/**
+ * overrideMeta($metadata, $dataset = False)
+ * 
+ * merge/override directly stored metadata, with metadata stored in
+ * "meta:", and optionally with metadata specific to a dataset
+  * returns merged metadata (analytical data is stripped)
+ */
 function overrideMeta($metadata, $dataset = false)
 {
     // get metadata stored in :meta, that needs to override direct metadata
@@ -469,6 +517,7 @@ function overrideMeta($metadata, $dataset = false)
     
     return array_replace_recursive($metadata, $metameta, $dsmeta);
 }
+
 
 /**
  * findDataType($type, $datatypes, $key = false) 
@@ -510,6 +559,7 @@ function findDataType($type, $datatypes, $key = false)
     eventLog("WARNING", "Unknown data type: " . $type . " [findDataType()]", false);
     return false;
 }
+
 
 /**
  * findDataTypeUnits($type, $datatypes, $key = "json", $search = Null)
@@ -603,6 +653,12 @@ function orderData(&$data, $sortOrder = null) {
 }
 
 
+/**
+ * mdate($format, $microtime)
+ * 
+ * outputs timestamp with a optionally supplied $format (default 'Y-m-d H:i:s.u')
+ * optional takes another microtime
+ */
 function mdate($format = 'Y-m-d H:i:s.u', $microtime = null)
 {
     $microtime = explode(' ', ($microtime ? $microtime : microtime()));
@@ -616,7 +672,14 @@ function mdate($format = 'Y-m-d H:i:s.u', $microtime = null)
 }
 
 
-
+/**
+ * eventLog($cat, $msg, $fatal = false, $mail = false)
+ * 
+ * writes an eventmessage ($msg) of category ($cat, eg ERROR, WARNING, ...) to the event log file
+ * when optional $fatal is true it will stop all further code execution.
+ * when optional $mail is true it will send an email to the sysadmin; or if set to an valid address to this address
+ * !! returns $msg !!
+ */
 function eventLog($cat, $msg, $fatal = false, $mail = false)
 {
     //global $logdir, $evlog, $adminMail;
@@ -667,6 +730,8 @@ function eventLog($cat, $msg, $fatal = false, $mail = false)
 
 
 /**
+ * bulmaColorModifier($color, $colorList, $default = null)
+ * 
  * Returns Bulma color modifier
  *
  * @param mixed $color Color name (without 'is-') or color number in colors.json 
@@ -698,6 +763,8 @@ function bulmaColorModifier($color, $colorList, $default = null)
 
 
 /**
+ * bulmaColorInt($color, $colorList, $default = null)
+ * 
  * Returns color number
  *
  * @param mixed $color Color name (without 'is-') or color number in colors.json 
@@ -729,7 +796,9 @@ function bulmaColorModifier($color, $colorList, $default = null)
 
 
  /**
- * selectConvertorClass(): select an export or import convertor based on the supplied datatype and format
+ * selectConvertorClass($convertors, $datatype, $format, $options = array())
+ * 
+ * select an export or import convertor based on the supplied datatype and format
  * 
  * It reads the import.json or export.json configuration file and searches the listed convertors based on
  * the two criteria: datatype and format. Searching happens in the order the convertors
