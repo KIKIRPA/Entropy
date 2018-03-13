@@ -1,13 +1,17 @@
 {
-  "privpath":      "/opt/entropy/",
-  "pubpath":       "/srv/http/",
-  "htgroup":       "http",
-  "css_fa":        "./local/font-awesome/css/font-awesome.min.css",
-  "css_bulma":     "./local/bulma.css",
-  "css_dt_bulma":  "./local/datatables.bulma.min.css",
-  "css_dygraph":   "./local/dygraph.css",
-  "js_jquery":     "./local/jquery.min.js",
-  "js_dt":         "./local/datatables.min.js",
-  "js_dt_bulma":   "./local/datatables.bulma.min.js",
-  "js_dygraph":    "./local/dygraph.min.js"
+  "setup": {
+    "privpath":      "/opt/entropy/",
+    "pubpath":       "/srv/http/",
+    "htgroup":       "http"
+  },
+  "app": {
+    "css_fa":        "./local/font-awesome/css/font-awesome.min.css",
+    "css_bulma":     "./local/bulma.css",
+    "css_dt_bulma":  "./local/datatables.bulma.min.css",
+    "css_dygraph":   "./local/dygraph.css",
+    "js_jquery":     "./local/jquery.min.js",
+    "js_dt":         "./local/datatables.min.js",
+    "js_dt_bulma":   "./local/datatables.bulma.min.js",
+    "js_dygraph":    "./local/dygraph.min.js"
+  }
 }

@@ -1,5 +1,7 @@
 {
-  "privpath":      "/opt/entropy/",
-  "pubpath":       "/srv/http/",
-  "htgroup":       "http"
+  "setup": {
+    "privpath":      "/opt/entropy/",
+    "pubpath":       "/srv/http/",
+    "htgroup":       "http"
+  }
 }
