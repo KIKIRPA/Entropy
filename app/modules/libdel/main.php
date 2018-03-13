@@ -8,9 +8,9 @@ if (count(get_included_files()) == 1) {
 
 
 //HEADER
-array_push($htmlHeaderStyles, CSS_DT_BULMA);
-array_push($htmlHeaderScripts, JS_DT, JS_DT_BULMA);  
-include(HEADER_FILE);
+array_push($htmlHeaderStyles, \Core\Config\App::get("css_dt_bulma"));
+array_push($htmlHeaderScripts, \Core\Config\App::get("js_dt"), \Core\Config\App::get("js_dt_bulma"));  
+include(PRIVPATH . 'inc/header.inc.php');
 
 
 $id = str_replace(" ", "", strtolower($_REQUEST["lib"]));
@@ -30,7 +30,7 @@ if ($id == "_START") {
 } elseif (isset($_REQUEST["del"]) and isset($LIBS[$id])) {
     // UPDATE JSON LIBRARIES FILE
     unset($LIBS[$id]);
-    $error = writeJSONfile(LIB_FILE, $LIBS);
+    $error = writeJSONfile(\Core\Config\App::get("config_libraries_file"), $LIBS);
     if (!$error) {
         echo "      <span style='color:red'>Deleted library " . $id . "!</span><br><br>\n";
     } else {
@@ -38,7 +38,7 @@ if ($id == "_START") {
     }
 
     // BACKUP DATA DIR
-    if (!backupFile(LIB_PATH, $id)) {
+    if (!backupFile(\Core\Config\App::get("libraries_path"), $id)) {
         echo "      <span style='color:red'>ERROR: failed to remove the data directory!</span><br><br>\n";
     }
 } else {
@@ -47,4 +47,4 @@ if ($id == "_START") {
 
 
 //FOOTER
-include(FOOTER_FILE);
+include(PRIVPATH . 'inc/footer.inc.php');

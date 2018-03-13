@@ -36,8 +36,8 @@ if (!isset($showMod)) $showMod = null;
 $navMenuLibs = array();
 $isHiddenLib = false;
 $navMenuMods = array();
-$navMenuTitle = APP_NAME;
-$navMenuSubtitle = APP_CATCHPHRASE;
+$navMenuTitle = \Core\Config\App::get("app_name");
+$navMenuSubtitle = \Core\Config\App::get("app_catchphrase");
 $navMenuLogoBox = false;
 
 // list accessible libraries
@@ -127,12 +127,12 @@ unset($lib, $id, $value, $perm);
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">  
     <head>
-        <title><?= APP_NAME ?></title>
+        <title><?= \Core\Config\App::get("app_name") ?></title>
         <meta charset="utf-8">		
         <meta http-equiv="Window-target" content="_top">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="keywords" content="<?= APP_KEYWORDS ?>">
-        <link rel="shortcut icon" href="<?= APP_ICON ?>">
+        <meta name="keywords" content="<?= \Core\Config\App::get("app_keywords") ?>">
+        <link rel="shortcut icon" href="<?= \Core\Config\App::get("app_icon") ?>">
 <?php foreach ($htmlHeaderStyles as $value): ?>
         <link rel="stylesheet" type="text/css" href="<?= $value ?>">
 <?php endforeach; ?>
@@ -142,11 +142,11 @@ unset($lib, $id, $value, $perm);
     </head>
   
     <body>
-        <nav class="navbar <?= bulmaColorModifier(NAVBAR_COLOR, $COLORS, "white") ?>">
+        <nav class="navbar <?= bulmaColorModifier(\Core\Config\App::get("app_color_navbar"), $COLORS, "white") ?>">
             <div class="container">
                 <div class="navbar-brand">
                     <a class="navbar-item" href=".\">
-                        <img src="<?= APP_LOGO ?>" alt="<?= APP_NAME?>" height="28">
+                        <img src="<?= \Core\Config\App::get("app_logo") ?>" alt="<?= \Core\Config\App::get("app_name")?>" height="28">
                     </a>
                     <div class="navbar-burger burger" data-target="navMenu">
                         <span></span>
@@ -169,17 +169,17 @@ unset($lib, $id, $value, $perm);
                         <div class="navbar-item">
                             <div class="field has-addons">
                                 <p class="control">
-                                    <a class="button <?= bulmaColorModifier(NAVBAR_COLOR, $COLORS, "white") ?> is-inverted is-outlined is-static"><?= $isLoggedIn ?></a>
+                                    <a class="button <?= bulmaColorModifier(\Core\Config\App::get("app_color_navbar"), $COLORS, "white") ?> is-inverted is-outlined is-static"><?= $isLoggedIn ?></a>
                                 </p>
                                 <p class="control">
-                                    <a class="button <?= bulmaColorModifier(NAVBAR_COLOR, $COLORS, "white") ?> is-inverted" href="./tools.php?mod=console">
+                                    <a class="button <?= bulmaColorModifier(\Core\Config\App::get("app_color_navbar"), $COLORS, "white") ?> is-inverted" href="./tools.php?mod=console">
                                         <span class="icon">
                                             <i class="fa fa-cog" aria-hidden="true"></i>
                                         </span>
                                     </a>
                                 </p>
                                 <p class="control">
-                                    <a class="button <?= bulmaColorModifier(NAVBAR_COLOR, $COLORS, "white") ?> is-inverted" href="./auth.php?logout">
+                                    <a class="button <?= bulmaColorModifier(\Core\Config\App::get("app_color_navbar"), $COLORS, "white") ?> is-inverted" href="./auth.php?logout">
                                         <span class="icon">
                                             <i class="fa fa-sign-out" aria-hidden="true"></i>
                                         </span>
@@ -190,7 +190,7 @@ unset($lib, $id, $value, $perm);
 <?php                 else: ?>
                         <div class="navbar-item">
                             <p class="control">
-                                <a class="button <?= bulmaColorModifier(NAVBAR_COLOR, $COLORS, "white") ?> is-inverted" href="./auth.php">
+                                <a class="button <?= bulmaColorModifier(\Core\Config\App::get("app_color_navbar"), $COLORS, "white") ?> is-inverted" href="./auth.php">
                                     <span class="icon">
                                         <i class="fa fa-sign-in" aria-hidden="true"></i>
                                     </span>
@@ -205,7 +205,7 @@ unset($lib, $id, $value, $perm);
             </div>
         </nav>
 
-        <section class="hero <?= bulmaColorModifier($showLib ? $LIBS[$showLib]["color"] : DEFAULT_COLOR, $COLORS, DEFAULT_COLOR) ?>">
+        <section class="hero <?= bulmaColorModifier($showLib ? $LIBS[$showLib]["color"] : \Core\Config\App::get("app_color_default"), $COLORS, \Core\Config\App::get("app_color_default")) ?>">
             <div class="hero-body">
                 <div class="container">
 

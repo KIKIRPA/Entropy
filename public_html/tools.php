@@ -59,7 +59,7 @@ if ($isLoggedIn) {
 
 
 
-$LIBS = json_decode(file_get_contents(LIB_FILE), true);
+$LIBS = readJSONfile(\Core\Config\App::get("config_libraries_file"), true);
 
 $showMod = $_REQUEST["mod"];
 

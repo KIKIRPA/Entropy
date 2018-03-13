@@ -1,0 +1,32 @@
+{
+    "ascii": {
+        "datatypes": {
+            "raman": {},
+            "ftir": {},
+            "ms": {}
+        },
+        "extensions": {
+            "txt": {},
+            "asc": {},
+            "ascii": {},
+            "csv": {},
+            "rruff": {}
+        }    
+    },
+    "jcampdx": {
+        "datatypes": {
+            "raman": {},
+            "ftir": {},
+            "ms": {}
+        },
+        "extensions": {
+            "dx": {},
+            "jdx": {}
+        }    
+    },
+    "annotations": {
+        "extensions": {
+            "anno": {}
+        }    
+    }
+}

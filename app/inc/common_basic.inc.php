@@ -691,7 +691,7 @@ function eventLog($cat, $msg, $fatal = false, $mail = false)
                     "IP"          => $_SERVER['REMOTE_ADDR'] );
     
     // open or create event log file and append line
-    $handle = fopen(LOG_EV_FILE, "a");
+    $handle = fopen(\Core\Config\App::get("events_log_file"), "a");
     if ($handle) {
         $success = fputcsv($handle, $event);
     } else {
@@ -703,22 +703,23 @@ function eventLog($cat, $msg, $fatal = false, $mail = false)
     
     // mail: if asked ($mail=true), and if failed to write log ($success=false)
     if ($mail or !$success) {
-        $title = APP_NAME . " event " . $cat;
+        $title = \Core\Config\App::get("app_name") . " event " . $cat;
         $body = "Automated mail from " . gethostname() . ":\r\n\r\n";
-        $headers = "From: " . MAIL_ADMIN . "\r\n"
-            . "Reply-To: " . MAIL_ADMIN . "\r\n"
+        $from = \Core\Config\App::get("mail_admin");
+        $headers = "From: " . $from . "\r\n"
+            . "Reply-To: " . $from . "\r\n"
             . "X-Mailer: PHP/" . phpversion();
     
         if (!$success) {
             $title .= " - failed to log!";
-            $body .= "FAILED TO WRITE TO " . LOG_EV_FILE ."\r\n\r\n";
+            $body .= "FAILED TO WRITE TO EVENT LOG FILE\r\n\r\n";
         }
     
         foreach ($event as $key => $value) {
             $body .= $key . ": " . $value . "\r\n";
         }
     
-        mail(MAIL_ADMIN, $title, $body, $headers);
+        mail($from, $title, $body, $headers);
     }
 
     // proceed or die if fatal error

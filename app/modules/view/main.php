@@ -21,7 +21,7 @@ foreach ($measurement as $key => $value) {
     }
 }
 
-$viewColor = isset($LIBS[$showLib]["color"]) ? bulmaColorModifier($LIBS[$showLib]["color"], $COLORS, DEFAULT_COLOR) : bulmaColorModifier(DEFAULT_COLOR, $COLORS);
+$viewColor = isset($LIBS[$showLib]["color"]) ? bulmaColorModifier($LIBS[$showLib]["color"], $COLORS, \Core\Config\App::get("app_color_default")) : bulmaColorModifier(\Core\Config\App::get("app_color_default"), $COLORS);
 
 // metadata can be saved on different levels, override lesser priority metadata
 $meta = overrideMeta($data, $showDS);
@@ -46,11 +46,11 @@ if (    (!$isLoggedIn and $MODULES["lib"]["download"]["public"])
      or ($isLoggedIn and calcPermLib($user["permissions"], "download", $showLib))) {
     
     // $viewShowModal boolean (show download form)
-    if (LOG_DL) {
+    if (\Core\Config\App::get("downloads_log_enable")) {
         if ($isLoggedIn) {
             $viewShowModal = false;
-        } elseif (isset($_COOKIE[COOKIE_NAME])) {
-            $cookie = verifycookie($_COOKIE[COOKIE_NAME]); // in case of false data, this will output False
+        } elseif (isset($_COOKIE[\Core\Config\App::get("downloads_cookie_name")])) {
+            $cookie = verifycookie($_COOKIE[\Core\Config\App::get("downloads_cookie_name")]); // in case of false data, this will output False
             if (is_array($cookie)) {
                 $viewShowModal = !makecookie($cookie);
             }  // if not false: update cookie; makecookie always outputs TRUE, $viewShowModal needs to be FALSE
@@ -85,7 +85,7 @@ if (    (!$isLoggedIn and $MODULES["lib"]["download"]["public"])
     }
 
     // binary uploaded files
-    $prefix = LIB_PATH . $showLib . "/" . $transaction . "/" . $showID . (($showDS == 'default')?"":"__".$showDS);
+    $prefix = \Core\Config\App::get("libraries_path") . $showLib . "/" . $transaction . "/" . $showID . (($showDS == 'default')?"":"__".$showDS);
     $binfiles = glob($prefix . "__*");  //by using "__*" we exclude the original (converted) data files, json data files and annotations
     foreach ($binfiles as $file) {
         // button caption = EXT (ORIG BIN FILENAME)
@@ -122,8 +122,8 @@ if (isset($meta["license"])) {
     $viewLicense = $meta["license"];
 } elseif (isset($LIBS[$showLib]["license"])) {
     $viewLicense = $LIBS[$showLib]["license"];
-} elseif (!empty(DEFAULT_LICENSE)) {
-    $viewLicense = DEFAULT_LICENSE;
+} elseif (!empty(\Core\Config\App::get("license_default"))) {
+    $viewLicense = \Core\Config\App::get("license_default");
 }
 
 // if the license is a predefined one, replace it with the html version
@@ -191,9 +191,9 @@ unset($meta, $i, $row, $header, $key, $item, $subkey, $subitem);
    ****** */
 
 // HEADER + NAVBAR
-array_push($htmlHeaderStyles, CSS_DYGRAPH);
-array_push($htmlHeaderScripts, JS_DYGRAPH);  
-include(HEADER_FILE);
+array_push($htmlHeaderStyles, \Core\Config\App::get("css_dygraphs"));
+array_push($htmlHeaderScripts, \Core\Config\App::get("js_dygraphs"));  
+include(PRIVPATH . 'inc/header.inc.php');
 
 // MAIN
 if ($error) {
@@ -207,4 +207,4 @@ if ($viewDownloadEnabled and $viewShowModal) {
 }
 
 // FOOTER
-include(FOOTER_FILE);
+include(PRIVPATH . 'inc/footer.inc.php');

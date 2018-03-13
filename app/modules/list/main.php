@@ -40,7 +40,7 @@ if (count(get_included_files()) == 1) {
 $listText = False;
 if (isset($LIBS[$showLib]["text"])) {
     if (!empty($LIBS[$showLib]["text"])) {
-        $listTitle = ($showLib == "_START") ? APP_NAME : $LIBS[$showLib]["name"];
+        $listTitle = ($showLib == "_START") ? \Core\Config\App::get("app_name") : $LIBS[$showLib]["name"];
         $listText  = $LIBS[$showLib]["text"];
     }
 }
@@ -56,7 +56,7 @@ if (isset($LIBS[$showLib]["news"])) {
     }
 }
 if (isset($LIBS[$showLib]["color"])) {
-    $listNewsColor = bulmaColorModifier($LIBS[$showLib]["color"], $COLORS, DEFAULT_COLOR);
+    $listNewsColor = bulmaColorModifier($LIBS[$showLib]["color"], $COLORS, \Core\Config\App::get("app_color_default"));
 }
 
 // contacts
@@ -119,7 +119,7 @@ if ($showLib != "_START") { //normal library
                 $row = intdiv($i, 3);
                 $listLibs[$row][$id] = array();
                 $listLibs[$row][$id]["name"] = $lib["name"];
-                $listLibs[$row][$id]["color"] = isset($lib["color"]) ? bulmaColorModifier($lib["color"], $COLORS, DEFAULT_COLOR) : bulmaColorModifier(DEFAULT_COLOR, $COLORS);
+                $listLibs[$row][$id]["color"] = isset($lib["color"]) ? bulmaColorModifier($lib["color"], $COLORS, \Core\Config\App::get("app_color_default")) : bulmaColorModifier(\Core\Config\App::get("app_color_default"), $COLORS);
                 $listLibs[$row][$id]["catchphrase"] = isset($lib["catchphrase"]) ? $lib["catchphrase"] : false;
                 $listLibs[$row][$id]["logobox"] = isset($lib["logobox"]) ? $lib["logobox"] : false;
                 $i++;
@@ -136,9 +136,9 @@ if ($showLib != "_START") { //normal library
 */
 
 // HEADER + NAVBAR
-array_push($htmlHeaderStyles, CSS_DT_BULMA);
-array_push($htmlHeaderScripts, JS_DT, JS_DT_BULMA);            
-include(HEADER_FILE);
+array_push($htmlHeaderStyles, \Core\Config\App::get("css_dt_bulma"));
+array_push($htmlHeaderScripts, \Core\Config\App::get("js_dt"), \Core\Config\App::get("js_dt_bulma"));            
+include(PRIVPATH . 'inc/header.inc.php');
 
 // MAIN
 if ($error) {
@@ -147,5 +147,5 @@ if ($error) {
 require_once(__DIR__ . '/template.php');
 
 // FOOTER
-include(FOOTER_FILE);
+include(PRIVPATH . 'inc/footer.inc.php');
   

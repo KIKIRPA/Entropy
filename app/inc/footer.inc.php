@@ -13,7 +13,7 @@ if (count(get_included_files()) == 1) {
                 <div class="columns">
                     <div class="column is-8">
                         <div class="content is-size-6">
-                            <?= $isLoggedIn ? FOOTER_BOX : searchMailHide(FOOTER_BOX) ?> 
+                            <?= $isLoggedIn ? \Core\Config\App::get("app_footer_box") : searchMailHide(\Core\Config\App::get("app_footer_box")) ?> 
                         </div>
                     </div>
                     <div class="column has-text-right">

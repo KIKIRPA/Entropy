@@ -66,7 +66,7 @@ class Ascii
             }
             if (isset($options["templatefile"])) {
                 // locate template
-                if (file_exists(TEMPLATES_PATH . $options["templatefile"])) {
+                if (file_exists(\Core\Config\App::get("templates_path") . $options["templatefile"])) {
                     $this->templateFile = $options["templatefile"];
                 } else {
                     $this->error = eventLog("WARNING", "ASCII template could not be not found: " . $options["templatefile"]);
@@ -146,7 +146,7 @@ class Ascii
             "_id" => $this->id,
         );
         
-        $lines = fillTemplateWithMeta(TEMPLATES_PATH . $this->templateFile, $this->meta, $specificCodes);
+        $lines = fillTemplateWithMeta(\Core\Config\App::get("templates_path") . $this->templateFile, $this->meta, $specificCodes);
 
         if (is_array($lines)) {
             return implode("", $lines);

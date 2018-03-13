@@ -28,9 +28,9 @@ COOKIE-TOOLS
 function verifycookie($name, $institution = null, $email = null)
 {
     if (($institution == null) and ($email == null)) {
-        $cookiearray = explode("||", decode($name, CRYPT_KEY));
+        $cookiearray = explode("||", decode($name, \Core\Config\App::get("downloads_cookie_key")));
         if (count($cookiearray) != 3) {
-            eventLog("WARNING", "cookie could not be decrypted: ".decode($name, CRYPT_KEY)." [tools_cookie.verifycookie]", false);
+            eventLog("WARNING", "cookie could not be decrypted: ".decode($name, \Core\Config\App::get("downloads_cookie_key"))." [tools_cookie.verifycookie]", false);
             return false;
         }
     
@@ -61,22 +61,22 @@ function verifycookie($name, $institution = null, $email = null)
 
 function makecookie($cookiearray, $cpath = './')
 {
-    $cvalue =  encode(implode("||", $cookiearray), CRYPT_KEY);
+    $cvalue =  encode(implode("||", $cookiearray), \Core\Config\App::get("downloads_cookie_key"));
     
-    setcookie(COOKIE_NAME, $cvalue, time() + COOKIE_EXPIRE, $cpath);
+    setcookie(\Core\Config\App::get("downloads_cookie_name"), $cvalue, time() + \Core\Config\App::get("downloads_cookie_expire"), $cpath);
     return true;
 }
 
 
 function removecookie($cpath = './')
 {
-    unset($_COOKIE[COOKIE_NAME]);
-    setcookie(COOKIE_NAME, '', time() - 3600, $cpath); // empty value and expire time at a past time
+    unset($_COOKIE[\Core\Config\App::get("downloads_cookie_name")]);
+    setcookie(\Core\Config\App::get("downloads_cookie_name"), '', time() - 3600, $cpath); // empty value and expire time at a past time
     return true;
 }
 
 
-function encode($string, $key = CRYPT_KEY)
+function encode($string, $key = \Core\Config\App::get("downloads_cookie_key"))
 {
     $j = 0;
     $hash = "";
@@ -97,7 +97,7 @@ function encode($string, $key = CRYPT_KEY)
 }
 
 
-function decode($string, $key = CRYPT_KEY)
+function decode($string, $key = \Core\Config\App::get("downloads_cookie_key"))
 {
     $j = 0;
     $hash = "";

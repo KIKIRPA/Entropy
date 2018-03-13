@@ -12,15 +12,16 @@ if (count(get_included_files()) == 1) {
  
 function mailhide($email, $show = null, $hoover = "e-mail")
 {
-    //global $pubkey, $privkey;
+    $pubkey = \Core\Config\App::get("mailhide_key_pub");
+    $privkey = \Core\Config\App::get("mailhide_key_priv");
 
-    //if MAILHIDE_PUB, MAILHIDE_PRIV not set: don't use mailhide
-    if (empty(MAILHIDE_PUB) or empty(MAILHIDE_PRIV)) {
+    //if mailhide keys not set: don't use mailhide
+    if (empty($pubkey) or empty($privkey)) {
         return "<a href='mailto:" . $email . "'  title=\"" . $hoover . "\">" . (is_null($show) ? $email : $show) . "</a>";
     }
     
     $emailparts = _recaptcha_mailhide_email_parts($email);
-    $url = recaptcha_mailhide_url(MAILHIDE_PUB, MAILHIDE_PRIV, $email);
+    $url = recaptcha_mailhide_url($pubkey, $privkey, $email);
     
     if (is_null($show)) {
         return htmlentities($emailparts[0]) . "<a href='" . htmlentities($url) .

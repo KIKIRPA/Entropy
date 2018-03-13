@@ -85,7 +85,8 @@ if ($showMod == "default") {
 // EVALUATE $_REQUEST["id"]
 if (!$showMod) {
     // read measurements list file
-    $measurements = readJSONfile(LIB_PATH . $showLib . "/measurements.json", false);
+    $librariesPath = \Core\Config\App::get("libraries_path");
+    $measurements = readJSONfile($librariesPath . $showLib . "/measurements.json", false);
     
     if (isset($_REQUEST["id"])) {
         $showID = $_REQUEST['id'];
@@ -97,12 +98,12 @@ if (!$showMod) {
     
         // does the measurment have an _transaction field?
         if (isset($measurements[$showID]["_transaction"])) {
-            $datapath = LIB_PATH . $showLib . "/" . $measurements[$showID]["_transaction"] . "/" . $showID;
+            $datapath = $librariesPath . $showLib . "/" . $measurements[$showID]["_transaction"] . "/" . $showID;
         } else {
             $error = "The requested measurement has no transaction id";
         }
     
-        // find the data file in the transaction LIB_PATH
+        // find the data file in the transaction directory
         $data = readJSONfile($datapath . ".json", true);
         if (count($data) == 0) {
             $error = "The requested measurement was not found or was empty";

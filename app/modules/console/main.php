@@ -7,14 +7,15 @@ if (count(get_included_files()) == 1) {
 }
 
 //HEADER
-array_push($htmlHeaderStyles, CSS_DT_BULMA);
-array_push($htmlHeaderScripts, JS_DT, JS_DT_BULMA);  
-include(HEADER_FILE);
+array_push($htmlHeaderStyles, \Core\Config\App::get("css_dt_bulma"));
+array_push($htmlHeaderScripts, \Core\Config\App::get("js_dt"), \Core\Config\App::get("js_dt_bulma"));  
+include(PRIVPATH . 'inc/header.inc.php');
 
 //MOTD
-if (file_exists(MOTD_FILE)) {
-    include_once(MOTD_FILE);
+$motd = \Core\Config\App::get("console_motd_file");
+if (file_exists($motd)) {
+    include_once($motd);
 }
 
 //FOOTER
-include(FOOTER_FILE);
+include(PRIVPATH . 'inc/footer.inc.php');

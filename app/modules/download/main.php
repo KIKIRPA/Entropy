@@ -60,8 +60,8 @@ try {
         if (!isset($meta["license"])) { // if no license in data file, search license in library or system settings
             if (isset($LIBS[$showLib]["license"])) {
                 $meta["license"] = $LIBS[$showLib]["license"];
-            } elseif (!empty(DEFAULT_LICENSE)) {
-                $meta["license"] = DEFAULT_LICENSE;
+            } elseif (!empty(\Core\Config\App::get("license_default"))) {
+                $meta["license"] = \Core\Config\App::get("license_default");
             }
         }
         if (isset($meta["license"])) { // if the license is a predefined one, replace it with the textonly version
@@ -76,11 +76,11 @@ try {
     }
 
     // evaluate download logging (via login, cookie or form)
-    if (LOG_DL) {
+    if (\Core\Config\App::get("downloads_log_enable")) {
         if ($isLoggedIn) {
             $downloadLogEntry = array($USERS[$isLoggedIn]["name"], $USERS[$isLoggedIn]["institution"], $USERS[$isLoggedIn]["email"], "login");
-        } elseif (isset($_COOKIE[COOKIE_NAME])) {
-            $cookie = verifycookie($_COOKIE[COOKIE_NAME]);
+        } elseif (isset($_COOKIE[\Core\Config\App::get("downloads_cookie_name")])) {
+            $cookie = verifycookie($_COOKIE[\Core\Config\App::get("downloads_cookie_name")]);
             if ($cookie) {
                 $downloadLogEntry = $cookie;
                 $downloadLogEntry[] = "cookie";
@@ -165,12 +165,12 @@ try {
 
 // CSV columns: timestamp | name | institution | email | source | IP | library | measurement | dataset | conv/bin | format/target | RESERVED*
 //  (*) reserved for (optional) conversion rules (eg TXT: tabulated, comma separated, eg SPC: old format), stored in $code[2]  --> TODO
-if (LOG_DL) {
+if (\Core\Config\App::get("downloads_log_enable")) {
     array_unshift($downloadLogEntry, date('Y-m-d H:i'));
     array_push($downloadLogEntry, $_SERVER['REMOTE_ADDR'], $showLib, $showID, $showDS, $code[0], $code[1], "");
 
     // open or create download.csv and append line
-    $logHandle = fopen(LOG_DL_FILE, "a");
+    $logHandle = fopen(\Core\Config\App::get("downloads_log_file"), "a");
     
     if ($logHandle) {
         $success = fputcsv($logHandle, $downloadLogEntry);

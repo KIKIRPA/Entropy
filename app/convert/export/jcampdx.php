@@ -78,7 +78,7 @@ class Jcampdx
             }
             if (isset($options["templatefile"])) {
                 // locate and read JCAMP-DX template
-                if (file_exists(TEMPLATES_PATH . $options["templatefile"])) {
+                if (file_exists(\Core\Config\App::get("templates_path") . $options["templatefile"])) {
                     $this->templateFile = $options["templatefile"];
                 } else {
                     $this->error = eventLog("WARNING", "JCAMP-DX template could not be not found: " . $options["templatefile"]);
@@ -195,7 +195,7 @@ class Jcampdx
             "_yunits"           => "RELATIVE INTENSITY" //TODO
         );
         
-        $lines = fillTemplateWithMeta(TEMPLATES_PATH . $this->templateFile, $this->meta, $specificCodes);
+        $lines = fillTemplateWithMeta(\Core\Config\App::get("templates_path") . $this->templateFile, $this->meta, $specificCodes);
 
         if (!$lines) {
             $this->error = eventLog("WARNING", "Failed to export to JCAMP-DX because of error in reading the metadata template file");

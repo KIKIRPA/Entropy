@@ -8,7 +8,7 @@ if (count(get_included_files()) == 1) {
 
 
 $notifications = array();
-$libeditColor = isset($LIBS[$showLib]["color"]) ? bulmaColorModifier($LIBS[$showLib]["color"], $COLORS, DEFAULT_COLOR) : bulmaColorModifier(DEFAULT_COLOR, $COLORS);
+$libeditColor = isset($LIBS[$showLib]["color"]) ? bulmaColorModifier($LIBS[$showLib]["color"], $COLORS, \Core\Config\App::get("app_color_default")) : bulmaColorModifier(\Core\Config\App::get("app_color_default"), $COLORS);
 
 
 /* *********************************************************
@@ -104,7 +104,7 @@ if ($f == "set") {
                     break;
 
                 case 2: // colors
-                    $value = bulmaColorInt(trim($_REQUEST[$item]), $COLORS, DEFAULT_COLOR);
+                    $value = bulmaColorInt(trim($_REQUEST[$item]), $COLORS, \Core\Config\App::get("app_color_default"));
                     if (isset($value)) {
                         $newLib[$item] = $value;
                     }
@@ -154,7 +154,7 @@ if ($f == "set") {
     $LIBS[$libeditId] = $newLib;
 
     //and write file
-    $output = writeJSONfile(LIB_FILE, $LIBS);
+    $output = writeJSONfile(\Core\Config\App::get("config_libraries_file"), $LIBS);
 
     if ($output == false) {
         $notifications[] = array("success", "Successfully created or updated library.");
@@ -240,12 +240,12 @@ if ($f == "error") {
 }
 
 // HEADER + NAVBAR
-array_push($htmlHeaderStyles, CSS_DT_BULMA);
-array_push($htmlHeaderScripts, JS_DT, JS_DT_BULMA);  
-include(HEADER_FILE);
+array_push($htmlHeaderStyles, \Core\Config\App::get("css_dt_bulma"));
+array_push($htmlHeaderScripts, \Core\Config\App::get("js_dt"), \Core\Config\App::get("js_dt_bulma"));  
+include(PRIVPATH . 'inc/header.inc.php');
 
 // MAIN
 require_once(__DIR__ . '/template.php');
 
 //FOOTER
-include(FOOTER_FILE);
+include(PRIVPATH . 'inc/footer.inc.php');
