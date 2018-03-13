@@ -76,10 +76,11 @@ function removecookie($cpath = './')
 }
 
 
-function encode($string, $key = \Core\Config\App::get("downloads_cookie_key"))
+function encode($string, $key = null)
 {
     $j = 0;
     $hash = "";
+    if (is_null($key)) $key = \Core\Config\App::get("downloads_cookie_key");
     $key = sha1($key);
     $strLen = strlen($string);
     $keyLen = strlen($key);
@@ -97,10 +98,11 @@ function encode($string, $key = \Core\Config\App::get("downloads_cookie_key"))
 }
 
 
-function decode($string, $key = \Core\Config\App::get("downloads_cookie_key"))
+function decode($string, $key = null)
 {
     $j = 0;
     $hash = "";
+    if (is_null($key)) $key = \Core\Config\App::get("downloads_cookie_key");
     $key = sha1($key);
     $strLen = strlen($string);
     $keyLen = strlen($key);
