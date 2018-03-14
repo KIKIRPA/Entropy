@@ -240,6 +240,8 @@ if ($cleaninstall) {
              . '// installation path' . "\n"
              . 'const PRIVPATH   = "' . $defaults["setup"]["privpath"] . "\";\n";
     file_put_contents($defaults["setup"]["pubpath"] . "install.conf.php", $install);
+    chmod($defaults["setup"]["pubpath"] . "install.conf.php", 0640);
+    chgrp($defaults["setup"]["pubpath"] . "install.conf.php", $defaults["setup"]["htgroup"]);
 
     echo "\nBUILD CONFIGURATION FILE: app.json\n";
     // interactive mode: ask config file questions
@@ -266,6 +268,9 @@ if ($cleaninstall) {
     // make file
     $app = json_encode($defaults["app"], JSON_PRETTY_PRINT);
     file_put_contents($defaults["setup"]["privpath"] . "config/app.json", $app);
+    chmod($defaults["setup"]["privpath"] . "config/app.json", 0660);
+    chgrp($defaults["setup"]["privpath"] . "config/app.json", $defaults["setup"]["htgroup"]);
+    
 
     echo "\nBUILD CONFIGURATION FILE: users.json\n";
     // interactive mode: ask config file questions
@@ -304,6 +309,8 @@ if ($cleaninstall) {
                   );
     $users = json_encode($users, JSON_PRETTY_PRINT);
     file_put_contents($defaults["setup"]["privpath"] . "config/users.json", $users);
+    chmod($defaults["setup"]["privpath"] . "config/users.json", 0660);
+    chgrp($defaults["setup"]["privpath"] . "config/users.json", $defaults["setup"]["htgroup"]);
 
     // leave trail
     file_put_contents($defaults["setup"]["privpath"] . ".installed", "");
@@ -311,10 +318,80 @@ if ($cleaninstall) {
 
 // update only: compare other config files and propose to leave/merge/replace them if changed (md5?)
 else {
-    //TODO
-    //don't touch app, blacklist, libraries, users
-}
+    echo "\nUPDATE CONFIGURATION FILES\n";
+    // scan all config files in the downloaded source
+    foreach (scandir2("./config/", true) as $filename) {
+        $src = "./config/" . $filename;
+        $dst = $defaults["setup"]["privpath"] . "config/" . $filename;
 
+        //check if this file already exists in the installed instance
+        if (!file_exists($dst)) {
+            // new file: copy!
+            echo "new config file " . $filename . "\n";
+            copy($src, $dst);
+            chmod($dst, 0660);
+            chgrp($dst, $defaults["setup"]["htgroup"]);
+        } else {
+            // file already exists
+            //don't touch app, blacklist, libraries, users
+            $updateble = array("colors.json", "datatypes.json", "export.json", "import.json", "licenses.json", "modules.json");
+            if (in_array($filename, $updateble)) {
+                if (md5_file($src) != md5_file($dst)) {
+                    // file is changed on one of the two ends (new version in src OR user has changed installed version!)
+                    // three options: keep installed, update or try to merge
+
+                    // interactive mode
+                    if (!isset($options["d"]) and !isset($options["defaults"])) {
+                        echo "\n" . $filename . " has been changed. Keep, update or merge? [merge] ";
+                        while (1) {
+                            $response = trim(fgets(STDIN));
+                            if (!empty($response)) {
+                                $response = strtolower($response[0]);
+                                if (in_array($response, ["k", "u", "m"])) {
+                                    break;
+                                } else {
+                                    echo "\nInvalid response; please answer with [k]eep, [u]pdate or [m]erge: ";
+                                }
+                            } else {
+                                $response = "m";
+                                break;
+                            }
+                        }
+                    } else { //non-interactive mode: merge!
+                        $response = "m";
+                    }
+
+                    switch ($response) {
+                        case "update": // UPDATE
+                        case "u":
+                            echo " - update configuration file " . $filename . "\n";
+                            copy($dst, $dst . "setup" . date("YmdHis"));  //backup the installed version!
+                            copy($src, $dst);
+                            chmod($dst, 0660);
+                            chgrp($dst, $defaults["setup"]["htgroup"]);
+                            break;
+                        case "keep": // KEEP = do nothing
+                        case "k":
+                            echo " - keep original file " . $filename . "\n";
+                            break;
+                        case "merge":
+                        case "m":
+                        default:
+                            // MERGE
+                            echo " - merge configuration file " . $filename . "\n";
+                            copy($dst, $dst . "setup" . date("YmdHis"));  //backup the installed version!
+                            $orig = json_decode(file_get_contents($dst), true);
+                            $new = json_decode(file_get_contents($src), true);
+                            $orig = array_merge_recursive($new, $orig);
+                            $orig = json_encode($orig, JSON_PRETTY_PRINT);
+                            file_put_contents($dst, $orig);
+                            break;
+                    }
+                }
+            }
+        }
+    }
+}
 
 echo "\nFinished.\n\n";
 
@@ -325,11 +402,17 @@ echo "\nFinished.\n\n";
 
 
 // array of files and subdirs (without . and ..) for a given dir
-function scandir2($dir)
+function scandir2($dir, $filesOnly = false)
 {
     if (is_dir($dir)) {
         $files = scandir($dir);
-        return array_diff($files, [".", ".."]);
+        $files = array_diff($files, [".", ".."]);
+        if ($filesOnly) {
+            foreach ($files as $f) {
+                if (is_dir($f)) $files = array_diff($files, [$f]);
+            }
+        }
+        return $files;
     }
     return array();
 }
