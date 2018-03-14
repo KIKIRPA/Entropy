@@ -19,16 +19,16 @@ require_once(PRIVPATH . 'inc/common_basic.inc.php');
     - datatypes.json  --> $DATATYPES
   ***********************************************************************************/
 
-$BLACKLIST = readJSONfile(BLACKLIST_FILE);
-$USERS     = readJSONfile(USERS_FILE);
+$BLACKLIST = readJSONfile(\Core\Config\App::get("config_blacklist_file"));
+$USERS     = readJSONfile(\Core\Config\App::get("config_users_file"));
 
-$MODULES   = readJSONfile(MODULES_FILE, true);
-$LIBS      = readJSONfile(LIB_FILE, true);
-$DATATYPES = readJSONfile(DATATYPES_FILE, true);
-$COLORS    = readJSONfile(COLORS_FILE, true);
+$MODULES   = readJSONfile(\Core\Config\App::get("config_modules_file"), true);
+$LIBS      = readJSONfile(\Core\Config\App::get("config_libraries_file"), true);
+$DATATYPES = readJSONfile(\Core\Config\App::get("config_datatypes_file"), true);
+$COLORS    = readJSONfile(\Core\Config\App::get("config_colors_file"), true);
 
-$IMPORT = readJSONfile(IMPORT_FILE, true);
-$EXPORT = readJSONfile(EXPORT_FILE, true);
+$IMPORT = readJSONfile(\Core\Config\App::get("config_import_file"), true);
+$EXPORT = readJSONfile(\Core\Config\App::get("config_export_file"), true);
 
 
 /***********************************************************************************
@@ -56,7 +56,7 @@ if (isset($BLACKLIST[$_SERVER['REMOTE_ADDR']])) {
 }
 
 define("BLACKLIST_COUNT", $temp);
-define("IS_BLACKLISTED", ($temp >= MAXTRIES_IP));
+define("IS_BLACKLISTED", ($temp >= \Core\Config\App::get("login_ip_attempts")));
 
 // SESSION MANAGEMENT
 
@@ -80,7 +80,7 @@ if (IS_HTTPS and !IS_BLACKLISTED) {
     // set or renew session
     if (!isset($_SESSION['ts'])) {      // set timestamp to auto-close sessions after a certain time
         $_SESSION['ts'] = time();
-    } elseif (time() - $_SESSION['ts'] < EXPIRE) {  //last activity is less than $expire ago: stay logged in
+    } elseif (time() - $_SESSION['ts'] < \Core\Config\App::get("login_session_expire")) {  //last activity is less than $expire ago: stay logged in
         session_regenerate_id(true);    // change session ID for the current session and invalidate old session ID (protects against session fixation attack)
         $_SESSION['ts'] = time();       // update timestamp
     } else {                              // auto log off
@@ -100,13 +100,13 @@ if (IS_HTTPS and !IS_BLACKLISTED) {
   ***********************************************************************************/
 
 $htmlHeaderStyles = Array(
-    CSS_FA,
-    CSS_BULMA,
+    \Core\Config\App::get("css_fa"),
+    \Core\Config\App::get("css_bulma"),
     "./css/jquery.notifyBar.css"
 );
 
 $htmlHeaderScripts = Array(
-    JS_JQUERY,
+    \Core\Config\App::get("js_jquery"),
     "./js/jquery.notifyBar.js",
     "./js/main.js"
 );

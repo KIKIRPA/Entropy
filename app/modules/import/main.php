@@ -17,9 +17,9 @@ require_once(PRIVPATH . 'inc/common_convert.inc.php');
 ****************************/
 
 //HEADER
-array_push($htmlHeaderStyles, CSS_DT_BULMA);
-array_push($htmlHeaderScripts, JS_DT, JS_DT_BULMA);  
-include(HEADER_FILE);
+array_push($htmlHeaderStyles, \Core\Config\App::get("css_dt_bulma"));
+array_push($htmlHeaderScripts, \Core\Config\App::get("js_dt"), \Core\Config\App::get("js_dt_bulma"));  
+include(PRIVPATH . 'inc/header.inc.php');
 
 echo "      <h3>Library upload tool</h3>\n";
 
@@ -28,15 +28,17 @@ echo "      <h3>Library upload tool</h3>\n";
 
 $action = false;
 
-if (!file_exists(LIB_PATH . $_REQUEST["lib"])) {
-    if (!mkdir2(LIB_PATH . $_REQUEST["lib"] . "/")) {
+$libraryPath = \Core\Config\App::get("libraries_path") . $_REQUEST["lib"] . "/";
+
+if (!file_exists($libraryPath)) {
+    if (!mkdir2($libraryPath)) {
         echo "<span style='color:red'>ERROR: Could not make library directory for: " . $id . "!</span><br><br>\n";
         eventLog("ERROR", "Could not make library directory for: " .$id . " [module_import]", true, false);
     }
 }
 
-if (file_exists(LIB_PATH . $_REQUEST["lib"] . "/transactions_open.json")) {
-    $transactions = readJSONfile(LIB_PATH . $_REQUEST["lib"] . "/transactions_open.json", false);
+if (file_exists($libraryPath . "transactions_open.json")) {
+    $transactions = readJSONfile($libraryPath . "transactions_open.json", false);
 } else {
     $transactions = array();
 }
@@ -56,7 +58,7 @@ try {
         }
     
         // check if the transaction dir exists
-        $trdir = LIB_PATH . $_REQUEST["lib"] . "/" . $tr . "/";
+        $trdir = $libraryPath . $tr . "/";
         if (!file_exists($trdir)) {
             throw new \Exception('Upload directory was not found for '. $tr);
         }
@@ -65,7 +67,7 @@ try {
         if (isset($_REQUEST["del"])) {
             rmdir2($trdir);
             unset($transactions[$tr]);
-            $error = writeJSONfile(LIB_PATH . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
+            $error = writeJSONfile($libraryPath . "transactions_open.json", $transactions);
             if ($error) {
                 throw new \Exception($error);
             }
@@ -85,7 +87,7 @@ try {
                             "action" => "none",
                             "step"   => 1
                             );
-        $trdir = LIB_PATH . $_REQUEST["lib"] . "/" . $tr . "/";
+        $trdir = $libraryPath . $tr . "/";
         //don't write transactions_open.json at this time, it will create an empty transaction each
     //time STEP1 is opened
     }
@@ -280,7 +282,7 @@ STEP1:
 
 
     //FOOTER
-    include(FOOTER_FILE);
+    include(PRIVPATH . 'inc/footer.inc.php');
 
     return;   // return to the main php page
 }
@@ -377,7 +379,7 @@ STEP2:
         // Update transactions_open.json
         $transactions[$tr]["action"] = $action;
         $transactions[$tr]["step"] = 3;
-        $error = writeJSONfile(LIB_PATH . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
+        $error = writeJSONfile($libraryPath . "transactions_open.json", $transactions);
         if ($error) {
             throw new \Exception($error);
         }
@@ -409,7 +411,7 @@ STEP3:
       - empty fields (warnings)
     */
 
-    $existing = readJSONfile(LIB_PATH . $_REQUEST["lib"] . "/measurements.json");  //if file does not exist: empty array
+    $existing = readJSONfile($libraryPath . "measurements.json");  //if file does not exist: empty array
     $existing = array_keys($existing);
     
     //unset($measurements[""]);   //remove empty rows
@@ -629,7 +631,7 @@ STEP3:
 
 
     //FOOTER
-    include(FOOTER_FILE);
+    include(PRIVPATH . 'inc/footer.inc.php');
     
     return;   // return to the main php page
   }
@@ -708,7 +710,7 @@ STEP3:
       
         // Update transactions_open.json
         $transactions[$tr]["step"] = 5;
-        $error = writeJSONfile(LIB_PATH . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
+        $error = writeJSONfile($libraryPath . "transactions_open.json", $transactions);
         if ($error) {
             throw new \Exception($error);
         }
@@ -824,7 +826,7 @@ STEP5:
     
 
     //FOOTER
-    include(FOOTER_FILE);
+    include(PRIVPATH . 'inc/footer.inc.php');
 
     return;
 }
@@ -913,7 +915,7 @@ STEP6:
 
 
     //FOOTER
-    include(FOOTER_FILE);
+    include(PRIVPATH . 'inc/footer.inc.php');
 
     return;
   }
@@ -1164,12 +1166,10 @@ STEP9:
        . "      action: " . $action . "<br>\n"
        . "    </strong><br><br>\n\n";
     
-    $libdir = LIB_PATH . $_REQUEST["lib"] . "/";
-    
     try {
         // open the library measurements.json (or a empty array in case of replace) as $result
         if (($action == "append") or ($action == "update")) {
-            $result = readJSONfile($libdir . "measurements.json", false);
+            $result = readJSONfile($libraryPath . "measurements.json", false);
         } elseif ($action == "replace") {
             $result = array();
         } else {
@@ -1194,10 +1194,10 @@ STEP9:
         if ($error) {
             throw new \Exception($error);
         }
-        if (file_exists($libdir . "measurements.json")) {
-            unlink($libdir . "measurements.json");
+        if (file_exists($libraryPath . "measurements.json")) {
+            unlink($libraryPath . "measurements.json");
         }
-        $success = link($path, $libdir . "measurements.json");
+        $success = link($path, $libraryPath . "measurements.json");
         if ($success) {
             echo "<strong>Published</strong> library file<br><br>\n";
         } else {
@@ -1205,12 +1205,12 @@ STEP9:
         }
       
         // some administration in transactions_open and transactions_closed.json
-        $transactions_closed = readJSONfile($libdir . "transactions_closed.json", false);
+        $transactions_closed = readJSONfile($libraryPath . "transactions_closed.json", false);
         $transactions_closed[$tr] = $transactions[$tr];
         $transactions_closed[$tr]["timestamp"] = mdate();
         unset($transactions[$tr]);
-        writeJSONfile($libdir . "transactions_closed.json", $transactions_closed);
-        writeJSONfile($libdir . "transactions_open.json", $transactions);
+        writeJSONfile($libraryPath . "transactions_closed.json", $transactions_closed);
+        writeJSONfile($libraryPath . "transactions_open.json", $transactions);
       
         echo "      <span style='color:red'>Data successfully merged into library ". $_REQUEST["lib"] ."</span><br>\n";
     } catch (\Exception $e) {
@@ -1221,9 +1221,9 @@ STEP9:
       
         // Update transactions_open.json
       $transactions[$tr]["step"] = 10;  // lock this transaction, so that a sysadmin can look into it
-      $error = writeJSONfile(LIB_PATH . $_REQUEST["lib"] . "/transactions_open.json", $transactions);
+      $error = writeJSONfile($libraryPath . "transactions_open.json", $transactions);
     }
 
     //FOOTER
-    include(FOOTER_FILE);
+    include(PRIVPATH . 'inc/footer.inc.php');
 }

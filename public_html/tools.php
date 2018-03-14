@@ -6,7 +6,7 @@
 
 
 require_once('install.conf.php');
-require_once(PRIVPATH . 'entropy.conf.php');
+//require_once(PRIVPATH . 'entropy.conf.php');
 require_once(PRIVPATH . 'inc/autoloader.php');
 require_once(PRIVPATH . 'inc/init.inc.php');
 require_once(PRIVPATH . 'inc/common_basic.inc.php');
@@ -59,7 +59,7 @@ if ($isLoggedIn) {
 
 
 
-$LIBS = json_decode(file_get_contents(LIB_FILE), true);
+$LIBS = readJSONfile(\Core\Config\App::get("config_libraries_file"), true);
 
 $showMod = $_REQUEST["mod"];
 

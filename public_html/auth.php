@@ -1,6 +1,6 @@
 <?php
 require_once('install.conf.php');
-require_once(PRIVPATH . 'entropy.conf.php');
+//require_once(PRIVPATH . 'entropy.conf.php');
 require_once(PRIVPATH . 'inc/autoloader.php');
 require_once(PRIVPATH . 'inc/init.inc.php');
 require_once(PRIVPATH . 'inc/common_basic.inc.php');
@@ -62,8 +62,6 @@ if (isset($_REQUEST["logout"])
     3. LOG IN
 ************ */
 
-//$USERS = readJSONfile(USERS_FILE, true);  --> already loaded in init.inc.php
-
 if (!isset($_SESSION['username']) and !isset($showMod)) {
     if (isset($_POST['user']) and isset($_POST['pass'])) { //login action
         // 1. check username or email address
@@ -79,10 +77,11 @@ if (!isset($_SESSION['username']) and !isset($showMod)) {
     
         if (!empty($user)) {        //only if the supplied username/email occurs in the users-table, this will be set
         // 2. check if not blocked (tries >= maxtries)
-        if (count($USERS[$user]['tries']) >= MAXTRIES_PW) {   // account blocked!
-        if (count($USERS[$user]['tries']) == MAXTRIES_PW) {
-            eventLog("AUTH", "Account " . $user .  " has been disabled due to too many failed login attempts.", false, true);
-        }
+        $maxTries = \Core\Config\App::get("login_password_attempts");
+        if (count($USERS[$user]['tries']) >= $maxTries) {   // account blocked!
+            if (count($USERS[$user]['tries']) == $maxTries) {
+                eventLog("AUTH", "Account " . $user .  " has been disabled due to too many failed login attempts.", false, true);
+            }
         
             $msg = "The account <i>" . $user . "</i> has been disabled due to too many failed login attempts. Contact the site administrator to re-enable it.";
             $showMod = "loginform";
@@ -94,7 +93,7 @@ if (!isset($_SESSION['username']) and !isset($showMod)) {
         $USERS[$user]['tries'][$ts] = $ip;     // username based login tries  --> blocking account
         $BLACKLIST[$ip][$ts] = $_POST['user']; // ip based blacklist
         
-        $msg = "Wrong password for " . $user . ".  Attempt " . (count($USERS[$user]['tries']) + 1) . " of " . MAXTRIES_PW ;  //add number of tries left?
+        $msg = "Wrong password for " . $user . ".  Attempt " . (count($USERS[$user]['tries']) + 1) . " of " . \Core\Config\App::get("login_password_attempts") ;  //add number of tries left?
         $showMod = "loginform";        // show login form (again)
         eventLog("AUTH", "Login " . $user .  " FAILED. Password count: " . count($USERS[$user]['tries']));
         } else { //correct password!
@@ -139,7 +138,7 @@ if (!isset($_SESSION['username']) and !isset($showMod)) {
 *************************************** */
 
 //if (empty($showMod) and !in_array($ip, $USERS[$user]['trusted']))  //isset($_SESSION('untrusted'))
-if (TWOPASS_ENABLE) {
+if (\Core\Config\App::get("login_twopass_enable")) {
     if (!$_SESSION['trusted']
         and !isset($showMod)
         and isset($_SESSION['username'])
@@ -147,11 +146,12 @@ if (TWOPASS_ENABLE) {
         // if no trustcode is given (POST): create one and show form
         if (empty($_POST['trustcode'])) {
             $_SESSION['trustcode'] = sprintf("%04d", mt_rand(0, 9999));
+            $from = \Core\Config\App::get("mail_admin");
             mail(
-            $USERS[$user]['email'],
-            APP_NAME . " authorisation code",
-            "Automated mail from " . gethostname() . ", do not reply.\r\n\r\nAuthorisation code : <b>" . $_SESSION['trustcode'] . "</b>\r\n\r\nCopy this code in the designated code box on " . gethostname() . ".\r\nThe code is time-limited and will expire after a given time.\r\n",
-            "From:  " . MAIL_ADMIN . "\r\nReply-To:  " . MAIL_ADMIN . "\r\nX-Mailer: PHP/" . phpversion()
+                $USERS[$user]['email'],
+                APP_NAME . " authorisation code",
+                "Automated mail from " . gethostname() . ", do not reply.\r\n\r\nAuthorisation code : <b>" . $_SESSION['trustcode'] . "</b>\r\n\r\nCopy this code in the designated code box on " . gethostname() . ".\r\nThe code is time-limited and will expire after a given time.\r\n",
+                "From:  " . $from . "\r\nReply-To:  " . $from . "\r\nX-Mailer: PHP/" . phpversion()
             );
             $showMod = "trustform";
             unset($msg);
@@ -207,11 +207,11 @@ if (!$_SESSION['pwdok']
 }
 
 //all security checks are performed!
-if (!file_put_contents(USERS_FILE, json_encode($USERS, JSON_PRETTY_PRINT))) {
-    eventLog("WARNING", "Could not write to ". USERS_FILE);
+if (!file_put_contents(\Core\Config\App::get("config_users_file"), json_encode($USERS, JSON_PRETTY_PRINT))) {
+    eventLog("WARNING", "Could not write to users configuration file");
 }
-if (!file_put_contents(BLACKLIST_FILE, json_encode($BLACKLIST, JSON_PRETTY_PRINT))) {
-    eventLog("WARNING", "Could not write to ". BLACKLIST_FILE);
+if (!file_put_contents(\Core\Config\App::get("config_blacklist_file"), json_encode($BLACKLIST, JSON_PRETTY_PRINT))) {
+    eventLog("WARNING", "Could not write to blacklist file");
 }
 
 
@@ -241,11 +241,11 @@ if (!isset($showMod)) {
 
 skip:
 
-include(HEADER_FILE);
+include(PRIVPATH . 'inc/header.inc.php');
 
 if ($showMod != "empty") {
     include(PRIVPATH . 'inc/auth_' . $showMod . '.inc.php');
 } elseif (isset($msg)) {
     echo $msg;
 }
-include(FOOTER_FILE);
+include(PRIVPATH . 'inc/footer.inc.php');

@@ -13,8 +13,11 @@ class Licenses
     private static $config = array();
     private static $initialized = false;
     
-    private static function init($file = LICENSES_FILE)
+    private static function init($file = null)
     {
+        if (is_null($file))
+            $file = \Core\Config\App::get("config_licenses_file");
+        
         self::$config = readJSONfile($file);
         self::$initialized = true;
 

@@ -28,7 +28,7 @@ if (($f == "set") and ($output == false)) {
             }
         }
     
-        $error = writeJSONfile(USERS_FILE, $USERS);
+        $error = writeJSONfile(\Core\Config\App::get("config_users_file"), $USERS);
 
         if ($error) {
             echo "<span style='color:red'>ERROR: " . $error . "!</span><br><br>\n";
@@ -40,7 +40,7 @@ if (($f == "set") and ($output == false)) {
     }
 
     // create directory?
-    if (!mkdir2(LIB_PATH . $id . "/")) {
+    if (!mkdir2(\Core\Config\App::get("libraries_path") . $id . "/")) {
         echo "<span style='color:red'>ERROR: could not create directory.</span><br><br>\n";
         eventLog("ERROR", "Could not create directory. [module_libmk]", false, true);
     }

@@ -7,9 +7,9 @@ if (count(get_included_files()) == 1) {
 }
 
 //HEADER
-array_push($htmlHeaderStyles, CSS_DT_BULMA);
-array_push($htmlHeaderScripts, JS_DT, JS_DT_BULMA);  
-include(HEADER_FILE);
+array_push($htmlHeaderStyles, \Core\Config\App::get("css_dt_bulma"));
+array_push($htmlHeaderScripts, \Core\Config\App::get("js_dt"), \Core\Config\App::get("js_dt_bulma"));  
+include(PRIVPATH . 'inc/header.inc.php');
 
 ?>
   <h3>Library management</h3>
@@ -83,4 +83,4 @@ include(HEADER_FILE);
 <?php
 
 //FOOTER
-include(FOOTER_FILE);
+include(PRIVPATH . 'inc/footer.inc.php');
