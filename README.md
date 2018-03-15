@@ -22,16 +22,15 @@ Although Entropy is considered relatively stable (beta), the authors cannot be h
 - Terms of usage / licensing on measurement, library and repository levels
 
 ### M1.1
-- support linked datasets
-- viewer for static images
-- improved import module
+- Support linked datasets
+- Viewer for static images
+- Improved import module
 
 ### M2
 - Multi-user (user and permission management)
 - Single file import and editing existing data
-- Support for very large (linked) datasets
+- Explore the possibilities for storing/converting/displaying large datasets (internally stored)
 - Support for mapping/imaging data
-- Implementation of a CSS framework
 
 ### M3
 - API
