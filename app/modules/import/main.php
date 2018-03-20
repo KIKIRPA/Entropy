@@ -668,13 +668,13 @@ STEP3:
     //      or, if none are specified the "default"-dataset
     $datasets = array();
     foreach ($measurements as $id => $measurement) {
-        if (!isset($measurement["dataset"])) {
-            $measurements[$id]["dataset"]["default"] = array();
+        if (!isset($measurement["datasets"])) {
+            $measurements[$id]["datasets"]["default"] = array();
             if (!in_array("default", $datasets)) {
                 array_push($datasets, "default");
             }
         } else {
-            foreach ($measurement["dataset"] as $datasetid => $value) {
+            foreach ($measurement["datasets"] as $datasetid => $value) {
                 if (!in_array($datasetid, $datasets)) {
                     array_push($datasets, $datasetid);
                 }
@@ -778,8 +778,8 @@ STEP5:
         foreach ($datasets as $ds) {
             echo "          <td><em>";
         
-            if (isset($measurement["dataset"][$ds])) {
-                $ds = $measurement["dataset"][$ds];
+            if (isset($measurement["datasets"][$ds])) {
+                $ds = $measurement["datasets"][$ds];
         
                 // (non-binary) data
                 // $ds["_data"] is just a field where we store if a file was uploaded, not meant to
@@ -854,7 +854,7 @@ STEP6:
        
     $i = 0; //an index for datasets, which we can add to the POST parameters
     
-    foreach ($measurements[$_REQUEST["id"]]["dataset"] as $dsid => $ds) {
+    foreach ($measurements[$_REQUEST["id"]]["datasets"] as $dsid => $ds) {
         // examine the existing data
         // 1. data
         $hasData = isset($ds["_data"]);
@@ -930,7 +930,7 @@ STEP6:
 
 STEP7:
 {
-    $datasets = array_keys($measurements[$_REQUEST["id"]]["dataset"]); //array of dataset names
+    $datasets = array_keys($measurements[$_REQUEST["id"]]["datasets"]); //array of dataset names
     $build = false;  // rebuild a data json file
 
     try {
@@ -948,9 +948,9 @@ STEP7:
             $json = $measurements[$_REQUEST["id"]];
             unset($json["_action"], $json["_built"]);
             foreach ($datasets as $dsid => $ds) {
-                unset($json["dataset"][$dsid]["_data"],
-                    $json["dataset"][$dsid]["_anno"],
-                    $json["dataset"][$dsid]["_bin"]);
+                unset($json["datasets"][$dsid]["_data"],
+                    $json["datasets"][$dsid]["_anno"],
+                    $json["datasets"][$dsid]["_bin"]);
             }
         } else { // 1.2 UPDATE EXISTING
             // open JSON data file
@@ -998,23 +998,23 @@ STEP7:
                 }
           
                 // merge with metadata, update original $measurements and set $build
-                if (!is_array($json["dataset"][$ds])) {
-                    $json["dataset"][$ds] = array();
+                if (!is_array($json["datasets"][$ds])) {
+                    $json["datasets"][$ds] = array();
                 }
-                $json["dataset"][$ds]["data"] = $data;
-                if (!is_array($measurements[$_REQUEST["id"]]["dataset"][$ds])) {
-                    $measurements[$_REQUEST["id"]]["dataset"][$ds] = array();
+                $json["datasets"][$ds]["data"] = $data;
+                if (!is_array($measurements[$_REQUEST["id"]]["datasets"][$ds])) {
+                    $measurements[$_REQUEST["id"]]["datasets"][$ds] = array();
                 }
-                $measurements[$_REQUEST["id"]]["dataset"][$ds]["_data"] = $_FILES["dataUp" . $key]['name'];
+                $measurements[$_REQUEST["id"]]["datasets"][$ds]["_data"] = $_FILES["dataUp" . $key]['name'];
                 $build = true;
 
                 // set units: correct if supplied in csv, or take the default values
                 // TODO: create a way to read those from the uploaded data (via the importfilters)
                 // TODO: create a way to change them in the data upload form
-                $json["dataset"][$ds]["units"] = findDataTypeUnits( $measurements[$_REQUEST["id"]]["type"], 
+                $json["datasets"][$ds]["units"] = findDataTypeUnits( $measurements[$_REQUEST["id"]]["type"], 
                                                                     $DATATYPES, 
                                                                     "json",
-                                                                    isset($json["dataset"][$ds]["units"]) ? $json["dataset"][$ds]["units"] : null
+                                                                    isset($json["datasets"][$ds]["units"]) ? $json["datasets"][$ds]["units"] : null
                                                                   );
             }
         
@@ -1041,13 +1041,13 @@ STEP7:
                 }
           
                 // merge with metadata, $measurements and set $build
-                $json["dataset"][$ds]["anno"] = $data;
-                $measurements[$_REQUEST["id"]]["dataset"][$ds]["_anno"] = $_FILES["annoUp" . $key]['name'];
+                $json["datasets"][$ds]["anno"] = $data;
+                $measurements[$_REQUEST["id"]]["datasets"][$ds]["_anno"] = $_FILES["annoUp" . $key]['name'];
                 $build = true;
             } elseif ($_REQUEST["annoUpRadio" . $key] == "del") {
                 unlink($trdir . $fn . ".anno");
-                unset($json["dataset"]["ds"]["anno"],
-                $measurements[$_REQUEST["id"]]["dataset"][$ds]["_anno"]);
+                unset($json["datasets"]["ds"]["anno"],
+                $measurements[$_REQUEST["id"]]["datasets"][$ds]["_anno"]);
                 $build = true;
             }
         
@@ -1067,11 +1067,11 @@ STEP7:
                 $error = checkMultiUpload("binUp" . $key, $trdir, $fn . "__");
                 if (!$error) {  // update $measurements...[_bin]
                     foreach ($_FILES["binUp" . $key]['name'] as $file) {
-                        if (!isset($measurements[$_REQUEST["id"]]["dataset"][$ds]["_bin"])) {
-                            $measurements[$_REQUEST["id"]]["dataset"][$ds]["_bin"] = array();
+                        if (!isset($measurements[$_REQUEST["id"]]["datasets"][$ds]["_bin"])) {
+                            $measurements[$_REQUEST["id"]]["datasets"][$ds]["_bin"] = array();
                         }
-                        if (!in_array($file, $measurements[$_REQUEST["id"]]["dataset"][$ds]["_bin"])) {
-                            $measurements[$_REQUEST["id"]]["dataset"][$ds]["_bin"][] = $file;
+                        if (!in_array($file, $measurements[$_REQUEST["id"]]["datasets"][$ds]["_bin"])) {
+                            $measurements[$_REQUEST["id"]]["datasets"][$ds]["_bin"][] = $file;
                         }
                     }
                 } else {
@@ -1124,7 +1124,7 @@ STEP7:
 STEP8:
 {
     try {
-        $i = array_search($_REQUEST["f"], $measurements[$_REQUEST["id"]]["dataset"][$_REQUEST["ds"]]["_bin"]);
+        $i = array_search($_REQUEST["f"], $measurements[$_REQUEST["id"]]["datasets"][$_REQUEST["ds"]]["_bin"]);
         if ($i) {
             // delete file
             $fn = $_REQUEST["id"] . (($ds == 'default')?"":"__".$ds) . "__" . $_REQUEST["f"];
@@ -1134,7 +1134,7 @@ STEP8:
             }
         
             // log in inflated json
-            unset($measurements[$_REQUEST["id"]]["dataset"][$ds]["_bin"][$i]);
+            unset($measurements[$_REQUEST["id"]]["datasets"][$ds]["_bin"][$i]);
             $error = writeJSONfile($trdir . "_3_inflated.json", $measurements);
             if ($error) {
                 throw new \Exception($error);

@@ -8,14 +8,14 @@ if (count(get_included_files()) == 1) {
 
 // sort data
 $sortOrder = in_array("inverted", $DATATYPES[$parenttype]["graph"]["xy"]) ? SORT_DESC : SORT_ASC;
-orderData($data["dataset"][$showDS]["data"], $sortOrder);
+orderData($data["datasets"][$showDS]["data"], $sortOrder);
 
 ?>
                         <div id="graph" style="width: 100%; height: 450px;"></div>          
                         <script type="text/javascript">
                             g = new Dygraph(
                                 document.getElementById("graph"),
-                                <?= json_encode($data["dataset"][$showDS]["data"]) ?>,
+                                <?= json_encode($data["datasets"][$showDS]["data"]) ?>,
                                 { 
                                     labels: ["<?= isset($units["x"]) ? $units["x"] : "Undefined" ?>","<?= reset($viewTags) ?>"],
                                     xlabel: "<?= isset($units["x"]) ? $units["x"] : "Undefined" ?>", 

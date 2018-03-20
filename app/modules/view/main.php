@@ -140,11 +140,11 @@ if ($viewLicense) {
 
 $parenttype = findDataType($viewTags["Type"], $DATATYPES);
 $viewer = $DATATYPES[$parenttype]["viewer"];
-$units = findDataTypeUnits($parenttype, $DATATYPES, 'html', $data["dataset"][$showDS]["units"]);
+$units = findDataTypeUnits($parenttype, $DATATYPES, 'html', $data["datasets"][$showDS]["units"]);
 
-if (isset($data["dataset"][$showDS]["anno"])) {
-    if (is_array($data["dataset"][$showDS]["anno"])) {
-        $anno = $data["dataset"][$showDS]["anno"];
+if (isset($data["datasets"][$showDS]["anno"])) {
+    if (is_array($data["datasets"][$showDS]["anno"])) {
+        $anno = $data["datasets"][$showDS]["anno"];
         foreach ($anno as $i => $a) {
             $anno[$i]["series"] = reset($viewTags);
         }

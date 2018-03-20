@@ -21,10 +21,10 @@ if (count(get_included_files()) == 1) {
                     </div>
 <?php             endforeach; ?>
                 </div>
-<?php         if (count($data["dataset"]) > 1): ?>
+<?php         if (count($data["datasets"]) > 1): ?>
                 <div class="tabs">
                     <ul>
-<?php                 foreach ($data["dataset"] as $key => $value): ?>
+<?php                 foreach ($data["datasets"] as $key => $value): ?>
                         <li<?= ($key == $showDS) ? " class=\"is-active\"" : "" ?>>
                             <a href="<?= $_SERVER["PHP_SELF"]; ?>?lib=<?= $showLib ?>&id=<?= $showID ?>&ds=<?= $key ?>"><?= $key ?></a>
                         </li>

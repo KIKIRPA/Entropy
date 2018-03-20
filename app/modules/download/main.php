@@ -45,7 +45,7 @@ try {
         
         // separate metadata, data and export-options
         $meta = overrideMeta($data, $showDS);
-        $data = $data["dataset"][$showDS]["data"];
+        $data = $data["datasets"][$showDS]["data"];
         //$units
 
         if (isset($data["options"]["export"])) 

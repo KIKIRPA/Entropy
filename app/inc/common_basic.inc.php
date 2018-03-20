@@ -506,14 +506,14 @@ function overrideMeta($metadata, $dataset = false)
     }
     
     // get dataset-specific metadata, that needs to override all other metadata
-    if ($dataset and isset($metadata[$dataset]["meta"])) {
-        $dsmeta = $metadata[$dataset]["meta"];
+    if ($dataset and isset($metadata["datasets"][$dataset]["meta"])) {
+        $dsmeta = $metadata["datasets"][$dataset]["meta"];
     } else {
         $dsmeta = array();
     }
 
     // remove meta and dataset things from metadata --> only direct metadata
-    unset($metadata["meta"], $metadata["dataset"]);
+    unset($metadata["meta"], $metadata["datasets"]);
     
     return array_replace_recursive($metadata, $metameta, $dsmeta);
 }
