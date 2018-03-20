@@ -13,20 +13,24 @@ Although Entropy is considered relatively stable (beta), the authors cannot be h
 
 ## Planned milestones
 
-### M1
-- ~~Single user (more users are possible, but no front-end)~~
-- ~~Twodimensional data (spectra)~~
-- ~~File conversion from/to common file formats for Raman spectroscopy~~
-- ~~Flexible file-based data storage (database-less)~~
-- ~~Mass import of data (metadata supplied as comma-separated-values file)~~
-- ~~Terms of usage / licensing on measurement, library and repository levels~~
+### [v1.0](https://github.com/KIKIRPA/Entropy/releases/tag/v1.0) (15 March 2018)
+- Single user (more users are possible, but no front-end)
+- Twodimensional data (spectra)
+- File conversion from/to common file formats for Raman spectroscopy
+- Flexible file-based data storage (database-less)
+- Mass import of data (metadata supplied as comma-separated-values file)
+- Terms of usage / licensing on measurement, library and repository levels
+
+### M1.1
+- Support linked datasets
+- Viewer for static images
+- Improved import module
 
 ### M2
 - Multi-user (user and permission management)
 - Single file import and editing existing data
-- Support for very large (linked) datasets
+- Explore the possibilities for storing/converting/displaying large datasets (internally stored)
 - Support for mapping/imaging data
-- Implementation of a CSS framework
 
 ### M3
 - API
