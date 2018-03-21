@@ -367,7 +367,7 @@ else {
                         case "update": // UPDATE
                         case "u":
                             echo " - update configuration file " . $filename . "\n";
-                            copy($dst, $dst . "setup" . date("YmdHis"));  //backup the installed version!
+                            copy($dst, $dst . "_setup" . date("YmdHis"));  //backup the installed version!
                             copy($src, $dst);
                             chmod($dst, 0660);
                             chgrp($dst, $defaults["setup"]["htgroup"]);
@@ -381,10 +381,10 @@ else {
                         default:
                             // MERGE
                             echo " - merge configuration file " . $filename . "\n";
-                            copy($dst, $dst . "setup" . date("YmdHis"));  //backup the installed version!
+                            copy($dst, $dst . "_setup" . date("YmdHis"));  //backup the installed version!
                             $orig = json_decode(file_get_contents($dst), true);
                             $new = json_decode(file_get_contents($src), true);
-                            $orig = array_merge_recursive($new, $orig);
+                            $orig = array_replace_recursive($new, $orig);
                             $orig = json_encode($orig, JSON_PRETTY_PRINT);
                             file_put_contents($dst, $orig);
                             break;
