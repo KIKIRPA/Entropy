@@ -23,10 +23,19 @@ foreach ($measurement as $key => $value) {
 
 $viewColor = isset($LIBS[$showLib]["color"]) ? bulmaColorModifier($LIBS[$showLib]["color"], $COLORS, \Core\Config\App::get("app_color_default")) : bulmaColorModifier(\Core\Config\App::get("app_color_default"), $COLORS);
 
-// metadata can be saved on different levels, override lesser priority metadata
-$meta = overrideMeta($data, $showDS);
+// datasets
+if (is_array($data["datasets"])) {
+    // make a list of datasets
+    $datasetList = array_keys($data["datasets"]);
 
-unset($measurement, $key, $value);
+    // collapse measurement to only the chosen dataset
+    $measurement = collapseMeasurement($data, $showDS);
+} else {
+    $datasetList = array();
+    $measurement = $data;
+}
+
+unset($data, $key, $value);
 
 
 /* ***********
@@ -118,8 +127,8 @@ unset ($cookie, $code, $format, $prefix, $binfiles);
 $viewLicense = false;
 
 // search license in data file, library or system settings
-if (isset($meta["license"])) {
-    $viewLicense = $meta["license"];
+if (isset($measurement["license"])) {
+    $viewLicense = $measurement["license"];
 } elseif (isset($LIBS[$showLib]["license"])) {
     $viewLicense = $LIBS[$showLib]["license"];
 } elseif (!empty(\Core\Config\App::get("license_default"))) {
@@ -140,11 +149,11 @@ if ($viewLicense) {
 
 $parenttype = findDataType($viewTags["Type"], $DATATYPES);
 $viewer = $DATATYPES[$parenttype]["viewer"];
-$units = findDataTypeUnits($parenttype, $DATATYPES, 'html', $data["datasets"][$showDS]["units"]);
+$units = findDataTypeUnits($parenttype, $DATATYPES, 'html', $measurements["units"]);
 
-if (isset($data["datasets"][$showDS]["anno"])) {
-    if (is_array($data["datasets"][$showDS]["anno"])) {
-        $anno = $data["datasets"][$showDS]["anno"];
+if (isset($measurements["annotations"])) {
+    if (is_array($measurements["annotations"])) {
+        $anno = $measurements["annotations"];
         foreach ($anno as $i => $a) {
             $anno[$i]["series"] = reset($viewTags);
         }
@@ -158,32 +167,29 @@ if (isset($data["datasets"][$showDS]["anno"])) {
    ********** */
 
 $viewMetadata = array();
-$metaNoShow = array("id", "type", "units", "annotations", "attachements", "options", "data", "linkeddata");
 $i = 0;
-foreach ($meta as $key => $item) {
-    if (!in_array($key, $metaNoShow)) {
-        $row = intdiv($i, 3);   // display 3 categories per row
-        $header = nameMeta($key);
-        if (is_array($item)) {
-            foreach ($item as $subkey => $subitem) {
-                $subitem = getMeta($meta, $key . ":" . $subkey, "; ", false);
-                if (!$isLoggedIn) {
-                    $subitem = searchMailHide($subitem);
-                }
-                $subkey = nameMeta($key . ":" . $subkey);
-                $viewMetadata[$row][$header][$subkey] = $subitem;
-            }
-        } else {
+foreach ($measurement["meta"] as $key => $item) {
+    $row = intdiv($i, 3);   // display 3 categories per row
+    $header = nameMeta($key);
+    if (is_array($item)) {
+        foreach ($item as $subkey => $subitem) {
+            $subitem = getMeta($measurement, $key . ":" . $subkey, "; ", false);
             if (!$isLoggedIn) {
-                $item = searchMailHide($item);
+                $subitem = searchMailHide($subitem);
             }
-            $viewMetadata[$row][$header] = $item;
+            $subkey = nameMeta($key . ":" . $subkey);
+            $viewMetadata[$row][$header][$subkey] = $subitem;
         }
-        $i++;
+    } else {
+        if (!$isLoggedIn) {
+            $item = searchMailHide($item);
+        }
+        $viewMetadata[$row][$header] = $item;
     }
+    $i++;
 }
 
-unset($meta, $i, $row, $header, $key, $item, $subkey, $subitem);
+unset($i, $row, $header, $key, $item, $subkey, $subitem);
 
 
 /* ******

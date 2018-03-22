@@ -360,10 +360,10 @@ if (count(get_included_files()) == 1) {
                                 <p class="help">
                                     Defines the columns and the order in which they will be displayed on the library list page. 
                                     All common metadata fields and subfields as defined in the metadata scheme can be requested. 
-                                    With the exception of the "metadata:" prefix, the complete hierarchical tree of a subfield has to be supplied e.g. "samplesource:0:sample identifier". 
-                                    If a field is (in all or some data files) subdivided in subfield, requesting the parent field as a column will join all metadata in its subfields (e.g. it is possible to request "contributor", even if this field is subdivided in "contributor:analyst", "...:institution", "...:address" and more; all the subfield metadata will be shown in a single column, separated with semicolumns). 
-                                    In case you would like to combine selected subfields of a subdivided field in a specific order, this can be achieved by combining them with a plus sign (e.g. "contributor:analyst+institution").
-                                    Date/time fields can be formatted by adding a predefined format string following a caret; possible formats are "datetime", "longdate", "shortdate", "year" and "time" (e.g. "sample:age^year").<br>
+                                    The complete hierarchical tree of a subfield has to be supplied e.g. "meta:sample source:0:sample identifier". 
+                                    If a field is (in all or some data files) subdivided in subfield, requesting the parent field as a column will join all metadata in its subfields (e.g. it is possible to request "meta:contributor", even if this field is subdivided in "meta:contributor:analyst", "...:institution", "...:address" and more; all the subfield metadata will be shown in a single column, separated with semicolumns). 
+                                    In case you would like to combine selected subfields of a subdivided field in a specific order, this can be achieved by combining them with a plus sign (e.g. "meta:contributor:analyst+institution").
+                                    Date/time fields can be formatted by adding a predefined format string following a caret; possible formats are "datetime", "longdate", "shortdate", "year" and "time" (e.g. "meta:sample:age^year").<br>
                                     <strong>IMPORTANT NOTE:</strong> define the columns based on your metadata schema <strong>BEFORE DATA IS IMPORTED</strong>. 
                                     Based on the chosen columns, metadata will be indexed. This indexation cannot be changed afterwards by altering these columns.
                                 </p>

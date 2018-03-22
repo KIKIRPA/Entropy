@@ -7,6 +7,7 @@ class Jcampdx
     public $id;
     public $data = array();
     public $meta = array();
+    public $units = array();
     public $error = false;  // last error msg
 
     public $datatypes;      // TODO: remove this dependency by using a static datatypes class, and accessing it directly!!!
@@ -28,7 +29,7 @@ class Jcampdx
 
 
     /**
-     * __construct($id, $data, $meta = array(), $options = array(), $datatypes = array())
+     * __construct($id, $measurement, $options = array(), $datatypes = array())
      * 
      * Reads data and metadata for conversion
      * - supported parameters:
@@ -45,26 +46,28 @@ class Jcampdx
      *     - forceequalspacing  force equal spacing for (XY..XY) encoding (note: for (X++(Y..Y)) equal spacing is required!)
      *                          O == false, all other values == true
      * 
-     * @param array $data data array
-     * @param array $meta metadata array
+     * @param array $measurement array
      * @param array $options Specific parameters for this convertor
      */
-    function __construct($id, $data, $meta = array(), $options = array(), $datatypes = array())
+    function __construct($id, $data, $measurement, $options = array(), $datatypes = array())
     {
         $this->id = $id;
         $this->datatypes = $datatypes;
 
-        if (is_array($data) and !empty($data)) {
-            $this->data = $data;
+        if (is_array($measurement["data"]) and !empty($measurement["data"])) {
+            $this->data = $measurement["data"];
         } else {
             $this->error = eventLog("WARNING", "No data or not in the correct format");
         }
+                           
+        $this->units = findDataTypeUnits($this->meta["type"], 
+                                         $this->datatypes, 
+                                         "jcampdx", 
+                                         is_array($measurement["units"]) ? $measurement["units"] : false
+                                        );
 
-        if (is_array($meta)) {
-            $this->meta = $meta;
-        } else {
-            $this->error = eventLog("WARNING", "Metadata is not in the correct format");
-        }
+        unset($measurement["data"], $measurement["datasets"], $measurement["datalink"], $measurement["annotations"], $measurement["attachments"], $measurement["options"], $measurement["units"]);
+        $this->meta = $measurement;
         
         if (is_array($options)) {
             $options = array_change_key_case($options, CASE_LOWER);
@@ -191,8 +194,8 @@ class Jcampdx
             "_datatype"         => findDataType($this->meta["type"], $this->datatypes, "jcampdx"),
             "_license"          => "",
             "_softwarestring"   => $this->softwareString,
-            "_xunits"           => "1/CM",              //TODO: findDataTypeUnits($this->meta["type"], $this->datatypes, "jcampdx", $this->units), // there is no $this->units yet; damn, I need that measurement class!
-            "_yunits"           => "RELATIVE INTENSITY" //TODO
+            "_xunits"           => $this->units["x"],
+            "_yunits"           => $this->units["y"]
         );
         
         $lines = fillTemplateWithMeta(\Core\Config\App::get("templates_path") . $this->templateFile, $this->meta, $specificCodes);

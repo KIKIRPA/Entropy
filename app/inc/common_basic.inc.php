@@ -19,7 +19,8 @@ if (count(get_included_files()) == 1) {
     flattenArray($array, $multirecords = false, $mode = -1, $keysep = ":", $fieldsep = "|")
     getMeta($metadata, $get, $concatenate = "; ", $description = ": ")
     nameMeta($get)
-    overrideMeta($metadata, $dataset = False)
+    overrideMeta($metadata, $dataset = False)   ___ DEPRECIATED ___
+    collapseMeasurement($measurement, $dataset)
     findDataType($type, $datatypes, $key = false)
     findDataTypeUnits($type, $datatypes, $key = "json", $search = Null)
     orderData(&$data, $sortOrder = null)
@@ -492,6 +493,8 @@ function nameMeta($get)
 /**
  * overrideMeta($metadata, $dataset = False)
  * 
+ * DEPRECIATED --> use collapseMeasurement()
+ * 
  * merge/override directly stored metadata, with metadata stored in
  * "meta:", and optionally with metadata specific to a dataset
   * returns merged metadata (analytical data is stripped)
@@ -517,6 +520,58 @@ function overrideMeta($metadata, $dataset = false)
     
     return array_replace_recursive($metadata, $metameta, $dsmeta);
 }
+
+
+/**
+ * collapseMeasurement($measurement, $dataset)
+ * 
+ * merge/override common data/meta/units/options with the dataset-specific values of a given dataset 
+ * returns merged, collapsed measurement (without datasets field), or false if the supplied dataset is not found
+ */
+function collapseMeasurement($measurement, $dataset)
+{
+    //different actions for different parts:
+    $recursive = array("meta", "data", "units", "options");           // use array_replace_recursive()
+    $overwrite = array("type", "license", "datalink", "annotations"); // use =
+    $merge     = array("attachments");                                // use array_unique(array_merge())
+
+    //check if dataset exists in the data
+    if (is_array($measurement["datasets"][$dataset])) {
+        $dataset = $measurement["datasets"][$dataset]; 
+    } else {
+        return false;
+    }
+
+    // 1. recursively replace things
+    foreach ($recursive as $item) {
+        if (is_array($measurement[$item]) and is_array($dataset[$item])) {
+            $measurement[$item] = array_replace_recursive($measurement[$item], $dataset[$item]);
+        } elseif (!is_array($measurement[$item]) and is_array($dataset[$item])) {
+            $measurement[$item] = $dataset[$item];
+        }
+    }
+
+    // 2. overwrite things
+    foreach ($overwrite as $item) {
+        if (isset($dataset[$item]))
+            $measurement[$item] = $dataset[$item];
+    }
+
+    // 3. merge things (non-recursively)
+    foreach ($merge as $item) {
+        if (is_array($measurement[$item]) and is_array($dataset[$item])) {
+            $measurement[$item] = array_unique(array_merge($measurement[$item], $dataset[$item]));
+        } elseif (!is_array($measurement[$item]) and is_array($dataset[$item])) {
+            $measurement[$item] = $dataset[$item];
+        }
+    }
+
+    // remove datasets
+    unset($measurement["datasets"]);
+
+    return $measurement;
+}
+
 
 
 /**
@@ -808,7 +863,7 @@ function bulmaColorModifier($color, $colorList, $default = null)
  * The format can be a file extension, or a downloadconverted library setting item in the form of "[convertor:[datatype:]]extension".
  * 
  * The optional $options array contains convertor options, as can be supplied in the CSV
- * metadata files ("options:import:jcampdx:templatefile" --> $options = $meta["options"]["import"]), and will be
+ * metadata files ("options:import:jcampdx:templatefile" --> $options = $measurement["options"]["import"]), and will be
  * supplemented with options defined in the import.json/export.json file for the given extension and datatype.
  * If the same parameter with different value is defined in multiple places, than the value defined
  * in the metadata wins over the value in extension, which in turn wins over the value in datatype.

@@ -206,11 +206,10 @@ STEP1:
           <li>The first line is the header, defining (sub)field names. Columns without a (sub)field name will be neglected.</li>
           <li>Each measurement is written on a new line. Lines without (unique) "id" will be neglected.</li>
           <li>There are two required columns: "<strong>id</strong>", a unique identifier for each measurement, and "<strong>type</strong>", defining the (supported) data type.</li>
-          <li>It is recommended to use the main column headers "<strong>meta:sample</strong>", "<strong>meta:samplesource</strong>", "<strong>meta:instrument</strong>", "<strong>meta:parameters</strong>", "<strong>meta:measurement</strong>" and "<strong>meta:contributor</strong>". The "meta"-prefix is optional, but strongly advised. These and other fields can be recursively subdivided as required using a semicolon as separator, e.g. "meta:sample:CI number", "meta:samplesource:0:sample identifier". If a field is subdivided in subfields, the parent field should not be used (or: you can't have data in a "meta:sample" and a "meta:sample:CI name" column simultaneously for a given measurement; and it is not advised to use both in the same transaction).</li>
-          <li>If each measurement only contains a single dataset, the system will create a "default" dataset. You can overrule this behaviour by defining an empty column e.g. "dataset:baseline corrected".</li>
-          <li>If all or some measurements contain multiple datasets, the CSV table has to contain multiple datasets, e.g. "dataset:baseline corrected" and "dataset:original data". Dataset-specific metadata can be supplied as subfields of "dataset:original data:meta" and will overrule common metadata. It is advised to store common metadata as subfield of "meta", e.g. "meta:sample:CI number". Metadata in "dataset:x:meta" will overrule those in "meta:", which will in turn overrule those defined directly.</li>
-          <li>In case of multiple datasets within a single measurement, the "type" field must be the data type of the primary (first) dataset. Other datasets can have different data types, defined in "dataset:x:type".</li>
-          <li>If you want to enable downloading the files in JCAMP-DX format, a "<strong>jcampdxtemplate</strong>" column has to be present pointing to the uploaded dxt file. This element can be declared for all datasets, or defined for each dataset separately when used as a subfield "dataset:x:jcampdxtemplate".</li>
+          <li>It is recommended to use the main column headers "<strong>meta:sample</strong>", "<strong>meta:samplesource</strong>", "<strong>meta:instrument</strong>", "<strong>meta:parameters</strong>", "<strong>meta:measurement</strong>" and "<strong>meta:contributor</strong>". These and other fields can be recursively subdivided as required using a semicolon as separator, e.g. "meta:sample:C.I. number", "meta:sample source:0:sample identifier". If a field is subdivided in subfields, the parent field should not be used (or: you can't have data in a "meta:sample" and a "meta:sample:C.I. name" column simultaneously for a given measurement; and it is not advised to use both in the same transaction).</li>
+          <li>If each measurement only contains a single dataset, the system will create a "default" dataset. You can overrule this behaviour by defining an empty column e.g. "datasets:baseline corrected".</li>
+          <li>If all or some measurements contain multiple datasets, the CSV table has to contain multiple datasets, e.g. "datasets:baseline corrected" and "datasets:original data". Dataset-specific metadata can be supplied as subfields of "datasets:original data:meta" and will overrule common metadata. It is advised to store common metadata as subfield of "meta", e.g. "meta:sample:CI number". Metadata in "datasets:x:meta" will overrule those in "meta:".</li>
+          <li>In case of multiple datasets within a single measurement, the "type" field must be the data type of the primary (first) dataset. Other datasets can have different data types, defined in "datasets:x:type".</li>
         </ul>
         <form enctype="multipart/form-data" action="<?= $_SERVER["SCRIPT_NAME"] ?>?mod=import&lib=<?= $_REQUEST["lib"] ?>&step=2" method="POST">
           <input type="hidden" name="MAX_FILE_SIZE" value="2000000">
@@ -690,12 +689,12 @@ STEP3:
             throw new \Exception($error);
         }
       
-        //make $list with keys from $columns and values retrieved from $measurements
+        //make transaction $list with keys from $columns and values retrieved from $measurements
         $columns = $LIBS[$_REQUEST["lib"]]["listcolumns"];
         $list =  array();
         foreach ($measurements as $id => $measurement) {
             if ($id != "_datasets") {
-                $measurement = overrideMeta($measurement); //fold "meta:" metadata together with direct metadata
+                //$measurement = overrideMeta($measurement); //fold "meta:" metadata together with direct metadata
                 foreach ($columns as $column) {
                     $list[$id][$column] = getMeta($measurement, $column, "; ", false);
                 }       
@@ -708,7 +707,7 @@ STEP3:
             throw new \Exception($error);
         }
       
-        // Update transactions_open.json
+        // Update overview of open transactions: transactions_open.json
         $transactions[$tr]["step"] = 5;
         $error = writeJSONfile($libraryPath . "transactions_open.json", $transactions);
         if ($error) {
