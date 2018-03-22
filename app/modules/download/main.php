@@ -65,7 +65,7 @@ try {
             }
         }
         if (isset($meta["license"])) { // if the license is a predefined one, replace it with the textonly version
-            $textonly = \Core\Config\Licenses::searchForNeedle($viewLicense, "textonly");
+            $textonly = \Core\Config\Licenses::searchForNeedle($meta["license"], "textonly");
             if ($textonly) {
                 $meta["license"] = $textonly;
             }

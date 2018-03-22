@@ -154,7 +154,7 @@ class Jcampdx
             // word wrapping on the metadata (the data itself should take care of its lines)
             if ($this->wordWrap > 0) {
                 foreach ($lines as &$ref) 
-                $ref = wordwrap($ref, $this->wordWrap, "\r\n", true);
+                  $ref = wordwrap($ref, $this->wordWrap, "\r\n", true);
             }
             
             // build data series
@@ -165,7 +165,7 @@ class Jcampdx
             
             // open a temporary file
             $handle = tmpfile();
-            fwrite($handle, implode("", $lines));
+            fwrite($handle, implode("\r\n", $lines));
 
         } catch (\Exception $e) {
             $this->error = eventLog("WARNING", $e->getMessage());
@@ -268,7 +268,7 @@ class Jcampdx
         }
 
         $lines = array();
-        foreach ($array as $key => $value) array_push($lines, $key . "=" . $value . "\r\n");
+        foreach ($array as $key => $value) array_push($lines, $key . "=" . $value);
 
         return $lines;
     }
@@ -293,7 +293,7 @@ class Jcampdx
                     list($x, $y) = array_pop($queue);
                     if ($this->normalizeX != 1) $x = strval(round($x / $this->xFactor));
                     if ($this->normalizeY != 1) $y = strval(round($y / $this->yFactor));
-                    $lines[] = $x . " " . $y . "\r\n";
+                    $lines[] = $x . " " . $y;
                 }
                 break;
                 
@@ -316,7 +316,7 @@ class Jcampdx
                     if ($currentLength + $addLength <= $dataWW) {   //if enough space on the $line: add current Y value
                         $newLine .= " " . $y;
                     } else {                                        //if not enough space: add $line to $lines, and begin a new $line
-                        $lines[] = $newLine . "\r\n";
+                        $lines[] = $newLine;
                         $newLine = $x . " " . $y;
                     }
                 }

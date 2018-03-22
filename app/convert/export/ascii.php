@@ -149,7 +149,7 @@ class Ascii
         $lines = fillTemplateWithMeta(\Core\Config\App::get("templates_path") . $this->templateFile, $this->meta, $specificCodes);
 
         if (is_array($lines)) {
-            return implode("", $lines);
+            return implode("\r\n", $lines);
         } else {
             $this->error = eventLog("WARNING", "Failed to export to ASCII because of error in reading the metadata template file");
             return "";
