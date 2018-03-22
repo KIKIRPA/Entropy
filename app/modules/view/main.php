@@ -11,10 +11,10 @@ if (count(get_included_files()) == 1) {
     main metadata
     *************** */
 
-// data from the measurement json file
-$transaction = $measurement["_transaction"];
+// data from the measurement list json file
+$transaction = $measurementListItem["_transaction"];
 $viewTags = array();
-foreach ($measurement as $key => $value) {
+foreach ($measurementListItem as $key => $value) {
     // taglist: don't include keys starting with _ (e.g. _transaction) or having empty values
     if ((substr($key, 0, 1) != "_") and (!empty($value))) {
         $viewTags[nameMeta($key)] = $value;
@@ -23,10 +23,19 @@ foreach ($measurement as $key => $value) {
 
 $viewColor = isset($LIBS[$showLib]["color"]) ? bulmaColorModifier($LIBS[$showLib]["color"], $COLORS, \Core\Config\App::get("app_color_default")) : bulmaColorModifier(\Core\Config\App::get("app_color_default"), $COLORS);
 
-// metadata can be saved on different levels, override lesser priority metadata
-$meta = overrideMeta($data, $showDS);
+// datasets
+if (is_array($measurement["datasets"])) {
+    // make a list of datasets
+    $datasetList = array_keys($measurement["datasets"]);
 
-unset($measurement, $key, $value);
+    // collapse measurement to only the chosen dataset
+    $measurement = collapseMeasurement($measurement, $showDS);
+} else {
+    $datasetList = array();
+    $measurement = $measurement;
+}
+
+unset($key, $value);
 
 
 /* ***********
@@ -69,7 +78,7 @@ if (    (!$isLoggedIn and $MODULES["lib"]["download"]["public"])
     // convert from json data files
     foreach ($LIBS[$showLib]["downloadconverted"] as $format) {
         // check if this format "[convertor:[datatype:]]extension" is allowed for this datatype (returns array if found, false if not found)
-        $datatype = findDataType($viewTags["Type"], $DATATYPES);
+        $datatype = findDataType($measurement["type"], $DATATYPES);
         $result = selectConvertorClass($EXPORT, $datatype, $format);
         if ($result) {
             $temp = explode(":", $format, 3);
@@ -118,8 +127,8 @@ unset ($cookie, $code, $format, $prefix, $binfiles);
 $viewLicense = false;
 
 // search license in data file, library or system settings
-if (isset($meta["license"])) {
-    $viewLicense = $meta["license"];
+if (isset($measurement["license"])) {
+    $viewLicense = $measurement["license"];
 } elseif (isset($LIBS[$showLib]["license"])) {
     $viewLicense = $LIBS[$showLib]["license"];
 } elseif (!empty(\Core\Config\App::get("license_default"))) {
@@ -138,13 +147,13 @@ if ($viewLicense) {
   viewer
   ******** */
 
-$parenttype = findDataType($viewTags["Type"], $DATATYPES);
+$parenttype = findDataType($measurement["type"], $DATATYPES);
 $viewer = $DATATYPES[$parenttype]["viewer"];
-$units = findDataTypeUnits($parenttype, $DATATYPES, 'html', $data["dataset"][$showDS]["units"]);
+$units = findDataTypeUnits($parenttype, $DATATYPES, 'html', $measurement["units"]);
 
-if (isset($data["dataset"][$showDS]["anno"])) {
-    if (is_array($data["dataset"][$showDS]["anno"])) {
-        $anno = $data["dataset"][$showDS]["anno"];
+if (isset($measurement["annotations"])) {
+    if (is_array($measurement["annotations"])) {
+        $anno = $measurement["annotations"];
         foreach ($anno as $i => $a) {
             $anno[$i]["series"] = reset($viewTags);
         }
@@ -158,32 +167,29 @@ if (isset($data["dataset"][$showDS]["anno"])) {
    ********** */
 
 $viewMetadata = array();
-$metaNoShow = array("id", "type", "units", "annotations", "attachements", "options", "data", "linkeddata");
 $i = 0;
-foreach ($meta as $key => $item) {
-    if (!in_array($key, $metaNoShow)) {
-        $row = intdiv($i, 3);   // display 3 categories per row
-        $header = nameMeta($key);
-        if (is_array($item)) {
-            foreach ($item as $subkey => $subitem) {
-                $subitem = getMeta($meta, $key . ":" . $subkey, "; ", false);
-                if (!$isLoggedIn) {
-                    $subitem = searchMailHide($subitem);
-                }
-                $subkey = nameMeta($key . ":" . $subkey);
-                $viewMetadata[$row][$header][$subkey] = $subitem;
-            }
-        } else {
+foreach ($measurement["meta"] as $key => $item) {
+    $row = intdiv($i, 3);   // display 3 categories per row
+    $header = nameMeta($key);
+    if (is_array($item)) {
+        foreach ($item as $subkey => $subitem) {
+            $subitem = getMeta($measurement, "meta:" . $key . ":" . $subkey, "; ", false);
             if (!$isLoggedIn) {
-                $item = searchMailHide($item);
+                $subitem = searchMailHide($subitem);
             }
-            $viewMetadata[$row][$header] = $item;
+            $subkey = nameMeta("meta:" . $key . ":" . $subkey);
+            $viewMetadata[$row][$header][$subkey] = $subitem;
         }
-        $i++;
+    } else {
+        if (!$isLoggedIn) {
+            $item = searchMailHide($item);
+        }
+        $viewMetadata[$row][$header] = $item;
     }
+    $i++;
 }
 
-unset($meta, $i, $row, $header, $key, $item, $subkey, $subitem);
+unset($i, $row, $header, $key, $item, $subkey, $subitem);
 
 
 /* ******

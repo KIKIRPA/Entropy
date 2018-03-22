@@ -28,7 +28,7 @@ class Jcampdx
 
 
     /**
-     * __construct($id, $data, $meta = array(), $options = array(), $datatypes = array())
+     * __construct($id, $measurement, $options = array(), $datatypes = array())
      * 
      * Reads data and metadata for conversion
      * - supported parameters:
@@ -45,27 +45,30 @@ class Jcampdx
      *     - forceequalspacing  force equal spacing for (XY..XY) encoding (note: for (X++(Y..Y)) equal spacing is required!)
      *                          O == false, all other values == true
      * 
-     * @param array $data data array
-     * @param array $meta metadata array
+     * @param array $measurement array
      * @param array $options Specific parameters for this convertor
      */
-    function __construct($id, $data, $meta = array(), $options = array(), $datatypes = array())
+    function __construct($id, $measurement, $options = array(), $datatypes = array())
     {
         $this->id = $id;
         $this->datatypes = $datatypes;
 
-        if (is_array($data) and !empty($data)) {
-            $this->data = $data;
+        if (is_array($measurement["data"]) and !empty($measurement["data"])) {
+            $this->data = $measurement["data"];
         } else {
             $this->error = eventLog("WARNING", "No data or not in the correct format");
-        }
-
-        if (is_array($meta)) {
-            $this->meta = $meta;
-        } else {
-            $this->error = eventLog("WARNING", "Metadata is not in the correct format");
-        }
+        }             
         
+        unset($measurement["data"], $measurement["datasets"], $measurement["datalink"], $measurement["annotations"], $measurement["attachments"], $measurement["options"]);
+        $this->meta = $measurement;
+        
+        // replace units by their jcampdx-formats
+        $this->meta["units"] = findDataTypeUnits($this->meta["type"], 
+                                                 $this->datatypes, 
+                                                 "jcampdx",
+                                                 is_array($measurement["units"]) ? $measurement["units"] : false
+                                                );
+
         if (is_array($options)) {
             $options = array_change_key_case($options, CASE_LOWER);
             if (isset($options["dataencoding"])) {
@@ -118,8 +121,8 @@ class Jcampdx
                 $this->forceEqualSpacing = ($options["forceequalspacing"] ? true : false);
             }
         } else {
-            $this->error = eventLog("WARNING", "Metadata is not in the correct format");
-        }   
+            $this->error = eventLog("WARNING", "Options are not in the correct format");
+        }
     }
 
     public function getFile($getMeta = true) //getmeta is discarded, JCAMP-DX will always include metadata
@@ -154,7 +157,7 @@ class Jcampdx
             // word wrapping on the metadata (the data itself should take care of its lines)
             if ($this->wordWrap > 0) {
                 foreach ($lines as &$ref) 
-                $ref = wordwrap($ref, $this->wordWrap, "\r\n", true);
+                  $ref = wordwrap($ref, $this->wordWrap, "\r\n", true);
             }
             
             // build data series
@@ -165,7 +168,7 @@ class Jcampdx
             
             // open a temporary file
             $handle = tmpfile();
-            fwrite($handle, implode("", $lines));
+            fwrite($handle, implode("\r\n", $lines));
 
         } catch (\Exception $e) {
             $this->error = eventLog("WARNING", $e->getMessage());
@@ -190,9 +193,7 @@ class Jcampdx
             "_id"               => $this->id,
             "_datatype"         => findDataType($this->meta["type"], $this->datatypes, "jcampdx"),
             "_license"          => "",
-            "_softwarestring"   => $this->softwareString,
-            "_xunits"           => "1/CM",              //TODO: findDataTypeUnits($this->meta["type"], $this->datatypes, "jcampdx", $this->units), // there is no $this->units yet; damn, I need that measurement class!
-            "_yunits"           => "RELATIVE INTENSITY" //TODO
+            "_softwarestring"   => $this->softwareString
         );
         
         $lines = fillTemplateWithMeta(\Core\Config\App::get("templates_path") . $this->templateFile, $this->meta, $specificCodes);
@@ -268,7 +269,7 @@ class Jcampdx
         }
 
         $lines = array();
-        foreach ($array as $key => $value) array_push($lines, $key . "=" . $value . "\r\n");
+        foreach ($array as $key => $value) array_push($lines, $key . "=" . $value);
 
         return $lines;
     }
@@ -293,7 +294,7 @@ class Jcampdx
                     list($x, $y) = array_pop($queue);
                     if ($this->normalizeX != 1) $x = strval(round($x / $this->xFactor));
                     if ($this->normalizeY != 1) $y = strval(round($y / $this->yFactor));
-                    $lines[] = $x . " " . $y . "\r\n";
+                    $lines[] = $x . " " . $y;
                 }
                 break;
                 
@@ -316,7 +317,7 @@ class Jcampdx
                     if ($currentLength + $addLength <= $dataWW) {   //if enough space on the $line: add current Y value
                         $newLine .= " " . $y;
                     } else {                                        //if not enough space: add $line to $lines, and begin a new $line
-                        $lines[] = $newLine . "\r\n";
+                        $lines[] = $newLine;
                         $newLine = $x . " " . $y;
                     }
                 }

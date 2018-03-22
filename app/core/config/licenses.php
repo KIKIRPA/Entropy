@@ -66,7 +66,7 @@ class Licenses
         if (isset(self::$config[$needle])) {
             $result = $needle;
         } else {
-            foreach (self::$config as $id -> $types) {
+            foreach (self::$config as $id => $types) {
                 foreach ($types as $type) {
                     if ($needle == sanitizeStr($type, "", "-+:^", 1)) {
                         $result = $id;
@@ -96,7 +96,7 @@ class Licenses
         $string = sanitizeStr($string, "", "-+:^", 1);
 
         // search id's in string
-        foreach (self::$config as $id -> $types) { 
+        foreach (self::$config as $id => $types) { 
             if (strpos($string, $id) !== false) {
                 return $id;
             }

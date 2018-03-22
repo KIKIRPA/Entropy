@@ -96,7 +96,7 @@ if ($showLib != "_START") { //normal library
 
     // prepare the measurement data in an easy to process grid
     $listData = array();
-    foreach ($measurements as $id => $measurement) {
+    foreach ($measurementList as $id => $measurement) {
         foreach ($listColumns as $col => $caption) {
             if (strtolower($col) == "id") {
                 $listData[$id][$col] = $id;
@@ -108,7 +108,7 @@ if ($showLib != "_START") { //normal library
             }
         }
     }
-    unset($measurements, $id, $measurement, $col);
+    unset($measurementList, $id, $measurement, $col);
 
 } else {    // startpage
     $listLibs = array();

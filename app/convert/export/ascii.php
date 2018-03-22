@@ -18,7 +18,7 @@ class Ascii
 
     
     /**
-     * __construct($id, $data, $meta = array(), $options = array(), $datatypes = array())
+     * __construct($id, $measurement, $options = array(), $datatypes = array())
      * 
      * Reads data and metadata for conversion
      * - supported parameters:
@@ -30,25 +30,22 @@ class Ascii
      * 
      * $datatypes is not used in Convert\Export\Ascii, but is required for compatibility
      * 
-     * @param array $data data array
-     * @param array $meta metadata array
+     * @param array $measurement array
      * @param array $options Specific parameters for this convertor
      */
-    function __construct($id, $data, $meta = array(), $options = array(), $datatypes = array())
+    function __construct($id, $measurement, $options = array(), $datatypes = array())
     {
         $this->id = $id;
 
-        if (is_array($data) and !empty($data)) {
-            $this->data = $data;
+        if (is_array($measurement["data"]) and !empty($measurement["data"])) {
+            $this->data = $measurement["data"];
         } else {
             $this->error = eventLog("WARNING", "No data or not in the correct format");
         }
 
-        if (is_array($meta)) {
-            $this->meta = $meta;
-        } else {
-            $this->error = eventLog("WARNING", "Metadata is not in the correct format");
-        }
+        unset($measurement["data"], $measurement["datasets"], $measurement["datalink"], $measurement["annotations"], $measurement["attachments"], $measurement["options"]);
+        $this->meta = $measurement;
+
 
         if (is_array($options)) {
             $options = array_change_key_case($options, CASE_LOWER);
@@ -149,7 +146,7 @@ class Ascii
         $lines = fillTemplateWithMeta(\Core\Config\App::get("templates_path") . $this->templateFile, $this->meta, $specificCodes);
 
         if (is_array($lines)) {
-            return implode("", $lines);
+            return implode("\r\n", $lines);
         } else {
             $this->error = eventLog("WARNING", "Failed to export to ASCII because of error in reading the metadata template file");
             return "";

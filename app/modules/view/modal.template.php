@@ -119,9 +119,10 @@ if (count(get_included_files()) == 1) {
                             <div class="control">
                                 <label class="checkbox">
                                     <input type="checkbox" name="license" id="license" value="license">
-                                    I agree to the terms and conditions of the license <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/3.0/" target="_parent" ><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-nd/3.0/88x31.png" /></a>
+                                    I agree to the terms and conditions of the license:
                                 </label>
                             </div>
+                            <div class="is-size-7 has-text-centered"><?= $viewLicense ?></div>
                             <p class="help is-danger" id="lichelp">Required</p>
                         </div>
 
