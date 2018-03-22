@@ -24,18 +24,18 @@ foreach ($measurement as $key => $value) {
 $viewColor = isset($LIBS[$showLib]["color"]) ? bulmaColorModifier($LIBS[$showLib]["color"], $COLORS, \Core\Config\App::get("app_color_default")) : bulmaColorModifier(\Core\Config\App::get("app_color_default"), $COLORS);
 
 // datasets
-if (is_array($data["datasets"])) {
+if (is_array($measurement["datasets"])) {
     // make a list of datasets
-    $datasetList = array_keys($data["datasets"]);
+    $datasetList = array_keys($measurement["datasets"]);
 
     // collapse measurement to only the chosen dataset
-    $measurement = collapseMeasurement($data, $showDS);
+    $measurement = collapseMeasurement($measurement, $showDS);
 } else {
     $datasetList = array();
-    $measurement = $data;
+    $measurement = $measurement;
 }
 
-unset($data, $key, $value);
+unset($key, $value);
 
 
 /* ***********
@@ -78,7 +78,7 @@ if (    (!$isLoggedIn and $MODULES["lib"]["download"]["public"])
     // convert from json data files
     foreach ($LIBS[$showLib]["downloadconverted"] as $format) {
         // check if this format "[convertor:[datatype:]]extension" is allowed for this datatype (returns array if found, false if not found)
-        $datatype = findDataType($viewTags["Type"], $DATATYPES);
+        $datatype = findDataType($measurement["type"], $DATATYPES);
         $result = selectConvertorClass($EXPORT, $datatype, $format);
         if ($result) {
             $temp = explode(":", $format, 3);
@@ -147,7 +147,7 @@ if ($viewLicense) {
   viewer
   ******** */
 
-$parenttype = findDataType($viewTags["Type"], $DATATYPES);
+$parenttype = findDataType($measurement["type"], $DATATYPES);
 $viewer = $DATATYPES[$parenttype]["viewer"];
 $units = findDataTypeUnits($parenttype, $DATATYPES, 'html', $measurements["units"]);
 

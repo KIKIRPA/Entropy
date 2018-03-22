@@ -44,7 +44,7 @@ try {
         }
         
         // separate metadata, data and export-options
-        $measurement = collapseMeasurement($data, $showDS);
+        $measurement = collapseMeasurement($measurement, $showDS);
 
         // set/adjust license
         if (!isset($measurement["license"])) { // if no license in data file, search license in library or system settings

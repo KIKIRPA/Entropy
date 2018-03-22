@@ -98,20 +98,20 @@ if (!$showMod) {
     
         // does the measurment have an _transaction field?
         if (isset($measurements[$showID]["_transaction"])) {
-            $datapath = $librariesPath . $showLib . "/" . $measurements[$showID]["_transaction"] . "/" . $showID;
+            $dataPath = $librariesPath . $showLib . "/" . $measurements[$showID]["_transaction"] . "/" . $showID;
         } else {
             $error = "The requested measurement has no transaction id";
         }
     
         // find the data file in the transaction directory
-        $data = readJSONfile($datapath . ".json", true);
-        if (count($data) == 0) {
+        $measurement = readJSONfile($dataPath . ".json", true);
+        if (count($measurement) == 0) {
             $error = "The requested measurement was not found or was empty";
         }
     
         if ($error) {
             $showMod = "list";
-            unset($datapath, $data);
+            unset($dataPath, $measurement);
         }
     } else {
         $showMod = "list";
@@ -125,7 +125,7 @@ if (!$showMod) {
     unset($measurements);
     
     if (isset($_REQUEST["ds"])) {
-        if (isset($data["datasets"][$_REQUEST["ds"]])) {
+        if (isset($measurement["datasets"][$_REQUEST["ds"]])) {
             $showDS = $_REQUEST["ds"];
         } else {
             $error = "The requested dataset does not exist";
@@ -136,11 +136,11 @@ if (!$showMod) {
     }
 
     if (!isset($showDS)) {  //if at this point no dataset is set, either choose 'default', or the first
-        if (isset($data["datasets"]["default"])) {
+        if (isset($measurement["datasets"]["default"])) {
             $showDS = "default";
         } else {
-            reset($data["datasets"]);
-            $showDS = key($data["datasets"]);
+            reset($measurement["datasets"]);
+            $showDS = key($measurement["datasets"]);
         }
     }
 }
