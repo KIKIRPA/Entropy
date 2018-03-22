@@ -11,10 +11,10 @@ if (count(get_included_files()) == 1) {
     main metadata
     *************** */
 
-// data from the measurement json file
-$transaction = $measurement["_transaction"];
+// data from the measurement list json file
+$transaction = $measurementListItem["_transaction"];
 $viewTags = array();
-foreach ($measurement as $key => $value) {
+foreach ($measurementListItem as $key => $value) {
     // taglist: don't include keys starting with _ (e.g. _transaction) or having empty values
     if ((substr($key, 0, 1) != "_") and (!empty($value))) {
         $viewTags[nameMeta($key)] = $value;
@@ -149,11 +149,11 @@ if ($viewLicense) {
 
 $parenttype = findDataType($measurement["type"], $DATATYPES);
 $viewer = $DATATYPES[$parenttype]["viewer"];
-$units = findDataTypeUnits($parenttype, $DATATYPES, 'html', $measurements["units"]);
+$units = findDataTypeUnits($parenttype, $DATATYPES, 'html', $measurement["units"]);
 
-if (isset($measurements["annotations"])) {
-    if (is_array($measurements["annotations"])) {
-        $anno = $measurements["annotations"];
+if (isset($measurement["annotations"])) {
+    if (is_array($measurement["annotations"])) {
+        $anno = $measurement["annotations"];
         foreach ($anno as $i => $a) {
             $anno[$i]["series"] = reset($viewTags);
         }
@@ -173,11 +173,11 @@ foreach ($measurement["meta"] as $key => $item) {
     $header = nameMeta($key);
     if (is_array($item)) {
         foreach ($item as $subkey => $subitem) {
-            $subitem = getMeta($measurement, $key . ":" . $subkey, "; ", false);
+            $subitem = getMeta($measurement, "meta:" . $key . ":" . $subkey, "; ", false);
             if (!$isLoggedIn) {
                 $subitem = searchMailHide($subitem);
             }
-            $subkey = nameMeta($key . ":" . $subkey);
+            $subkey = nameMeta("meta:" . $key . ":" . $subkey);
             $viewMetadata[$row][$header][$subkey] = $subitem;
         }
     } else {

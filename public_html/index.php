@@ -86,19 +86,19 @@ if ($showMod == "default") {
 if (!$showMod) {
     // read measurements list file
     $librariesPath = \Core\Config\App::get("libraries_path");
-    $measurements = readJSONfile($librariesPath . $showLib . "/measurements.json", false);
+    $measurementList = readJSONfile($librariesPath . $showLib . "/measurements.json", false);
     
     if (isset($_REQUEST["id"])) {
         $showID = $_REQUEST['id'];
     
         // id exists?
-        if (!isset($measurements[$showID])) {
+        if (!isset($measurementList[$showID])) {
             $error = "The requested measurement does not exist";
         }
     
         // does the measurment have an _transaction field?
-        if (isset($measurements[$showID]["_transaction"])) {
-            $dataPath = $librariesPath . $showLib . "/" . $measurements[$showID]["_transaction"] . "/" . $showID;
+        if (isset($measurementList[$showID]["_transaction"])) {
+            $dataPath = $librariesPath . $showLib . "/" . $measurementList[$showID]["_transaction"] . "/" . $showID;
         } else {
             $error = "The requested measurement has no transaction id";
         }
@@ -120,9 +120,9 @@ if (!$showMod) {
 
 // EVALUATE $_REQUEST["ds"]
 if (!$showMod) {
-    // reduce $measurements to just the measurement we need
-    $measurement = $measurements[$showID];
-    unset($measurements);
+    // reduce $measurementList to just the measurement we need
+    $measurementListItem = $measurementList[$showID];
+    unset($measurementList);
     
     if (isset($_REQUEST["ds"])) {
         if (isset($measurement["datasets"][$_REQUEST["ds"]])) {

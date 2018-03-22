@@ -7,7 +7,6 @@ class Jcampdx
     public $id;
     public $data = array();
     public $meta = array();
-    public $units = array();
     public $error = false;  // last error msg
 
     public $datatypes;      // TODO: remove this dependency by using a static datatypes class, and accessing it directly!!!
@@ -49,7 +48,7 @@ class Jcampdx
      * @param array $measurement array
      * @param array $options Specific parameters for this convertor
      */
-    function __construct($id, $data, $measurement, $options = array(), $datatypes = array())
+    function __construct($id, $measurement, $options = array(), $datatypes = array())
     {
         $this->id = $id;
         $this->datatypes = $datatypes;
@@ -58,17 +57,18 @@ class Jcampdx
             $this->data = $measurement["data"];
         } else {
             $this->error = eventLog("WARNING", "No data or not in the correct format");
-        }
-                           
-        $this->units = findDataTypeUnits($this->meta["type"], 
-                                         $this->datatypes, 
-                                         "jcampdx", 
-                                         is_array($measurement["units"]) ? $measurement["units"] : false
-                                        );
-
-        unset($measurement["data"], $measurement["datasets"], $measurement["datalink"], $measurement["annotations"], $measurement["attachments"], $measurement["options"], $measurement["units"]);
+        }             
+        
+        unset($measurement["data"], $measurement["datasets"], $measurement["datalink"], $measurement["annotations"], $measurement["attachments"], $measurement["options"]);
         $this->meta = $measurement;
         
+        // replace units by their jcampdx-formats
+        $this->meta["units"] = findDataTypeUnits($this->meta["type"], 
+                                                 $this->datatypes, 
+                                                 "jcampdx",
+                                                 is_array($measurement["units"]) ? $measurement["units"] : false
+                                                );
+
         if (is_array($options)) {
             $options = array_change_key_case($options, CASE_LOWER);
             if (isset($options["dataencoding"])) {
@@ -121,8 +121,8 @@ class Jcampdx
                 $this->forceEqualSpacing = ($options["forceequalspacing"] ? true : false);
             }
         } else {
-            $this->error = eventLog("WARNING", "Metadata is not in the correct format");
-        }   
+            $this->error = eventLog("WARNING", "Options are not in the correct format");
+        }
     }
 
     public function getFile($getMeta = true) //getmeta is discarded, JCAMP-DX will always include metadata
@@ -193,9 +193,7 @@ class Jcampdx
             "_id"               => $this->id,
             "_datatype"         => findDataType($this->meta["type"], $this->datatypes, "jcampdx"),
             "_license"          => "",
-            "_softwarestring"   => $this->softwareString,
-            "_xunits"           => $this->units["x"],
-            "_yunits"           => $this->units["y"]
+            "_softwarestring"   => $this->softwareString
         );
         
         $lines = fillTemplateWithMeta(\Core\Config\App::get("templates_path") . $this->templateFile, $this->meta, $specificCodes);

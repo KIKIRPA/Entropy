@@ -396,29 +396,36 @@ function getMeta($metadata, $get, $concatenate = "; ", $description = ": ")
         // formatting options, eg for timestamps
         if (array_key_exists(strtolower($id2), $formats) and !is_null($value)) {
             // try to convert the string into a DateTime type; will be false if not a valid timestamp
-            $ts = new DateTime($value);
-            switch ($formats[strtolower($id)]) {
-                case "long":
-                case "longdate":
-                    $temp = $ts->format('Y/m/d');
-                    break;
-                case "short":
-                case "shortdate":
-                    $temp = $ts->format('y/m/d');
-                    break;
-                case "year":
-                    $temp = $ts->format('Y');
-                    break;
-                case "time":
-                    $temp = $ts->format('H:i:s');
-                    break;
-                case "datetime":
-                case "timestamp":
-                default:
-                    $temp = $ts->format('Y/m/d H:i:s');
+            $ts = strtotime($value);
+            if ($ts === FALSE) {
+                //php expects american dates with /, european dates wit - or .; if an error, try to convert
+                $ts = strtotime(str_replace('/', '-', $value));
             }
-            if ($temp) {    // a valid timestamp
-                $value = $temp;
+            if ($ts !== FALSE) { //if still not good, give up on timestamp!
+                $ts = new DateTime(date(DATE_RSS, $ts));
+                switch ($formats[strtolower($id)]) {
+                    case "long":
+                    case "longdate":
+                        $temp = $ts->format('Y/m/d');
+                        break;
+                    case "short":
+                    case "shortdate":
+                        $temp = $ts->format('y/m/d');
+                        break;
+                    case "year":
+                        $temp = $ts->format('Y');
+                        break;
+                    case "time":
+                        $temp = $ts->format('H:i:s');
+                        break;
+                    case "datetime":
+                    case "timestamp":
+                    default:
+                        $temp = $ts->format('Y/m/d H:i:s');
+                }
+                if ($temp) {    // a valid timestamp
+                    $value = $temp;
+                }
             }
         }
     
