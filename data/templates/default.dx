@@ -32,5 +32,5 @@
 ##STATE=
 ##CROSS REFERENCE=	
 ##=
-##XUNITS={_xunits}
-##YUNITS={_yunits}
+##XUNITS={units:x}
+##YUNITS={units:y}

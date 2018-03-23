@@ -44,30 +44,20 @@ try {
         }
         
         // separate metadata, data and export-options
-        $meta = overrideMeta($data, $showDS);
-        $data = $data["dataset"][$showDS]["data"];
-        //$units
-
-        if (isset($data["options"]["export"])) 
-            $exportOptions = $data["options"]["export"];
-        else
-            $exportOptions = array(); 
-
-        // remove things from meta that are not metadata (in a broad sense: keep units, type, id)
-        unset($meta["annotations"], $meta["attachements"], $meta["options"], $meta["data"], $meta["linkeddata"]);
+        $measurement = collapseMeasurement($measurement, $showDS);
 
         // set/adjust license
-        if (!isset($meta["license"])) { // if no license in data file, search license in library or system settings
+        if (!isset($measurement["license"])) { // if no license in data file, search license in library or system settings
             if (isset($LIBS[$showLib]["license"])) {
-                $meta["license"] = $LIBS[$showLib]["license"];
+                $measurement["license"] = $LIBS[$showLib]["license"];
             } elseif (!empty(\Core\Config\App::get("license_default"))) {
-                $meta["license"] = \Core\Config\App::get("license_default");
+                $measurement["license"] = \Core\Config\App::get("license_default");
             }
         }
-        if (isset($meta["license"])) { // if the license is a predefined one, replace it with the textonly version
-            $textonly = \Core\Config\Licenses::searchForNeedle($viewLicense, "textonly");
+        if (isset($measurement["license"])) { // if the license is a predefined one, replace it with the textonly version
+            $textonly = \Core\Config\Licenses::searchForNeedle($measurement["license"], "textonly");
             if ($textonly) {
-                $meta["license"] = $textonly;
+                $measurement["license"] = $textonly;
             }
         }
 
@@ -115,12 +105,16 @@ try {
         $fileName = $showID . (($showDS == 'default') ? "" : "_" . $showDS) . "." . end($temp);
 
         // select convertor and assemble all export options
-        $exportOptions = selectConvertorClass($EXPORT, findDataType($meta["type"], $DATATYPES), $code[1], $exportOptions);
+        $exportOptions = selectConvertorClass($EXPORT,
+                                              findDataType($measurement["type"], $DATATYPES),
+                                              $code[1], 
+                                              is_array($measurement["options"]["export"]) ? $measurement["options"]["export"] : $exportOptions = array()
+                                             );
                 
         if (isset($exportOptions["convertor"])) {
             // create convertor        
             $className = "Convert\\Export\\" . ucfirst(strtolower($exportOptions["convertor"]));
-            $export = new $className($showID, $data, $meta, $exportOptions, $DATATYPES);
+            $export = new $className($showID, $measurement, $exportOptions, $DATATYPES);
             $fileHandle = $export->getFile();
             $error = $export->getError();
 

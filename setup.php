@@ -177,9 +177,11 @@ if (!isset($options["d"]) and !isset($options["defaults"])) {
 //   INSTALL / UPDATE   //
 //----------------------//
 
+$privpath = rtrim($defaults["setup"]["privpath"], "/") . "/"; // make sure that privpath ends with (a single) /
+$pubpath = rtrim($defaults["setup"]["pubpath"], "/") . "/";
 
 // determine if we do a clean install or an update
-if (!file_exists($defaults["setup"]["privpath"] . ".installed") or $defaults["setup"]["forceinstall"]) {
+if (!file_exists($privpath . ".installed") or $defaults["setup"]["forceinstall"]) {
     $cleaninstall = true;
     echo "Clean installation...\n\n";
 } else {
@@ -193,32 +195,32 @@ $currentUser = $currentUser['name'];
 
 // common tasks for both clean install and update
 echo "Copying files.\n";
-if (!file_exists($defaults["setup"]["privpath"])) {
-    mkdir($defaults["setup"]["privpath"], 0750, true);
-    chgrp($defaults["setup"]["privpath"], $defaults["setup"]["htgroup"]);
+if (!file_exists($privpath)) {
+    mkdir($privpath, 0750, true);
+    chgrp($privpath, $defaults["setup"]["htgroup"]);
 }
-if (!file_exists($defaults["setup"]["pubpath"])) {
-    mkdir($defaults["setup"]["pubpath"], 0750, true);
-    chgrp($defaults["setup"]["pubpath"], $defaults["setup"]["htgroup"]);
+if (!file_exists($pubpath)) {
+    mkdir($pubpath, 0750, true);
+    chgrp($pubpath, $defaults["setup"]["htgroup"]);
 }
 
 // recursively copy all subdirectories in ./app and ./public_html
 foreach (scandir2("./app/") as $f) {
-    if ($cleaninstall) rrmdir($defaults["setup"]["privpath"] . $f);
+    if ($cleaninstall) rrmdir($privpath . $f);
 }
-rcopy("./app", $defaults["setup"]["privpath"], $defaults["setup"]["htgroup"]);
+rcopy("./app", $privpath, $defaults["setup"]["htgroup"]);
 foreach (scandir2("./public_html/") as $f) {
-    if ($cleaninstall) rrmdir($defaults["setup"]["pubpath"] . $f);
+    if ($cleaninstall) rrmdir($pubpath . $f);
 }
-rcopy("./public_html", $defaults["setup"]["pubpath"], $defaults["setup"]["htgroup"]);
+rcopy("./public_html", $pubpath, $defaults["setup"]["htgroup"]);
 
 // clean install only: data and config (writable for htgroup)
 if ($cleaninstall) {
-    rrmdir($defaults["setup"]["privpath"] . "data/");
-    rcopy("./data/", $defaults["setup"]["privpath"] . "data/", $defaults["setup"]["htgroup"], true);
+    rrmdir($privpath . "data/");
+    rcopy("./data/", $privpath . "data/", $defaults["setup"]["htgroup"], true);
 
-    rrmdir($defaults["setup"]["privpath"] . "config/");
-    rcopy("./config/", $defaults["setup"]["privpath"] . "config/", $defaults["setup"]["htgroup"], true);
+    rrmdir($privpath . "config/");
+    rcopy("./config/", $privpath . "config/", $defaults["setup"]["htgroup"], true);
 }
 
 
@@ -238,10 +240,10 @@ if ($cleaninstall) {
              . '    exit("Direct access not permitted.");' . "\n"
              . '}' . "\n\n"
              . '// installation path' . "\n"
-             . 'const PRIVPATH   = "' . $defaults["setup"]["privpath"] . "\";\n";
-    file_put_contents($defaults["setup"]["pubpath"] . "install.conf.php", $install);
-    chmod($defaults["setup"]["pubpath"] . "install.conf.php", 0640);
-    chgrp($defaults["setup"]["pubpath"] . "install.conf.php", $defaults["setup"]["htgroup"]);
+             . 'const PRIVPATH   = "' . $privpath . "\";\n";
+    file_put_contents($pubpath . "install.conf.php", $install);
+    chmod($pubpath . "install.conf.php", 0640);
+    chgrp($pubpath . "install.conf.php", $defaults["setup"]["htgroup"]);
 
     echo "\nBUILD CONFIGURATION FILE: app.json\n";
     // interactive mode: ask config file questions
@@ -267,9 +269,9 @@ if ($cleaninstall) {
     }
     // make file
     $app = json_encode($defaults["app"], JSON_PRETTY_PRINT);
-    file_put_contents($defaults["setup"]["privpath"] . "config/app.json", $app);
-    chmod($defaults["setup"]["privpath"] . "config/app.json", 0660);
-    chgrp($defaults["setup"]["privpath"] . "config/app.json", $defaults["setup"]["htgroup"]);
+    file_put_contents($privpath . "config/app.json", $app);
+    chmod($privpath . "config/app.json", 0660);
+    chgrp($privpath . "config/app.json", $defaults["setup"]["htgroup"]);
     
 
     echo "\nBUILD CONFIGURATION FILE: users.json\n";
@@ -308,12 +310,12 @@ if ($cleaninstall) {
                                                         )
                   );
     $users = json_encode($users, JSON_PRETTY_PRINT);
-    file_put_contents($defaults["setup"]["privpath"] . "config/users.json", $users);
-    chmod($defaults["setup"]["privpath"] . "config/users.json", 0660);
-    chgrp($defaults["setup"]["privpath"] . "config/users.json", $defaults["setup"]["htgroup"]);
+    file_put_contents($privpath . "config/users.json", $users);
+    chmod($privpath . "config/users.json", 0660);
+    chgrp($privpath . "config/users.json", $defaults["setup"]["htgroup"]);
 
     // leave trail
-    file_put_contents($defaults["setup"]["privpath"] . ".installed", "");
+    file_put_contents($privpath . ".installed", "");
 }
 
 // update only: compare other config files and propose to leave/merge/replace them if changed (md5?)
@@ -322,7 +324,7 @@ else {
     // scan all config files in the downloaded source
     foreach (scandir2("./config/", true) as $filename) {
         $src = "./config/" . $filename;
-        $dst = $defaults["setup"]["privpath"] . "config/" . $filename;
+        $dst = $privpath . "config/" . $filename;
 
         //check if this file already exists in the installed instance
         if (!file_exists($dst)) {
@@ -365,7 +367,7 @@ else {
                         case "update": // UPDATE
                         case "u":
                             echo " - update configuration file " . $filename . "\n";
-                            copy($dst, $dst . "setup" . date("YmdHis"));  //backup the installed version!
+                            copy($dst, $dst . "_setup" . date("YmdHis"));  //backup the installed version!
                             copy($src, $dst);
                             chmod($dst, 0660);
                             chgrp($dst, $defaults["setup"]["htgroup"]);
@@ -379,10 +381,10 @@ else {
                         default:
                             // MERGE
                             echo " - merge configuration file " . $filename . "\n";
-                            copy($dst, $dst . "setup" . date("YmdHis"));  //backup the installed version!
+                            copy($dst, $dst . "_setup" . date("YmdHis"));  //backup the installed version!
                             $orig = json_decode(file_get_contents($dst), true);
                             $new = json_decode(file_get_contents($src), true);
-                            $orig = array_merge_recursive($new, $orig);
+                            $orig = array_replace_recursive($new, $orig);
                             $orig = json_encode($orig, JSON_PRETTY_PRINT);
                             file_put_contents($dst, $orig);
                             break;

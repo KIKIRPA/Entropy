@@ -20,6 +20,8 @@ function fillTemplateWithMeta($filepath, $meta, $otherCodes = array(), $preserve
         if ($handle) {
             // read the template file line by line
             while (($line = fgets($handle)) !== false) {
+                // remove newlines first
+                $line = str_replace(array("\r\n", "\n", "\r"), "", $line);
                 // find {codes} and replace them
                 $codes = findCodes($line);
                 foreach ($codes as $code) {

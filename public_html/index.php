@@ -86,32 +86,32 @@ if ($showMod == "default") {
 if (!$showMod) {
     // read measurements list file
     $librariesPath = \Core\Config\App::get("libraries_path");
-    $measurements = readJSONfile($librariesPath . $showLib . "/measurements.json", false);
+    $measurementList = readJSONfile($librariesPath . $showLib . "/measurements.json", false);
     
     if (isset($_REQUEST["id"])) {
         $showID = $_REQUEST['id'];
     
         // id exists?
-        if (!isset($measurements[$showID])) {
+        if (!isset($measurementList[$showID])) {
             $error = "The requested measurement does not exist";
         }
     
         // does the measurment have an _transaction field?
-        if (isset($measurements[$showID]["_transaction"])) {
-            $datapath = $librariesPath . $showLib . "/" . $measurements[$showID]["_transaction"] . "/" . $showID;
+        if (isset($measurementList[$showID]["_transaction"])) {
+            $dataPath = $librariesPath . $showLib . "/" . $measurementList[$showID]["_transaction"] . "/" . $showID;
         } else {
             $error = "The requested measurement has no transaction id";
         }
     
         // find the data file in the transaction directory
-        $data = readJSONfile($datapath . ".json", true);
-        if (count($data) == 0) {
+        $measurement = readJSONfile($dataPath . ".json", true);
+        if (count($measurement) == 0) {
             $error = "The requested measurement was not found or was empty";
         }
     
         if ($error) {
             $showMod = "list";
-            unset($datapath, $data);
+            unset($dataPath, $measurement);
         }
     } else {
         $showMod = "list";
@@ -120,12 +120,12 @@ if (!$showMod) {
 
 // EVALUATE $_REQUEST["ds"]
 if (!$showMod) {
-    // reduce $measurements to just the measurement we need
-    $measurement = $measurements[$showID];
-    unset($measurements);
+    // reduce $measurementList to just the measurement we need
+    $measurementListItem = $measurementList[$showID];
+    unset($measurementList);
     
     if (isset($_REQUEST["ds"])) {
-        if (isset($data["dataset"][$_REQUEST["ds"]])) {
+        if (isset($measurement["datasets"][$_REQUEST["ds"]])) {
             $showDS = $_REQUEST["ds"];
         } else {
             $error = "The requested dataset does not exist";
@@ -136,11 +136,11 @@ if (!$showMod) {
     }
 
     if (!isset($showDS)) {  //if at this point no dataset is set, either choose 'default', or the first
-        if (isset($data["dataset"]["default"])) {
+        if (isset($measurement["datasets"]["default"])) {
             $showDS = "default";
         } else {
-            reset($data["dataset"]);
-            $showDS = key($data["dataset"]);
+            reset($measurement["datasets"]);
+            $showDS = key($measurement["datasets"]);
         }
     }
 }
