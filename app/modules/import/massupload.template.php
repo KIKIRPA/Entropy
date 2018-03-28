@@ -22,6 +22,22 @@ if (count(get_included_files()) == 1) {
         </section>
 <?php endif; ?>
 
+        <section class="section">
+            <div class="container">
+                <div class="tabs">
+                    <ul>
+                        <li class="is-active">
+                            <a href="<?= $_SERVER["PHP_SELF"]; ?>?lib=<?= $showLib ?>&mod=import&task=massupload">Mass upload (CSV)</a>
+                        </li>
+                        <li>
+                            <a href="<?= $_SERVER["PHP_SELF"]; ?>?lib=<?= $showLib ?>&mod=import&task=transactionlist">Unfinished transactions</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+
         <script type="text/javascript">
             $(document).ready(function() {
                 $("#upfile").on('change', function () {
@@ -50,7 +66,7 @@ if (count(get_included_files()) == 1) {
                     </div>
                 </div><br>
 
-                <form enctype="multipart/form-data" action="<?= $_SERVER["SCRIPT_NAME"] ?>?mod=import&lib=<?= $_REQUEST["lib"] ?>&step=2" method="POST">
+                <form enctype="multipart/form-data" action="<?= $_SERVER["SCRIPT_NAME"] ?>?mod=import&lib=<?= $_REQUEST["lib"] ?>" method="POST">
                     <input type="hidden" name="MAX_FILE_SIZE" value="2000000">
                     <div class="field">
                         <label class="label">Upload CSV file</label>
@@ -62,19 +78,19 @@ if (count(get_included_files()) == 1) {
                     <div class="field">
                         <div class="control">
                             <label class="radio">
-                                <input type="radio" name="action" value="append" checked>
+                                <input type="radio" name="task" value="append" checked>
                                 Append: add one or more measurements; existing measurements (having the same "id") cannot be overwritten.
                             </label>
                         </div>
                         <div class="control">
                             <label class="radio">
-                                <input type="radio" name="action" value="update">
+                                <input type="radio" name="task" value="update">
                                 Update: add or update one or more measurements; existing measurements (having the same "id") will be updated.
                             </label>
                         </div>
                         <div class="control">
                             <label class="radio">
-                                <input type="radio" name="action" value="replace">
+                                <input type="radio" name="task" value="replace">
                                 Replace: <strong>wipe all existing measurements</strong> and replace them with one or more new measurements.
                             </label>
                         </div>

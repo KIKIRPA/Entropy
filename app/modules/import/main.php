@@ -19,13 +19,8 @@ $themeColor = isset($LIBS[$showLib]["color"]) ? bulmaColorModifier($LIBS[$showLi
 *                           *
 ****************************/
 
-//HEADER
-array_push($htmlHeaderStyles, \Core\Config\App::get("css_dt_bulma"));
-array_push($htmlHeaderScripts, \Core\Config\App::get("js_dt"), \Core\Config\App::get("js_dt_bulma"));  
-include(PRIVPATH . 'inc/header.inc.php');
 
-
-# check if the transaction already exists and set $tr and $action
+# check if the transaction already exists and set $transaction
 # also check if the user has permission to this transaction
 
 $action = false;
@@ -39,59 +34,31 @@ if (!file_exists($libraryPath)) {
     }
 }
 
-if (file_exists($libraryPath . "transactions_open.json")) {
-    $transactions = readJSONfile($libraryPath . "transactions_open.json", false);
-} else {
-    $transactions = array();
-}
+// if (file_exists($libraryPath . "transactions_open.json")) {
+//     $transactions = readJSONfile($libraryPath . "transactions_open.json", false);
+// } else {
+//     $transactions = array();
+// }
 
 try {
-    if (isset($_REQUEST["op"])) { // open an existing transaction
-    // check if it exists
-        if (isset($transactions[$_REQUEST["op"]])) {
-            $tr = $_REQUEST["op"];
-        } else {
-            throw new \Exception('Invalid transaction ID ' . $tr);
+    if (isset($_REQUEST["tr"])) { // open an existing transaction
+        // check if it exists
+        $transaction = new Core\Lib\Transaction($_REQUEST["lib"]);
+
+        if ($transaction->search($_REQUEST["tr"])) {
+            throw new \Exception('Invalid transaction ID: ' . $_REQUEST["tr"]);
         }
     
         // check if this user permission
-        if (!$user["permissions"]["admin"] and ($transactions[$tr]["user"] != $isLoggedIn)) {
-            throw new \Exception('Unauthorised access to transaction ' . $tr);
-        }
+        //if (!$user["permissions"]["admin"] and ($transaction->user] != $isLoggedIn)) {
+        //    throw new \Exception('Unauthorised access to transaction ' . $transaction->id;);
+        //}
     
         // check if the transaction dir exists
-        $trdir = $libraryPath . $tr . "/";
-        if (!file_exists($trdir)) {
-            throw new \Exception('Upload directory was not found for '. $tr);
+        $trPath = $libraryPath . $transaction->id . "/";
+        if (!file_exists($trPath)) {
+            throw new \Exception('Upload directory was not found for '. $transaction->id);
         }
-    
-        // delete
-        if (isset($_REQUEST["del"])) {
-            rmdir2($trdir);
-            unset($transactions[$tr]);
-            $error = writeJSONfile($libraryPath . "transactions_open.json", $transactions);
-            if ($error) {
-                throw new \Exception($error);
-            }
-            goto STEP1;
-        }
-    
-        // set $action
-        if (in_array($transactions[$tr]["action"], array("append", "update", "replace"))) {
-            $action = $transactions[$tr]["action"];
-        } else {
-            throw new \Exception('No valid action for transaction ' . $tr);
-        }
-    } else {
-        // create a new transaction
-        $tr = date("YmdHis");
-        $transactions[$tr] = array("user"   => $isLoggedIn,
-                            "action" => "none",
-                            "step"   => 1
-                            );
-        $trdir = $libraryPath . $tr . "/";
-        //don't write transactions_open.json at this time, it will create an empty transaction each
-    //time STEP1 is opened
     }
 } catch (\Exception $e) {
     $errormsg = $e->getMessage();
@@ -99,173 +66,40 @@ try {
     echo "    <span style='color:red'>ERROR: " . $errormsg . "</span><br><br>";
     goto STEP1;
 }
-  
 
-/* STEPS
-  1* VIEW    upload file and choose action (append/update/replace)    [step=1]
-  2  PROCESS check file (if ok, proceed with 3)                       [step=2, action=a/u/r, upfile]
-  3* VIEW    data checks (errors and warnings): reupload or continue  [step=3, op]
-  4  PROCESS make measurements.json (if ok, proceed with 5)           [step=4, op]
-  5* VIEW    view list of uploaded data                               [step=5, op]
-  6  VIEW    spectra upload form                                      [step=6, op, id]
-  7  PROCESS convert and make jsons (on every upload!)                [step=7, op, id]
-  8  PROCESS delete binary file                                       [step=8, op, id, ds, f]
-  9  PROCESS publish data                                             [step=9, op]
-  10* ERROR during publishing, nothing can be done to this upload; to be checked manually by sysadmin
-*/
 
-if (isset($_REQUEST["step"])) {
-    if (($transactions[$tr]["step"] == 1) and ($_REQUEST["step"] > 2)) {
-        $step = 1;
-    } elseif (($transactions[$tr]["step"] == 3) and ($_REQUEST["step"] > 4)) {
-        $step = 3;
-    } elseif (($transactions[$tr]["step"] == 5) and ($_REQUEST["step"] > 9)) {
-        $step = 5;
-    } elseif ($transactions[$tr]["step"] == 10) {
-        $step = 10;
-    } else {
-        $step = $_REQUEST["step"];
-    }
-} else {
-    $step = $transactions[$tr]["step"];
-}     // fallback to the last reached milestone step (1,3,5,10)
-
-    
-// read the right measurements file _2_flat.json or _inflated.json
-if ($step <= 2) {
-    $measurements = array();
-} elseif ($step <= 4) {
-    $measurements = readJSONfile($trdir . "_2_flat.json", false);
-} elseif ($step <= 8) {
-    $measurements = readJSONfile($trdir . "_3_inflated.json", false);
-} elseif ($step == 9) {
-    $measurements = readJSONfile($trdir . "_4_transaction.json", false);
+$action = (isset($_REQUEST["task"])) ? $_REQUEST["task"] : "massupload";
+switch ($action) {
+    case "transactionlist":
+        include_once(__DIR__ . '/transactionlist.php');
+        break;
+    case "delete":
+        break;
+    case "massupload":
+        include_once(__DIR__ . '/massupload.php');
+        break;
+    case "append":
+    case "update":
+    case "replace":
+        break;
+    case "list":
+        break;
+    case "dataupload":
+        break;
+    case "build":
+        break;
+    case "merge":
+        break;
 }
 
-switch ($step) {
-default:
-case 1:
-case 10:
-    break;
-case 2:
-    if (isset($_REQUEST["action"])) {
-        if (in_array($_REQUEST["action"], array("append", "update", "replace"))) {
-            goto STEP2;
-        }
-    }
-    break;
-case 3:
-    goto STEP3;
-    break;
-case 4:
-    goto STEP4;
-    break;
-case 5:
-    goto STEP5;
-    break;
-case 6:
-    if (isset($_REQUEST["id"])) {
-        goto STEP6;
-    } else {
-        goto STEP5;
-    }
-    break;
-case 7:
-    if (isset($_REQUEST["id"])) {
-        goto STEP7;
-    } else {
-        goto STEP5;
-    }
-    break;
-case 8:
-    if (isset($_REQUEST["id"]) and isset($_REQUEST["ds"]) and isset($_REQUEST["f"])) {
-        goto STEP8;
-    } else {
-        goto STEP5;
-    }
-    break;
-case 9:
-    goto STEP9;
-    break;
-}
+die();
 
 
-/****************************
-*                           *
-*  1 UPLOAD CSV / CONTINUE  *
-*                           *
-****************************/
-  
-STEP1:
-{
-    require_once(__DIR__ . '/massupload.template.php');
-?>
 
 
-      <br><br>
-      <div  style="border:1px dotted black;">
-        <h4>Continue an unfinished transaction</h4>
-        <script type="text/javascript" charset="utf-8">
-          $(document).ready(function() {
-            var oTable = $('#datatable').dataTable( {
-              //"sScrollY": "300px",
-              "bPaginate": false,
-              "bScrollCollapse": true,  
-            } );
-          } );
-        </script>
-    
-        <table id="_datatable" style="padding: 10px;">
-          <thead>
-            <tr>
-              <th style='background: #ddd; text-align: left; padding: 5px;'>date</th>
-              <th style='background: #ddd; text-align: left; padding: 5px;'>user</th>
-              <th style='background: #ddd; text-align: left; padding: 5px;'>action</th>
-              <th style='background: #ddd; text-align: left; padding: 5px;'></th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php
-                $n = 0;
-                
-                foreach ($transactions as $id => $transaction) {
-                    //test if the logged in user has made this transaction or is admin
-                    if (($transaction["user"] == $isLoggedIn) or $user["permissions"]["admin"]) {
-                        if (in_array($transaction["action"], array("append", "update", "replace"))) {
-                            $a = $transaction["action"];
-                            $u = $transaction["user"];
-                            $d = substr($id, 0, 4) . "/" . substr($id, 4, 2) . "/" . substr($id, 6, 2) . " "
-                               . substr($id, 8, 2) . ":" . substr($id, 10, 2) . ":" . substr($id, 12, 2);
-                            $bg = ($n++ & 1 ? "#eee" : "#fff");
-                      
-                            echo "              <tr>\n";
-                            echo "                <td style='background: $bg; padding: 5px;'>$d</td>\n";
-                            echo "                <td style='background: $bg; padding: 5px;'>$u</td>\n";
-                            echo "                <td style='background: $bg; padding: 5px;'>$a</td>\n";
-                            echo "                <td style='background: $bg; padding: 5px;'>";
-                            if ($transactions[$tr]["step"] != 10) {
-                                echo "<a href='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $id. "'>&#9998;</a> ";
-                            }
-                            if ($transactions[$tr]["step"] != 10) {
-                                echo "<a href='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $id. "&del' onclick=\"return confirm('Delete this unfinished transaction?')\">&#10006;</a></td>\n";
-                            }
-                            echo "              </tr>\n";
-                        }
-                    }
-                }
-            ?>
-          </tbody>
-        </table>
-
-      </div>
-<?php
 
 
-    //FOOTER
-    include(PRIVPATH . 'inc/footer.inc.php');
 
-    return;   // return to the main php page
-}
 
   
 
@@ -278,16 +112,16 @@ STEP1:
 STEP2:
 {
     try {
-        $action = $_REQUEST["action"];
+        $action = $_REQUEST["task"];
       
         // check and move uploaded file
-        $error = checkUpload('upfile', $trdir, "_1_" . $action . ".csv");
+        $error = checkUpload('upfile', $trPath, "_1_" . $action . ".csv");
         if ($error) {
             throw new \Exception($error);
         }
       
         // read CSV file
-        if (($handle = fopen($trdir . "_1_" . $action . ".csv", "r")) == false) {
+        if (($handle = fopen($trPath . "_1_" . $action . ".csv", "r")) == false) {
             throw new \Exception('Could not open the CSV file.');
         }
       
@@ -351,7 +185,7 @@ STEP2:
         fclose($handle);
       
         // Save .json
-        $error = writeJSONfile($trdir . "_2_flat.json", $measurements);
+        $error = writeJSONfile($trPath . "_2_flat.json", $measurements);
         if ($error) {
             throw new \Exception($error);
         }
@@ -379,7 +213,7 @@ STEP2:
 ****************************/
   // two ways to reach step 3:
   //  - following step 2 (processing)  -> $tr, $action, $measurements set during step 2
-  //  - opening a saved transaction    -> $tr, $action, $measurements set in the common tasks (derived from $_REQUEST["op"])
+  //  - opening a saved transaction    -> $tr, $action, $measurements set in the common tasks (derived from $_REQUEST["tr"])
   
 STEP3:
 {
@@ -595,14 +429,14 @@ STEP3:
     
     <?php
 
-    $error = writeJSONfile($trdir . "_2_flat.json", $measurements);
+    $error = writeJSONfile($trPath . "_2_flat.json", $measurements);
     if ($error) {
         eventLog("ERROR", "could not save autocorrected json [module_import: STEP3]");
     }
         
     // CONTINUE BUTTON
     if ($c == 0) {
-        echo "        <form action='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $tr . "&step=4" . "' method='POST'>\n"
+        echo "        <form action='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&tr=" . $tr . "&step=4" . "' method='POST'>\n"
            . "          <input type='submit' value='Next >' />\n"
            . "        </form>\n";
     } else {
@@ -665,7 +499,7 @@ STEP3:
     
     try {
         // Save inflated $measurements as .json
-        $error = writeJSONfile($trdir . "_3_inflated.json", $measurements);
+        $error = writeJSONfile($trPath . "_3_inflated.json", $measurements);
         if ($error) {
             throw new \Exception($error);
         }
@@ -683,7 +517,7 @@ STEP3:
         }
           
         //save list
-        $error = writeJSONfile($trdir . "_4_transaction.json", $list);
+        $error = writeJSONfile($trPath . "_4_transaction.json", $list);
         if ($error) {
             throw new \Exception($error);
         }
@@ -703,6 +537,22 @@ STEP3:
 }
   
   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /****************************
 *                           *
 *  5 VIEW DATA LIST         *
@@ -784,7 +634,7 @@ STEP5:
             }
         }
       
-        $link = "<a href='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $tr . "&step=6&id=" . $id . "'>";
+        $link = "<a href='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&tr=" . $tr . "&step=6&id=" . $id . "'>";
         echo "          <td>"
          . (isset($measurement["_built"])?"Yes ".$link."[change]":"No ".$link."[upload]")
          . "</a></td>\n"
@@ -797,7 +647,7 @@ STEP5:
     
     if ($needdata == 0) {
         echo "    <div>All required data files have been uploaded. You can still upload optional data or replace data.<br>When finished, we are ready to publish (" . $action . ") this data to " . $_REQUEST["lib"] . ".</div><br><br>\n"
-         . "    <form action='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $tr . "&step=9' method='POST'>\n"
+         . "    <form action='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&tr=" . $tr . "&step=9' method='POST'>\n"
          . "      <input type='submit' value='Publish >' />\n"
          . "    </form>\n";
     } else {
@@ -810,6 +660,22 @@ STEP5:
 
     return;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   
 /****************************
@@ -829,7 +695,7 @@ STEP6:
        . "      measurement: " . $_REQUEST["id"] . "\n"
        . "    </strong><br><br>\n\n";
     
-    echo "    <form enctype='multipart/form-data' action='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $tr . "&step=7&id=" . $_REQUEST["id"] . "' method='POST'>\n"
+    echo "    <form enctype='multipart/form-data' action='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&tr=" . $tr . "&step=7&id=" . $_REQUEST["id"] . "' method='POST'>\n"
        . "      <input type='hidden' name='MAX_FILE_SIZE' value='2000000'>\n";
        
     $i = 0; //an index for datasets, which we can add to the POST parameters
@@ -873,7 +739,7 @@ STEP6:
               New uploaded files with the same name will overwrite the old files with the same name.<br><br>
               <?php if ($hasBin): ?>
               <?php     foreach ($ds["_bin"] as $binfile):
-                            $link = "<a href='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $tr . "&step=8&id=" . $id . "&ds=" . $dsid . "&del=" . $binfile . "'>"; ?>
+                            $link = "<a href='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&tr=" . $tr . "&step=8&id=" . $id . "&ds=" . $dsid . "&del=" . $binfile . "'>"; ?>
               <em><?= $binfile ?></em><?=  $link ?>[X]</a><br>
               <?php     endforeach; ?>
               <?php endif; ?>
@@ -888,7 +754,7 @@ STEP6:
       $i++;
     }
     ?>
-        <?= '<a href="' . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $tr . "&step=6" . '">< Overview</a>' ?>
+        <?= '<a href="' . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&tr=" . $tr . "&step=6" . '">< Overview</a>' ?>
         <input type="submit" value="Update >" />
       </form>
     <?php
@@ -934,10 +800,10 @@ STEP7:
             }
         } else { // 1.2 UPDATE EXISTING
             // open JSON data file
-            if (!file_exists($trdir . $_REQUEST["id"] . ".json")) {
+            if (!file_exists($trPath . $_REQUEST["id"] . ".json")) {
                 throw new \Exception('JSON data file not found.');
             } else {
-                $json = readJSONfile($trdir . $_REQUEST["id"] . ".json", false);
+                $json = readJSONfile($trPath . $_REQUEST["id"] . ".json", false);
             }
         }
       
@@ -949,7 +815,7 @@ STEP7:
             if (($_REQUEST["dataUpRadio" . $key] == "new") and (is_uploaded_file($_FILES["dataUp" . $key]['tmp_name']))) {
                 // check and copy file
                 $ext = "." . strtolower(pathinfo($_FILES["dataUp" . $key]['name'], PATHINFO_EXTENSION));
-                $error = checkUpload("dataUp" . $key, $trdir, $fn . $ext);
+                $error = checkUpload("dataUp" . $key, $trPath, $fn . $ext);
                 if ($error) {
                     throw new \Exception($error);
                 }
@@ -966,7 +832,7 @@ STEP7:
                 if (isset($importOptions["convertor"])) {
                     // create convertor        
                     $className = "Convert\\Import\\" . ucfirst(strtolower($importOptions["convertor"]));
-                    $import = new $className($trdir . $fn . $ext, $importOptions);
+                    $import = new $className($trPath . $fn . $ext, $importOptions);
                     $data = $import->getData();
                     $error = $import->getError();
                     if ($error) {
@@ -1002,14 +868,14 @@ STEP7:
             if (($_REQUEST["annoUpRadio" . $key] == "new") and (is_uploaded_file($_FILES["annoUp" . $key]['tmp_name']))) {
                 // check and copy file
                 $ext = ".anno";
-                $error = checkUpload("annoUp" . $key, $trdir, $fn . $ext);
+                $error = checkUpload("annoUp" . $key, $trPath, $fn . $ext);
                 if ($error) {
                     throw new \Exception($error);
                 }
 
                 // create import convertor class for annotations
                 $viewer = $DATATYPES[findDataType($json["type"], $DATATYPES)]["viewer"];
-                $import = new Convert\Import\Annotations($trdir . $fn . $ext, $viewer);
+                $import = new Convert\Import\Annotations($trPath . $fn . $ext, $viewer);
                 $data = $import->getData();
                 $error = $import->getError();
 
@@ -1025,7 +891,7 @@ STEP7:
                 $measurements[$_REQUEST["id"]]["datasets"][$ds]["_anno"] = $_FILES["annoUp" . $key]['name'];
                 $build = true;
             } elseif ($_REQUEST["annoUpRadio" . $key] == "del") {
-                unlink($trdir . $fn . ".anno");
+                unlink($trPath . $fn . ".anno");
                 unset($json["datasets"]["ds"]["anno"],
                 $measurements[$_REQUEST["id"]]["datasets"][$ds]["_anno"]);
                 $build = true;
@@ -1044,7 +910,7 @@ STEP7:
                 }
             
                 // copy files to our transaction data directory
-                $error = checkMultiUpload("binUp" . $key, $trdir, $fn . "__");
+                $error = checkMultiUpload("binUp" . $key, $trPath, $fn . "__");
                 if (!$error) {  // update $measurements...[_bin]
                     foreach ($_FILES["binUp" . $key]['name'] as $file) {
                         if (!isset($measurements[$_REQUEST["id"]]["datasets"][$ds]["_bin"])) {
@@ -1065,7 +931,7 @@ STEP7:
         // 3. build and update _built
         if ($build) {
             // build JSON data file
-            $error = writeJSONfile($trdir . $_REQUEST["id"] . ".json", $json);
+            $error = writeJSONfile($trPath . $_REQUEST["id"] . ".json", $json);
             if ($error) {
                 throw new \Exception($error);
             }
@@ -1078,7 +944,7 @@ STEP7:
             }
         
             // rebuild JSON measurements_inflated file
-            $error = writeJSONfile($trdir . "_3_inflated.json", $measurements);
+            $error = writeJSONfile($trPath . "_3_inflated.json", $measurements);
             if ($error) {
                 throw new \Exception($error);
             }
@@ -1108,14 +974,14 @@ STEP8:
         if ($i) {
             // delete file
             $fn = $_REQUEST["id"] . (($ds == 'default')?"":"__".$ds) . "__" . $_REQUEST["f"];
-            $success = unlink($trdir . $fn);
+            $success = unlink($trPath . $fn);
             if (!$success) {
                 throw new \Exception("Could not remove " . $_REQUEST["f"]);
             }
         
             // log in inflated json
             unset($measurements[$_REQUEST["id"]]["datasets"][$ds]["_bin"][$i]);
-            $error = writeJSONfile($trdir . "_3_inflated.json", $measurements);
+            $error = writeJSONfile($trPath . "_3_inflated.json", $measurements);
             if ($error) {
                 throw new \Exception($error);
             }
@@ -1169,7 +1035,7 @@ STEP9:
         }
       
         // make the resulting measurements in the transaction directory and make hardlink into the library directory (= publish it)
-        $path = $trdir . "_5_result_" . date("YmdHis") . ".json";
+        $path = $trPath . "_5_result_" . date("YmdHis") . ".json";
         $error = writeJSONfile($path, $result);
         if ($error) {
             throw new \Exception($error);
