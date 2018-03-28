@@ -455,7 +455,7 @@ if (count(get_included_files()) == 1) {
                         <div class="field-label"></div>
                         <div class="field-body">
                             <div class="field">
-                                <button type="submit" id="btnsubmit" class="button <?= $libeditColor ?>">
+                                <button type="submit" id="btnsubmit" class="button <?= $themeColor ?>">
                                     <span class="icon is-small">
                                         <i class="fa fa-check"></i>
                                     </span>
