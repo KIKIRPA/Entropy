@@ -107,7 +107,7 @@ if (count(get_included_files()) == 1) {
                             <td>
                                 <a href="./index.php?lib=<?= $showLib ?>&id=<?= $id ?>">
                                     <span class="icon">
-                                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                        <i class="fa fa-chevron-circle-right" aria-hidden="true"></i>
                                     </span>
                                 </a>
                             </td>
@@ -140,7 +140,7 @@ if (count(get_included_files()) == 1) {
                             </div>
                             <a href="./index.php?lib=<?= $id ?>" class="button <?= $lib["color"] ?> is-inverted is-outlined is-pulled-right">
                                 <span class="icon is-small">
-                                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                                    <i class="fa fa-chevron-circle-right" aria-hidden="true"></i>
                                 </span>
                                 <span>Visit...</span>
                             </a>
