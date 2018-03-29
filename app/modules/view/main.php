@@ -198,7 +198,9 @@ unset($i, $row, $header, $key, $item, $subkey, $subitem);
 
 // HEADER + NAVBAR
 array_push($htmlHeaderStyles, \Core\Config\App::get("css_dygraphs"));
-array_push($htmlHeaderScripts, \Core\Config\App::get("js_dygraphs"));  
+array_push($htmlHeaderScripts, \Core\Config\App::get("js_dygraphs"));
+array_push($htmlHeaderStyles, \Core\Config\App::get("css_flickity"));
+array_push($htmlHeaderScripts, \Core\Config\App::get("js_flickity"));  
 include(PRIVPATH . 'inc/header.inc.php');
 
 // MAIN

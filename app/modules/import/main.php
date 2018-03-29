@@ -783,7 +783,7 @@ STEP5:
                 // (non-binary) data
                 // $ds["_data"] is just a field where we store if a file was uploaded, not meant to
                 // be saved into the resulting data json file (although it probably wouldn't harm)
-                if (isset($ds["_data"])) {
+                if (isset($ds["_data"]) or isset($ds["data"])) {
                     echo "<font style='color: green;'>D </font>";
                 } else {
                     echo "<font style='background-color: red;'>D </font>";
@@ -865,6 +865,7 @@ STEP6:
           </tr>
           <tr>
             <td style='border:1px dotted black; width:34%;'>DATA FILE<br><br>
+              <?php if (!isset($ds["data"])): ?>
               <?= $hasData ? "<em>" . $ds["_data"] . "</em><br><br>" : "" ?>
               <input type='radio' name='dataUpRadio<?= $i ?>' value='keep' <?= $hasData?"checked":"disabled" ?>> Keep existing<br>
               <input type='radio' id='showDataUp<?= $i ?>' name='dataUpRadio<?= $i ?>' value='new' <?= $hasData?"":"checked" ?>> Upload new file<br>
@@ -874,6 +875,7 @@ STEP6:
                     $('#show1<?= $i ?>').css('display', ($(this).val() === 'new') ? 'block':'none');
                 });
               </script>
+              <?php endif; ?>
             </td>
             <td style='border:1px dotted black; width:33%;'>ANNOTATION FILE<br><br>
               <?= $hasAnno ? "<em>" . $ds["_anno"] . "</em><br><br>" : "" ?>
@@ -938,8 +940,10 @@ STEP7:
         if (!isset($measurements[$_REQUEST["id"]]["_built"])) { // 1.1 NEW FILE
             //we require a data file for each dataset
             foreach ($datasets as $key => $ds) {
-                if (($_REQUEST["dataUpRadio" . $key] != "new") or (!is_uploaded_file($_FILES["dataUp" . $key]['tmp_name']))) {
-                    throw new \Exception('No data file for dataset ' . $ds);
+                if (!isset($measurements[$_REQUEST["id"]]["datasets"][$ds]["data"])) {
+                    if (($_REQUEST["dataUpRadio" . $key] != "new") or (!is_uploaded_file($_FILES["dataUp" . $key]['tmp_name']))) {
+                        throw new \Exception('No data file for dataset ' . $ds);
+                    }
                 }
             }
             

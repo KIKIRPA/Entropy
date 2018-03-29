@@ -134,5 +134,13 @@
                 }
             ]
         }
+    },
+    "images": {
+        "alias": [
+            "Images"
+        ],
+        "viewer": "images",
+        "graph": {},
+        "axis": {}
     }
 }
