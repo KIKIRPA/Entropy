@@ -23,7 +23,7 @@ Although Entropy is considered relatively stable (beta), the authors cannot be h
 
 ### M1.1
 - Support linked datasets
-- Viewer for static images
+- ~~Viewer for static images~~
 - Improved import module
 
 ### M2
