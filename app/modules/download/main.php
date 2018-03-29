@@ -8,6 +8,8 @@ if (count(get_included_files()) == 1) {
 
 require_once(PRIVPATH . 'inc/common_convert.inc.php');
 
+$url = false;
+
 try {
     /* ************
         conditions
@@ -25,7 +27,7 @@ try {
         throw new \Exception("Download failed: nothing to download");
     }
 
-    $code = explode("=", $code);
+    $code = explode("=", $code, 2);
     if (count($code) != 2) {
         throw new \Exception("Download failed: error in download code");
     }
@@ -38,6 +40,7 @@ try {
         elseif (!(in_array($extension, $LIBS[$showLib]["downloadbinary"]) or in_array("_ALL", $LIBS[$showLib]["downloadbinary"])) or in_array("_NONE", $LIBS[$showLib]["downloadbinary"])) {
             throw new \Exception("Download failed: binary download not allowed.");
         }
+
     } elseif ($code[0] == "conv") { // is conversion allowed in library file?  TODO: is allowed in conversion settings json?
         if (!in_array($code[1], $LIBS[$showLib]["downloadconverted"])) {
             throw new \Exception("Download failed: conversion to ". $code[1] ." not allowed.");
@@ -60,6 +63,12 @@ try {
                 $measurement["license"] = $textonly;
             }
         }
+
+    } elseif ($code[0] == "link") {
+        if (filter_var($code[1], FILTER_VALIDATE_URL) === FALSE) {
+            throw new \Exception("Download failed: datalink is not a valid URL.");
+        }
+        $url = $code[1];
 
     } else {
         throw new \Exception("Error in download code");
@@ -190,5 +199,7 @@ output
 // fpassthru($fileHandle);
 // fclose($fileHandle);
 // die();
+
+
 
 require_once(__DIR__ . '/template.php');

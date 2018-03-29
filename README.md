@@ -22,7 +22,7 @@ Although Entropy is considered relatively stable (beta), the authors cannot be h
 - Terms of usage / licensing on measurement, library and repository levels
 
 ### M1.1
-- Support linked datasets
+- ~~Support linked datasets~~
 - ~~Viewer for static images~~
 - Improved import module
 

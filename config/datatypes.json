@@ -137,7 +137,10 @@
     },
     "images": {
         "alias": [
-            "Images"
+            "Images",
+            "MAXRF",
+            "XRF imaging",
+            "OCT"
         ],
         "viewer": "images",
         "graph": {},
