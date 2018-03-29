@@ -9,6 +9,9 @@ if (count(get_included_files()) == 1) {
 require_once(PRIVPATH . 'inc/common_upload.inc.php');
 require_once(PRIVPATH . 'inc/common_convert.inc.php');
 
+$notifications = array();
+$themeColor = isset($LIBS[$showLib]["color"]) ? bulmaColorModifier($LIBS[$showLib]["color"], $COLORS, \Core\Config\App::get("app_color_default")) : bulmaColorModifier(\Core\Config\App::get("app_color_default"), $COLORS);
+
 
 /****************************
 *                           *
@@ -21,7 +24,6 @@ array_push($htmlHeaderStyles, \Core\Config\App::get("css_dt_bulma"));
 array_push($htmlHeaderScripts, \Core\Config\App::get("js_dt"), \Core\Config\App::get("js_dt_bulma"));  
 include(PRIVPATH . 'inc/header.inc.php');
 
-echo "      <h3>Library upload tool</h3>\n";
 
 # check if the transaction already exists and set $tr and $action
 # also check if the user has permission to this transaction
@@ -196,31 +198,10 @@ case 9:
   
 STEP1:
 {
+    require_once(__DIR__ . '/massupload.template.php');
 ?>
-      <div style="border:1px dotted black;">
-        <h4>Uploading a new set of measurements (append, update or replace)</h4>
-        <p>All measurements have to be described (metadata) in a table, saved as comma separated values (CSV). 
-        <p>Rules for the CSV-table: <br>
-        <ul>
-          <li>CSV files can be generated using Microsoft Excel, LibreOffice, Apache OpenOffice and similar programs. Save the file as CSV or Text format (recognised delimiters are commas, semicolons, tabs and | signs). If your text contains special characters (accents, umlauts...), consider to store the file as 'Unicode Text' in Excel.</li>
-          <li>The first line is the header, defining (sub)field names. Columns without a (sub)field name will be neglected.</li>
-          <li>Each measurement is written on a new line. Lines without (unique) "id" will be neglected.</li>
-          <li>There are two required columns: "<strong>id</strong>", a unique identifier for each measurement, and "<strong>type</strong>", defining the (supported) data type.</li>
-          <li>It is recommended to use the main column headers "<strong>meta:sample</strong>", "<strong>meta:samplesource</strong>", "<strong>meta:instrument</strong>", "<strong>meta:parameters</strong>", "<strong>meta:measurement</strong>" and "<strong>meta:contributor</strong>". These and other fields can be recursively subdivided as required using a semicolon as separator, e.g. "meta:sample:C.I. number", "meta:sample source:0:sample identifier". If a field is subdivided in subfields, the parent field should not be used (or: you can't have data in a "meta:sample" and a "meta:sample:C.I. name" column simultaneously for a given measurement; and it is not advised to use both in the same transaction).</li>
-          <li>If each measurement only contains a single dataset, the system will create a "default" dataset. You can overrule this behaviour by defining an empty column e.g. "datasets:baseline corrected".</li>
-          <li>If all or some measurements contain multiple datasets, the CSV table has to contain multiple datasets, e.g. "datasets:baseline corrected" and "datasets:original data". Dataset-specific metadata can be supplied as subfields of "datasets:original data:meta" and will overrule common metadata. It is advised to store common metadata as subfield of "meta", e.g. "meta:sample:CI number". Metadata in "datasets:x:meta" will overrule those in "meta:".</li>
-          <li>In case of multiple datasets within a single measurement, the "type" field must be the data type of the primary (first) dataset. Other datasets can have different data types, defined in "datasets:x:type".</li>
-        </ul>
-        <form enctype="multipart/form-data" action="<?= $_SERVER["SCRIPT_NAME"] ?>?mod=import&lib=<?= $_REQUEST["lib"] ?>&step=2" method="POST">
-          <input type="hidden" name="MAX_FILE_SIZE" value="2000000">
-          Upload CSV file: <input name="upfile" type="file"><br><br>
-          <input type='radio' id='action' name='action' value='append' checked> Append (add one or multiple measurements. You cannot overwrite existing measurements (with the same "id"))<br>
-          <input type='radio' id='action' name='action' value='update'        > Update (add or update multiple measurements. Existing measurements (with the same "id") will be updated)<br>
-          <input type='radio' id='action' name='action' value='replace'       > Replace (replace all measurements. This will <strong>wipe the existing library entirely!</strong>)<br><br>
-          <input type="submit" value="Next >" />
-        </form>
-      </div>
-      
+
+
       <br><br>
       <div  style="border:1px dotted black;">
         <h4>Continue an unfinished transaction</h4>
