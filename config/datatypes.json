@@ -134,5 +134,16 @@
                 }
             ]
         }
+    },
+    "images": {
+        "alias": [
+            "Images",
+            "MAXRF",
+            "XRF imaging",
+            "OCT"
+        ],
+        "viewer": "images",
+        "graph": {},
+        "axis": {}
     }
 }

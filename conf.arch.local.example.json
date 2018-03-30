@@ -8,10 +8,12 @@
     "css_fa":        "./local/font-awesome/css/font-awesome.min.css",
     "css_bulma":     "./local/bulma.css",
     "css_dt_bulma":  "./local/datatables.bulma.min.css",
-    "css_dygraphs":   "./local/dygraph.css",
+    "css_dygraphs":  "./local/dygraph.css",
+    "css_flickity":  "./local/flickity.css",
     "js_jquery":     "./local/jquery.min.js",
     "js_dt":         "./local/datatables.min.js",
     "js_dt_bulma":   "./local/datatables.bulma.min.js",
-    "js_dygraphs":    "./local/dygraph.min.js"
+    "js_dygraphs":   "./local/dygraph.min.js",
+    "js_flickity":   "./local/flickity.pkgd.min.js"
   }
 }

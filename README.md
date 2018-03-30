@@ -22,8 +22,8 @@ Although Entropy is considered relatively stable (beta), the authors cannot be h
 - Terms of usage / licensing on measurement, library and repository levels
 
 ### M1.1
-- Support linked datasets
-- Viewer for static images
+- ~~Support linked datasets~~
+- ~~Viewer for static images~~
 - Improved import module
 
 ### M2
@@ -54,8 +54,9 @@ With the support of:
 - [IPERION CH](http://www.iperionch.eu) (project funded by the European Commission, H2020-INFRAIA-2014-2015)
 
 Incorporates code from:
-- Dygraphs (MIT license) by Dan Vanderkam, dygraphs.com
-- Notify Bar (MIT license) by Dmitri Smirnov, www.whoop.ee
-- DataTables (GPL v2 / BSD) by Allan Jardine, www.datatables.net
 - jQuery (Apache v2.0) by the jQuery Foundation, jquery.com
+- DataTables (GPL v2 / BSD) by Allan Jardine, www.datatables.net
+- Dygraphs (MIT license) by Dan Vanderkam, dygraphs.com
+- Flickity (GPL v3 license) by Metafizzy LLC, flickity.metafizzy.co
+- Notify Bar (MIT license) by Dmitri Smirnov, www.whoop.ee
 - Freecons (Free) by Jiri Silha
