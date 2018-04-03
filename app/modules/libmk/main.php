@@ -20,11 +20,11 @@ if (($f == "set") and ($output == false)) {
             if (isset($USERS[$isLoggedIn]["permissions"][$mod])
             and !in_array("_ALL", $USERS[$isLoggedIn]["permissions"][$mod])
             and !in_array("_NONE", $USERS[$isLoggedIn]["permissions"][$mod])
-            and !in_array($id, $USERS[$isLoggedIn]["permissions"][$mod])
+            and !in_array($libeditId, $USERS[$isLoggedIn]["permissions"][$mod])
         ) {
-                array_push($USERS[$isLoggedIn]["permissions"][$mod], $id);
+                array_push($USERS[$isLoggedIn]["permissions"][$mod], $libeditId);
             } else {
-                $USERS[$isLoggedIn]["permissions"][$mod] = array($id);
+                $USERS[$isLoggedIn]["permissions"][$mod] = array($libeditId);
             }
         }
     
@@ -40,7 +40,7 @@ if (($f == "set") and ($output == false)) {
     }
 
     // create directory?
-    if (!mkdir2(\Core\Config\App::get("libraries_path") . $id . "/")) {
+    if (!mkdir2(\Core\Config\App::get("libraries_path") . $libeditId . "/")) {
         echo "<span style='color:red'>ERROR: could not create directory.</span><br><br>\n";
         eventLog("ERROR", "Could not create directory. [module_libmk]", false, true);
     }
