@@ -12,16 +12,30 @@ if (count(get_included_files()) == 1) {
     *************** */
 
 // data from the measurement list json file
+// --> transaction
 $transaction = $measurementListItem["_transaction"];
+
+// --> tags
+$tags = array("id", "type");
+if (isset($LIBS[$_REQUEST["lib"]]["listcolumns"])) {
+    if (!emtpy($LIBS[$_REQUEST["lib"]]["listcolumns"])) {
+        $tags = $LIBS[$_REQUEST["lib"]]["listcolumns"];
+    }     
+}
+
 $viewTags = array();
-foreach ($measurementListItem as $key => $value) {
-    // taglist: don't include keys starting with _ (e.g. _transaction) or having empty values
-    if ((substr($key, 0, 1) != "_") and (!empty($value))) {
-        $value = strip_tags($value);
-        if (len($value) > 30) {
-            $value = substr($value, 0, 27) . "...";
+foreach ($tags as $tag) {
+    if (isset($measurementListItem[$tag])) {
+        $value = $measurementListItem[$tag];
+
+        // taglist: don't include tagss starting with _ (e.g. _transaction) or having empty values
+        if ((substr($tag, 0, 1) != "_") and (!empty($value))) {
+            $value = strip_tags($value);
+            if (len($value) > 30) {
+                $value = substr($value, 0, 27) . "...";
+            }
+            $viewTags[nameMeta($tag)] = $value;
         }
-        $viewTags[nameMeta($key)] = $value;
     }
 }
 
