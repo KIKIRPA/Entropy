@@ -664,6 +664,37 @@ STEP3:
     $measurements["_datasets"] = $datasets;
     
     try {
+        // autobuild complete measurments
+        foreach ($measurements as $id => $measurement) {
+            if ($id != "_datasets") {
+                // check if all datasets have data array (note: might need some tweaking)
+                $autobuild = !isset($measurement["_built"]);
+                foreach ($measurement["datasets"] as $dsid => $ds) {
+                    $autobuild = ($autobuild and isset($ds["data"]));
+                }
+    
+                // build
+                if ($autobuild) {
+                    // prepare measurement for json
+                    unset($measurement["_action"], $measurement["_built"]);
+                    foreach ($measurement["datasets"] as $dsid => $ds) {
+                        unset($measurement["datasets"][$dsid]["_data"], $measurement["datasets"][$dsid]["_anno"], $measurement["datasets"][$dsid]["_bin"]);
+                    }
+                    $error = writeJSONfile($trdir . $id . ".json", $measurement);
+                    if ($error) {
+                        throw new \Exception($error);
+                    }
+                
+                    // set _built field in $measurements
+                    if (isset($measurements[$id]["_built"])) {
+                        $measurements[$id]["_built"]++;
+                    } else {
+                        $measurements[$id]["_built"] = 1;
+                    }
+                }
+            }
+        }
+
         // Save inflated $measurements as .json
         $error = writeJSONfile($trdir . "_3_inflated.json", $measurements);
         if ($error) {
@@ -671,11 +702,16 @@ STEP3:
         }
       
         //make transaction $list with keys from $columns and values retrieved from $measurements
-        $columns = $LIBS[$_REQUEST["lib"]]["listcolumns"];
+        $columns = array("id", "type");
+        if (isset($LIBS[$_REQUEST["lib"]]["listcolumns"])) {
+            if (!emtpy($LIBS[$_REQUEST["lib"]]["listcolumns"])) {
+                $columns = $LIBS[$_REQUEST["lib"]]["listcolumns"];
+            }     
+        }
+
         $list =  array();
         foreach ($measurements as $id => $measurement) {
             if ($id != "_datasets") {
-                //$measurement = overrideMeta($measurement); //fold "meta:" metadata together with direct metadata
                 foreach ($columns as $column) {
                     $list[$id][$column] = getMeta($measurement, $column, "; ", false);
                 }       
@@ -786,7 +822,7 @@ STEP5:
       
         $link = "<a href='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $tr . "&step=6&id=" . $id . "'>";
         echo "          <td>"
-         . (isset($measurement["_built"])?"Yes ".$link."[change]":"No ".$link."[upload]")
+         . (isset($measurement["_built"]) ? "Yes ".$link."[change]" : "No ".$link."[upload]")
          . "</a></td>\n"
          . "        </tr>\n";
     }
