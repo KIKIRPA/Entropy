@@ -17,6 +17,10 @@ $viewTags = array();
 foreach ($measurementListItem as $key => $value) {
     // taglist: don't include keys starting with _ (e.g. _transaction) or having empty values
     if ((substr($key, 0, 1) != "_") and (!empty($value))) {
+        $value = strip_tags($value);
+        if (len($value) > 30) {
+            $value = substr($value, 0, 27) . "...";
+        }
         $viewTags[nameMeta($key)] = $value;
     }
 }
