@@ -704,7 +704,7 @@ STEP3:
         //make transaction $list with keys from $columns and values retrieved from $measurements
         $columns = array("id", "type");
         if (isset($LIBS[$_REQUEST["lib"]]["listcolumns"])) {
-            if (!emtpy($LIBS[$_REQUEST["lib"]]["listcolumns"])) {
+            if (!empty($LIBS[$_REQUEST["lib"]]["listcolumns"])) {
                 $columns = $LIBS[$_REQUEST["lib"]]["listcolumns"];
             }     
         }

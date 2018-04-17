@@ -85,7 +85,7 @@ if (count(get_included_files()) == 1) {
                         <table class="table is-fullwidth">
                             <thead>
                                 <tr>
-                                    <th colspan = "2" class="has-text-centered"><?= $header ?></th>
+                                    <th colspan="2" class="has-text-centered"><?= $header ?></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -98,7 +98,7 @@ if (count(get_included_files()) == 1) {
 <?php                          endforeach; ?>
 <?php                         else: ?>
                                 <tr>
-                                    <td colspan = "2" class="has-text-centered"><?= $column ?></td>
+                                    <td colspan="2" class="has-text-centered"><?= $column ?></td>
                                 </tr>
 <?php                         endif; ?>
                             </tbody>

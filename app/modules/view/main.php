@@ -18,7 +18,7 @@ $transaction = $measurementListItem["_transaction"];
 // --> tags
 $tags = array("id", "type");
 if (isset($LIBS[$_REQUEST["lib"]]["listcolumns"])) {
-    if (!emtpy($LIBS[$_REQUEST["lib"]]["listcolumns"])) {
+    if (!empty($LIBS[$_REQUEST["lib"]]["listcolumns"])) {
         $tags = $LIBS[$_REQUEST["lib"]]["listcolumns"];
     }     
 }
@@ -31,7 +31,7 @@ foreach ($tags as $tag) {
         // taglist: don't include tagss starting with _ (e.g. _transaction) or having empty values
         if ((substr($tag, 0, 1) != "_") and (!empty($value))) {
             $value = strip_tags($value);
-            if (len($value) > 30) {
+            if (strlen($value) > 30) {
                 $value = substr($value, 0, 27) . "...";
             }
             $viewTags[nameMeta($tag)] = $value;
@@ -205,6 +205,14 @@ foreach ($measurement["meta"] as $key => $item) {
     $row = intdiv($i, 3);   // display 3 categories per row
     $header = nameMeta($key);
     if (is_array($item)) {
+        // add _description fields to the header
+        if (isset($item["_description"])) {
+            if (is_array($item["_description"])) $item["_description"] = implode("<br>", $item["_description"]);
+            if (!$isLoggedIn)                    $item["_description"] = searchMailHide($item["_description"]);
+            $item["_description"] = trim($item["_description"]);
+            if (!empty($item["_description"])) $header .= "<br><div class=\"is-size-7 has-text-weight-light is-italic has-text-left\">" . $item["_description"] . "</div>";
+            unset($item["_description"]);
+        }
         foreach ($item as $subkey => $subitem) {
             $subitem = getMeta($measurement, "meta:" . $key . ":" . $subkey, "; ", false);
             if (!$isLoggedIn) {
