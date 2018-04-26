@@ -943,3 +943,22 @@ function selectConvertorClass($convertors, $datatype, $format, $options = array(
         return false;
     }
 }
+
+
+/**
+ * serveFile($filePath) 
+ * 
+ * serves a file stored outside the webroot
+ */
+function serveFile($filePath) 
+{
+    if (file_exists($filePath)) {
+        header('Content-Type: ' . mime_content_type($filePath));
+        header('Content-Length: ' . filesize($filePath));
+        readfile($filePath);
+
+        return true;
+    }
+
+    return false;
+}
