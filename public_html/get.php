@@ -1,8 +1,8 @@
 <?php
 
 //DEBUG
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+//error_reporting(E_ALL);
+//ini_set('display_errors', 1);
 
 require_once('install.conf.php');
 require_once(PRIVPATH . 'inc/autoloader.php');
@@ -17,18 +17,23 @@ require_once(PRIVPATH . 'inc/common_basic.inc.php');
         --> use random codes in session to hide the exact location (which is stored in the session)
 
    This way we delegate user access restriction to the main app, and we don't have to check this here. What do we need to do here?
-    1. check if their is an active session
+    1. check if there is an active session
     2. check if this session is not expired
     3. check if the requested code exists in the session
     4. check if the file (that corresponds to this code) exist and is readable
     5. serve the file
 */
 
-// disable this script as long as the above security measures aren't implemented!
-// for testing: comment out the following line
-die();
 
 if (isset($_REQUEST["file"])) {
-    serveFile($_REQUEST["file"]);
+    $file = ltrim($_REQUEST["file"], "./\\");
+    $file = \Core\Config\App::get("helper_get_path") . "/" . $file;
+    serveFile($file);
+} else {
+    header("{$_SERVER['SERVER_PROTOCOL']} 400 Bad request");
+    header("Status: 400 Bad request");
+    echo "400 Bad request";
 }
+
+die();
 
