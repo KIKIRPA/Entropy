@@ -25,15 +25,13 @@ require_once(PRIVPATH . 'inc/common_basic.inc.php');
 */
 
 
-if (isset($_REQUEST["file"])) {
-    $file = ltrim($_REQUEST["file"], "./\\");
-    $file = \Core\Config\App::get("helper_get_path") . "/" . $file;
-    serveFile($file);
+if (isset($_REQUEST["code"])) {
+    $code = $_REQUEST["code"];
 } else {
-    header("{$_SERVER['SERVER_PROTOCOL']} 400 Bad request");
-    header("Status: 400 Bad request");
-    echo "400 Bad request";
+    $code = ""; //if no downloadcode is supplied, "" will serve as an invalid code, leading to a 400 error
 }
+
+\Core\Service\DownloadCode::download($code, true);
 
 die();
 

@@ -27,8 +27,8 @@ $LIBS      = readJSONfile(\Core\Config\App::get("config_libraries_file"), true);
 $DATATYPES = readJSONfile(\Core\Config\App::get("config_datatypes_file"), true);
 $COLORS    = readJSONfile(\Core\Config\App::get("config_colors_file"), true);
 
-$IMPORT = readJSONfile(\Core\Config\App::get("config_import_file"), true);
-$EXPORT = readJSONfile(\Core\Config\App::get("config_export_file"), true);
+$IMPORT    = readJSONfile(\Core\Config\App::get("config_import_file"), true);
+$EXPORT    = readJSONfile(\Core\Config\App::get("config_export_file"), true);
 
 
 /***********************************************************************************
@@ -60,36 +60,33 @@ define("IS_BLACKLISTED", ($temp >= \Core\Config\App::get("login_ip_attempts")));
 
 // SESSION MANAGEMENT
 
+session_start();
 $isLoggedIn = $isExpired = false;
 
-if (IS_HTTPS and !IS_BLACKLISTED) {
-    session_start();
-  
-    if (isset($_SESSION['username']) and $_SESSION['trusted'] and $_SESSION['pwdok']) {
-        $isLoggedIn = $_SESSION['username'];
-    
-        //set $user
-        if (isset($USERS[$isLoggedIn])) {
-            $user = $USERS[$isLoggedIn];
-        } else { //set $user and $isLoggedIn to false and log
-            $user = $isLoggedIn = false;
-            eventLog("WARNING", "Non-existant username stored in session: " . $isLoggedIn, false, true);
-        }
+if (isset($_SESSION['username']) and $_SESSION['trusted'] and $_SESSION['pwdok']) {
+    $isLoggedIn = $_SESSION['username'];
+
+    //set $user
+    if (isset($USERS[$isLoggedIn])) {
+        $user = $USERS[$isLoggedIn];
+    } else { //set $user and $isLoggedIn to false and log
+        $user = $isLoggedIn = false;
+        eventLog("WARNING", "Non-existant username stored in session: " . $isLoggedIn, false, true);
     }
-  
-    // set or renew session
-    if (!isset($_SESSION['ts'])) {      // set timestamp to auto-close sessions after a certain time
-        $_SESSION['ts'] = time();
-    } elseif (time() - $_SESSION['ts'] < \Core\Config\App::get("login_session_expire")) {  //last activity is less than $expire ago: stay logged in
-        session_regenerate_id(true);    // change session ID for the current session and invalidate old session ID (protects against session fixation attack)
-        $_SESSION['ts'] = time();       // update timestamp
-    } else {                              // auto log off
-        if ($isLoggedIn) {
-            $isLoggedIn = false;
-            $isExpired = true;
-        }
-        logout();
+}
+
+// set or renew session
+if (!isset($_SESSION['ts'])) {      // set timestamp to auto-close sessions after a certain time
+    $_SESSION['ts'] = time();
+} elseif (time() - $_SESSION['ts'] < \Core\Config\App::get("login_session_expire")) {  //last activity is less than $expire ago: stay logged in
+    session_regenerate_id(true);    // change session ID for the current session and invalidate old session ID (protects against session fixation attack)
+    $_SESSION['ts'] = time();       // update timestamp
+} else {                              // auto log off
+    if ($isLoggedIn) {
+        $isLoggedIn = false;
+        $isExpired = true;
     }
+    logout();
 }
 
 

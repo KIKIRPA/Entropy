@@ -30,7 +30,7 @@
     "downloads_cookie_name": "downloadid",
     "downloads_cookie_expire": 31536000,
     "downloads_cookie_key": "Tqh1QXGc",
-    "helper_get_path": "%ENTROPY_PATH%externalstorage",
+    "downloads_storage_path": "%ENTROPY_PATH%externalstorage",
     "events_log_file": "%ENTROPY_PATH%data/logs/events.csv",
     "mailhide_key_pub": "",
     "mailhide_key_priv": "",

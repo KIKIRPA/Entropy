@@ -944,28 +944,3 @@ function selectConvertorClass($convertors, $datatype, $format, $options = array(
     }
 }
 
-
-/**
- * serveFile($filePath) 
- * 
- * serves a file stored outside the webroot
- */
-function serveFile($filePath) 
-{
-    if (!is_file($filePath)) {
-        header("{$_SERVER['SERVER_PROTOCOL']} 404 Not Found");
-        header("Status: 404 Not Found");
-        echo "404 Not Found";
-        return false;
-    } elseif (!is_readable($filePath)) {
-        header("{$_SERVER['SERVER_PROTOCOL']} 403 Forbidden");
-        header("Status: 403 Forbidden");
-        echo "403 Forbidden";
-        return false;
-    } else {
-        header('Content-Type: ' . mime_content_type($filePath));
-        header('Content-Length: ' . filesize($filePath));
-        readfile($filePath);
-        return true;
-    }
-}
