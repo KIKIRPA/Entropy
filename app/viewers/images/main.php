@@ -21,19 +21,20 @@ foreach ($measurement["data"] as $imgAlt => $imgPath) {
         $imgPath = str_replace("..", "", $imgPath);
         $imgPath = $prefix . "/" . $imgPath;
         $array = glob($imgPath);
-
+        
         foreach ($array as $i => $item) {
-            $code = \Core\Service\DownloadCode::storePath($imgPath, $prefix);
+            $code = \Core\Service\DownloadCode::storePath($item);
+            $i++; 
 
             if ($code) {
-                $images[$imgAlt . " ($i)"] = $code;
+                $images[$imgAlt . " ($i)"] = "./img.php?code=$code";
             }
         }
     } else {
         $code = \Core\Service\DownloadCode::storePath($imgPath, $prefix);
     
         if ($code) {
-            $images[$imgAlt] = $code;
+            $images[$imgAlt] = "./img.php?code=$code";
         }
     }
 }

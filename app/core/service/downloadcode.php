@@ -17,13 +17,13 @@ class DownloadCode
         $code = "";
         $characters_length = strlen(self::$characters) - 1;
 
-        for ($i = 0; $i < self::$length; $i++) {
+        for ($i = 0; $i < $length; $i++) {
           $code .= self::$characters[mt_rand(0, $characters_length)];
         }
 
         //extremely small chance, but check if this code does not yet exist
         if (isset($_SESSION['downloadcodes'][$code])) {
-            self::generate($length);
+            self::generateCode($length);
         }
 
         return $code;
@@ -37,7 +37,7 @@ class DownloadCode
      */
     public static function storePath($path, $prefix = "", $codeLength = 6)
     {
-        $code = self::generate($codeLength);
+        $code = self::generateCode($codeLength);
 
         try {
             if ((substr($path, 0, 7) === 'http://') or (substr($path, 0, 8) === 'https://')) {

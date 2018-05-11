@@ -140,6 +140,7 @@
             "Images",
             "MAXRF",
             "XRF imaging",
+            "XRF mapping",
             "OCT"
         ],
         "viewer": "images",

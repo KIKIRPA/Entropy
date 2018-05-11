@@ -6,7 +6,7 @@
 
 require_once('install.conf.php');
 require_once(PRIVPATH . 'inc/autoloader.php');
-require_once(PRIVPATH . 'inc/init.inc.php');
+//require_once(PRIVPATH . 'inc/init.inc.php');
 require_once(PRIVPATH . 'inc/common_basic.inc.php');
 
 /* how do we prevent that this is used to get access to all files on "/"
@@ -23,6 +23,10 @@ require_once(PRIVPATH . 'inc/common_basic.inc.php');
     4. check if the file (that corresponds to this code) exist and is readable
     5. serve the file
 */
+
+// usual session management in init.inc.php was disabled because multiple simultaneous requests to this script destroyed the session.
+// the init script always writes to the script. This img.php script only reads the session, which seems to solve the issue.
+session_start();
 
 
 if (isset($_REQUEST["code"])) {
