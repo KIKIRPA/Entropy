@@ -9,7 +9,14 @@ if (count(get_included_files()) == 1) {
 /********************************************************
  *           MY VERY OWN WRAPPER FUNCTIONS              *
  ********************************************************/
- 
+
+/**
+ * mailhide($email, $show = null, $hoover = "e-mail")
+ * 
+ * hides a given e-mailaddress. 
+ * $show   display this string instead of a part of the hidden address
+ * $hoover display this tooltip when hoovering over the link
+ */ 
 function mailhide($email, $show = null, $hoover = "e-mail")
 {
     $pubkey = \Core\Config\App::get("mailhide_key_pub");

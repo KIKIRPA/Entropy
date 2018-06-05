@@ -160,4 +160,3 @@ if (!in_array($showMod, Array("list", "view", "download"))) {
     $showMod = "list";
 }
 require_once(PRIVPATH . 'modules/' . $showMod . '/main.php');
-

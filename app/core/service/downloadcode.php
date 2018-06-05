@@ -4,8 +4,6 @@ namespace Core\Service;
 
 class DownloadCode
 {
-    private static $characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-
     /**
      * generateCode($length = 6)
      * 
@@ -14,13 +12,8 @@ class DownloadCode
      */
     public static function generateCode($length = 6)
     {
-        $code = "";
-        $characters_length = strlen(self::$characters) - 1;
-
-        for ($i = 0; $i < $length; $i++) {
-          $code .= self::$characters[mt_rand(0, $characters_length)];
-        }
-
+        $code = Randomizer::generateString($length);
+        
         //extremely small chance, but check if this code does not yet exist
         if (isset($_SESSION['downloadcodes'][$code])) {
             self::generateCode($length);

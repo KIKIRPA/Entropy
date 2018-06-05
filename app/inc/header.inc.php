@@ -138,6 +138,7 @@ unset($lib, $id, $value, $perm);
 <?php endforeach; ?>
 <?php foreach ($htmlHeaderScripts as $value): ?>
         <script type='text/javascript' src="<?= $value ?>"></script>
+        <script type='text/javascript' src="./js/mailhider.js"></script>
 <?php endforeach; ?>
     </head>
   
