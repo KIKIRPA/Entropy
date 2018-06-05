@@ -30,7 +30,7 @@ class MailHider
     }
 
 
-    public static function search($string)
+    public static function search($string, $requireClick = true)
     {
         // find e-mail addresses in $string and store them in array $matches
         //$pattern = "/(?:[a-z0-9!#$%&'*+=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/";
@@ -40,7 +40,7 @@ class MailHider
         $matches = self::extractEmail($string);
         
         foreach ($matches as $match) {
-            $replace = self::createLink($match);
+            $replace = self::createLink($match, false, $requireClick);
             $string = str_replace($match, $replace, $string);
         }
         

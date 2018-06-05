@@ -63,7 +63,7 @@ if (isset($LIBS[$showLib]["color"])) {
 $listContact = "";
 if (isset($LIBS[$showLib]["contact"])) {
     if (!empty($LIBS[$showLib]["contact"])) {
-        $listContact =  $isLoggedIn ? $LIBS[$showLib]["contact"] : searchMailHide($LIBS[$showLib]["contact"]);
+        $listContact = \Core\Service\MailHider::search($LIBS[$showLib]["contact"], ($isLoggedIn ? false : true));
     }
 }
 

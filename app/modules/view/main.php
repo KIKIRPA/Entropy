@@ -208,23 +208,19 @@ foreach ($measurement["meta"] as $key => $item) {
         // add _description fields to the header
         if (isset($item["_description"])) {
             if (is_array($item["_description"])) $item["_description"] = implode("<br>", $item["_description"]);
-            if (!$isLoggedIn)                    $item["_description"] = searchMailHide($item["_description"]);
+            $item["_description"] = \Core\Service\MailHider::search($item["_description"], ($isLoggedIn ? false : true));
             $item["_description"] = trim($item["_description"]);
             if (!empty($item["_description"])) $header .= "<br><div class=\"is-size-7 has-text-weight-light is-italic has-text-left\">" . $item["_description"] . "</div>";
             unset($item["_description"]);
         }
         foreach ($item as $subkey => $subitem) {
             $subitem = getMeta($measurement, "meta:" . $key . ":" . $subkey, "; ", false);
-            if (!$isLoggedIn) {
-                $subitem = searchMailHide($subitem);
-            }
+            $subitem = \Core\Service\MailHider::search($subitem, ($isLoggedIn ? false : true));
             $subkey = nameMeta("meta:" . $key . ":" . $subkey);
             $viewMetadata[$row][$header][$subkey] = $subitem;
         }
     } else {
-        if (!$isLoggedIn) {
-            $item = searchMailHide($item);
-        }
+        $item = \Core\Service\MailHider::search($item, ($isLoggedIn ? false : true));
         $viewMetadata[$row][$header] = $item;
     }
     $i++;
