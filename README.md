@@ -24,7 +24,12 @@ Although Entropy is considered relatively stable (beta), the authors cannot be h
 ### M1.1
 - ~~Support linked datasets~~
 - ~~Viewer for static images~~
-- Improved import module
+- Serve images and linked data from outside the webroot
+- Replace reCaptcha MailHide (discontinued)
+
+### M1.2
+- rewritten import module
+- rewritten libmgmt module
 
 ### M2
 - Multi-user (user and permission management)
