@@ -22,12 +22,14 @@ Although Entropy is considered relatively stable (beta), the authors cannot be h
 - Terms of usage / licensing on measurement, library and repository levels
 
 ### M1.1
-- ~~Support linked datasets~~
+- ~~Support linked datasets [#28](https://github.com/KIKIRPA/Entropy/issues/28)~~
 - ~~Viewer for static images~~
 - Serve images and linked data from outside the webroot
-- Replace reCaptcha MailHide (discontinued)
+- ~~Replace reCaptcha MailHide (discontinued) [#57](https://github.com/KIKIRPA/Entropy/issues/57)~~
 
 ### M1.2
+- prevent overflowing of the main navigation menu [#58](https://github.com/KIKIRPA/Entropy/issues/58)
+- prevent overflowing of the dataset tabs [#59](https://github.com/KIKIRPA/Entropy/issues/59)
 - rewritten import module
 - rewritten libmgmt module
 
