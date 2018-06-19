@@ -44,7 +44,7 @@ Although Entropy is considered relatively stable (beta), the authors cannot be h
 - merge index.php, tools.php, auth.php [#62](https://github.com/KIKIRPA/Entropy/issues/62)
 - restructure init scripts [#63](https://github.com/KIKIRPA/Entropy/issues/63)
 
-### 1.6
+### M1.6
 - Single file import [#65](https://github.com/KIKIRPA/Entropy/issues/65)
 - Edit existing data [#66](https://github.com/KIKIRPA/Entropy/issues/66)
 - Create edit buttons on measurent list and view modules if user has permission [#67](https://github.com/KIKIRPA/Entropy/issues/67)
