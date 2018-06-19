@@ -83,6 +83,7 @@ With the support of:
 
 Incorporates code from:
 - jQuery (Apache v2.0) by the jQuery Foundation, jquery.com
+- Bulma (MIT license) by Jeremy Thomas, bulma.io
 - DataTables (GPL v2 / BSD) by Allan Jardine, www.datatables.net
 - Dygraphs (MIT license) by Dan Vanderkam, dygraphs.com
 - Flickity (GPL v3 license) by Metafizzy LLC, flickity.metafizzy.co
