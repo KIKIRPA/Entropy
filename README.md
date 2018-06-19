@@ -30,14 +30,35 @@ Although Entropy is considered relatively stable (beta), the authors cannot be h
 ### M1.2
 - prevent overflowing of the main navigation menu [#58](https://github.com/KIKIRPA/Entropy/issues/58)
 - prevent overflowing of the dataset tabs [#59](https://github.com/KIKIRPA/Entropy/issues/59)
-- rewritten import module
-- rewritten libmgmt module
+
+### M1.3
+- create a measurement class [#47](https://github.com/KIKIRPA/Entropy/issues/47)
+- rewrite import module [#18](https://github.com/KIKIRPA/Entropy/issues/18)
+- rewrite libmgmt module [#60](https://github.com/KIKIRPA/Entropy/issues/60)
+
+### M1.4
+- split code and html in header, navbar and footer [#64](https://github.com/KIKIRPA/Entropy/issues/64)
+- error and event handling [#61](https://github.com/KIKIRPA/Entropy/issues/61)
+
+### M1.5
+- merge index.php, tools.php, auth.php [#62](https://github.com/KIKIRPA/Entropy/issues/62)
+- restructure init scripts [#63](https://github.com/KIKIRPA/Entropy/issues/63)
+
+### 1.6
+- Single file import [#65](https://github.com/KIKIRPA/Entropy/issues/65)
+- Edit existing data [#66](https://github.com/KIKIRPA/Entropy/issues/66)
+- Create edit buttons on measurent list and view modules if user has permission [#67](https://github.com/KIKIRPA/Entropy/issues/67)
+
+### M1.7
+- User management [#16](https://github.com/KIKIRPA/Entropy/issues/16)
+- Permissions management [#15](https://github.com/KIKIRPA/Entropy/issues/15)
+- write user module [#14](https://github.com/KIKIRPA/Entropy/issues/14)
 
 ### M2
-- Multi-user (user and permission management)
-- Single file import and editing existing data
+- Introduce collections
 - Explore the possibilities for storing/converting/displaying large datasets (internally stored)
-- Support for mapping/imaging data
+- Improved support for very large datasets (mapping/imaging data)
+- write modules for events, downloadlog, config
 
 ### M3
 - API
