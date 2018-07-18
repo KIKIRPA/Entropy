@@ -51,19 +51,14 @@ if (count(get_included_files()) == 1) {
                             </div>
                         </div>
 <?php                 endif; ?>
-<?php                 if ($viewDownloadEnabled): ?>
+<?php                 if (!empty($viewDownloadButtons)): ?>
                         <div class="box">
                             <h1 class="title is-5">Download</h1>
                             <hr>
-                            <div class="buttons has-text-centered">
-<?php                         foreach ($viewDownloadButtons as $key => $value): ?>
-                                <a <?= $value ?>>
-                                    <span class="icon is-small"><i class="fa fa-download"></i></span>
-                                    <span><?= $key ?></span>
-                                </a>
-<?php                         endforeach; ?>
-                            </div> 
-                            <br>                       
+                            <div class="field is-grouped">
+<?php                         echo implode("", $viewDownloadButtons); ?>
+                            </div>
+                            <br>                     
                             <div class="is-size-7 has-text-centered">
                                 <p><em>The complete <?= $LIBS[$showLib]["name"] ?> can be requested by email.</em></p>
                                 <p><em>By downloading this file you agree to the terms described in the license.</em></p>

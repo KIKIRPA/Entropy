@@ -944,3 +944,29 @@ function selectConvertorClass($convertors, $datatype, $format, $options = array(
     }
 }
 
+/**
+ * getAllowedExtensions($list)
+ * 
+ * reads a list from the library field "downloadbinary"
+ * and outputs an array of allowed extensions, true (if _ALL is in the list), or false (if _NONE is in the list, the list is empty or not set)
+ * 
+ * NEEDS TO MOVE TO LIBRARY CLASS!!
+ */
+function getAllowedExtensions($list)
+{
+    if (isset($list)) {
+        if (is_array($list)) {
+            if (in_array("_NONE", $list) or empty($list)) {
+                return false;
+            } elseif (in_array("_ALL", $list)) {
+                return true;
+            } else {
+                return $list;
+            }
+        }
+    }
+
+    // in all other cases
+    return false;
+}
+

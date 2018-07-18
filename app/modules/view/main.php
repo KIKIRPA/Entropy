@@ -6,6 +6,8 @@ if (count(get_included_files()) == 1) {
     exit("Direct access not permitted.");
 }
 
+// add javascript specific for this page to the list of js-files to load in the page header
+array_push($htmlHeaderScripts, "./js/view.js");  
 
 /* ***************
     main metadata
@@ -67,8 +69,6 @@ unset($key, $value);
 // 5. if no: include download form
 
 
-// $viewDownloadEnabled boolean (show download box?) and $viewDownloadButtons (array of buttons to show)
-$viewDownloadEnabled = false;
 if (    (!$isLoggedIn and $MODULES["lib"]["download"]["public"])
      or ($isLoggedIn and calcPermLib($user["permissions"], "download", $showLib))) {
     
@@ -93,61 +93,79 @@ if (    (!$isLoggedIn and $MODULES["lib"]["download"]["public"])
     }
     
     $viewDownloadButtons = array();
+    $prefix = \Core\Config\App::get("downloads_storage_path");
+    $dlc_conditions = array("lib" => $showLib,
+                            "id"  => $showID,
+                            "ds"  => $showDS
+                           );
+    $allowedExtensions = getAllowedExtensions($LIBS[$showLib]["downloadbinary"]);
     
-    // datalink or data
-    if (isset($measurement["datalink"])) {
-        // datalink is not supplied directly but through redirect in download module (ensures download popup, logging and hides direct link)
-        $caption = "Download";
-        $format = encode("link=" . $measurement["datalink"]);
-
-        if ($viewShowModal) {
-            $viewDownloadButtons[$caption] = "class=\"button " . $viewColor . " modal-button\" data-target=\"dlmodal\" onclick=\"document.getElementById('dl').value = '" . $format . "';\"";
-        } else {
-            $viewDownloadButtons[$caption] = "class=\"button " . $viewColor . "\" href=\"" . $_SERVER["PHP_SELF"] . "?lib=". $showLib . "&id=" . $showID . "&ds=" . $showDS . "&dl=" . $format . "\"";
-        }
-    } else {
-        // convert from json data files
+    // DATA -> downloadbuttons with conversion
+    if (isset($measurement["data"])) {
         foreach ($LIBS[$showLib]["downloadconverted"] as $format) {
             // check if this format "[convertor:[datatype:]]extension" is allowed for this datatype (returns array if found, false if not found)
             $datatype = findDataType($measurement["type"], $DATATYPES);
             $result = selectConvertorClass($EXPORT, $datatype, $format);
             if ($result) {
-                $temp = explode(":", $format, 3);
-                $caption = strtoupper($result["convertor"]) . " (." . strtolower(end($temp)) . ")";
-                $format = encode("conv=" . $format);
-
-                if ($viewShowModal) {
-                    $viewDownloadButtons[$caption] = "class=\"button " . $viewColor . " modal-button\" data-target=\"dlmodal\" onclick=\"document.getElementById('dl').value = '" . $format . "';\"";
-                } else {
-                    $viewDownloadButtons[$caption] = "class=\"button " . $viewColor . "\" href=\"" . $_SERVER["PHP_SELF"] . "?lib=". $showLib . "&id=" . $showID . "&ds=" . $showDS . "&dl=" . $format . "\"";
+                $buttonText = strtoupper($result["convertor"]) . " (." . strtolower(end(explode(":", $format, 3))) . ")";
+                $dlc = new \Core\Service\DownloadCode();
+                if ($dlc->setConversion($format, $dlc_conditions)) {
+                    if (!is_null($dlc->store())) {
+                        $viewDownloadButtons[] = $dlc->makeButtonCode($buttonText, $viewColor, $viewShowModal);
+                    }
                 }
             }
         }
     }
 
-    // binary uploaded files
-    $prefix = \Core\Config\App::get("libraries_path") . $showLib . "/" . $transaction . "/" . $showID . (($showDS == 'default')?"":"__".$showDS);
-    $binfiles = glob($prefix . "__*");  //by using "__*" we exclude the original (converted) data files, json data files and annotations
-    foreach ($binfiles as $file) {
-        // button caption = EXT (ORIG BIN FILENAME)
-        $caption = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-        if (    (in_array($caption, $LIBS[$showLib]["downloadbinary"]) or in_array("_ALL", $LIBS[$showLib]["downloadbinary"]))
-            and !in_array("_NONE", $LIBS[$showLib]["downloadbinary"])) {
-                $tooltip = pathinfo(str_replace($prefix . "__", '', $file), PATHINFO_FILENAME) . "." . $caption;
-                $caption = "OTHER (." . $caption . ")";
-                $format = encode("bin=" . $file);
-
-                if ($viewShowModal) {
-                    $viewDownloadButtons[$caption] = "class=\"button " . $viewColor . " is-outlined modal-button\" data-target=\"dlmodal\" onclick=\"document.getElementById('dl').value = '" . $format . "';\" title=\"" . $tooltip . "\"";
-                } else {
-                    $viewDownloadButtons[$caption] = "class=\"button " . $viewColor . " is-outlined\" href=\"" . $_SERVER["PHP_SELF"] . "?lib=". $showLib . "&id=" . $showID . "&ds=" . $showDS . "&dl=" . $format . "\" title=\"" . $tooltip . "\"";
-                }
+    // DATALINK -> downloadbutton with path/url
+    // note: the Entropy data file specifications disallow to have both "data" and "datalink" in the same dataset, but if both are present anyway, we'll show both
+    if (isset($measurement["datalink"])) {
+        // datalink is not supplied directly but through redirect in download module (ensures download popup, logging and hides direct link) 
+        $dlc = new \Core\Service\DownloadCode();
+        if ($dlc->setPath($measurement["datalink"], $prefix, $dlc_conditions) > 0) {
+            if (!is_null($dlc->store())) {
+                // the button text is hardcoded "Download" at the moment. Would it be better to give it the file name (which may be very long)?
+                $viewDownloadButtons[] = $dlc->makeButtonCode("Download", $viewColor, $viewShowModal);
+            }
         }
     }
 
-    if (count($viewDownloadButtons) > 0) {
-        $viewDownloadEnabled = true;
+    // ATTACHMENTS -> downloadbuttons with path/url, inverted colors
+    if (isset($measurement["attachments"]) and (bool)$LIBS[$showLib]["downloadbinary"]) {
+        if (is_array($measurement["attachments"])) {
+            foreach ($measurement["attachments"] as $key => $attachment) {
+                // try to use the key as $buttonText in case it is an associative array, else the filename
+                if (!is_numeric($key)) {
+                    $buttonText = $key;
+                } else {
+                    $buttonText = basename($attachment);
+                }
+                
+                $dlc = new \Core\Service\DownloadCode();
+                if ($dlc->setPath($attachment, $prefix, $dlc_conditions, $allowedExtensions) > 0) {
+                    if (!is_null($dlc->store())) {
+                        $viewDownloadButtons[] = $dlc->makeButtonCode($buttonText, $viewColor, $viewShowModal, true, "paperclip");
+                    }
+                }
+            }
+        }
     }
+
+    // BINARY FILES -> downloadbuttons with path/url, inverted colors
+    // note: uploading binary files is no longer supported in Entropy 1.1 and higher
+    //       this code is here to support data files created with Entropy 1.0, and will be removed at some point
+    $binPath = \Core\Config\App::get("libraries_path") . $showLib . "/" . $transaction . "/" . $showID . (($showDS == 'default')?"":"__".$showDS)  . "__";
+    $binFiles = glob($binpath . "*");  //by using "__*" we exclude the original (converted) data files, json data files and annotations
+    foreach ($binFiles as $file) {
+        $dlc = new \Core\Service\DownloadCode();
+        if ($dlc->setPath($file, null, $dlc_conditions, $allowedExtensions) > 0) {
+            if (!is_null($dlc->store())) {
+                $buttonText = str_replace($binPath, "", $file); //remove the path, measurement id and dataset stuff from the file name (revert it to the original file name)
+                $viewDownloadButtons[] = $dlc->makeButtonCode($buttonText, $viewColor, $viewShowModal, true, "paperclip");
+            }
+        }
+    } 
 }
 
 unset ($cookie, $code, $format, $prefix, $binfiles);
@@ -160,20 +178,14 @@ unset ($cookie, $code, $format, $prefix, $binfiles);
 $viewLicense = false;
 
 // search license in data file, library or system settings
-if (isset($measurement["license"])) {
-    $viewLicense = $measurement["license"];
-} elseif (isset($LIBS[$showLib]["license"])) {
-    $viewLicense = $LIBS[$showLib]["license"];
-} elseif (!empty(\Core\Config\App::get("license_default"))) {
-    $viewLicense = \Core\Config\App::get("license_default");
-}
+if (isset($measurement["license"]))                       $viewLicense = $measurement["license"];
+elseif (isset($LIBS[$showLib]["license"]))                $viewLicense = $LIBS[$showLib]["license"];
+elseif (!empty(\Core\Config\App::get("license_default"))) $viewLicense = \Core\Config\App::get("license_default");
 
 // if the license is a predefined one, replace it with the html version
 if ($viewLicense) {
     $viewLicenseHtml = \Core\Config\Licenses::searchForNeedle($viewLicense, "html");
-    if ($viewLicenseHtml) {
-        $viewLicense = $viewLicenseHtml;
-    }
+    if ($viewLicenseHtml) $viewLicense = $viewLicenseHtml;
 }
 
 /* ********
@@ -247,7 +259,7 @@ if ($error) {
 require_once(__DIR__ . '/template.php');
 
 // MODAL
-if ($viewDownloadEnabled and $viewShowModal) {
+if (!empty($viewDownloadButtons) and $viewShowModal) {
     require_once(__DIR__ . '/modal.template.php');
 }
 

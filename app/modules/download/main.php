@@ -11,70 +11,39 @@ require_once(PRIVPATH . 'inc/common_convert.inc.php');
 $url = false;
 
 try {
-    /* ************
-        conditions
-       ************
+    /* 
+     * 1. evaluate and get download code
+     */
+    $code = new \Core\Service\DownloadCode();
+    if ($code->retrieve($_REQUEST["dl"]) === false) {
+        throw new \Exception("Download failed: the requested downloadcode is invalid or expired");
+    }
+
+    $dlType = $code->getType();
+    $i = ((isset($_REQUEST["i"])) ? $_REQUEST["i"] : null);
+    $dlValue = getValue($dlType, $i);
+    if (is_null($dlValue)) {
+        throw new \Exception("Download failed: the requested downloadcode is invalid");
+    }
     
-       - evaluate $_REQUEST[lib & id & ds]   --> TODO: move from
-       - evaluate download code
-       - evaluate download logging (via login, cookie or form)
-       => if conditions are not met, fallback to view module, with error notification
-    */
-
-    // evaluate download code
-    $code = decode($_REQUEST["dl"]);
-    if ($code == "") {
-        throw new \Exception("Download failed: nothing to download");
+    /* 
+     * 2. evaluate if the requested lib, id and ds (in $_REQUEST) correspond with those stored in the downloadcode
+     */
+    $dlConditions = $code->checkCondition();
+    $ok = true;
+    if (is_array($dlConditions)) {
+        foreach ($dlConditions as $key => $value) {
+            $ok = ($ok and ($_REQUEST[$key] == $value));
+        }
+    }
+    if (!$ok) {
+        throw new \Exception("Download failed: downloadcode mismatch");
     }
 
-    $code = explode("=", $code, 2);
-    if (count($code) != 2) {
-        throw new \Exception("Download failed: error in download code");
-    }
 
-    if ($code[0] == "bin") {
-        $extension = strtolower(pathinfo($code[1], PATHINFO_EXTENSION));
-        if (!file_exists($code[1])) { // search the binary file
-            throw new \Exception("Download failed: binary file not found.");
-        }
-        elseif (!(in_array($extension, $LIBS[$showLib]["downloadbinary"]) or in_array("_ALL", $LIBS[$showLib]["downloadbinary"])) or in_array("_NONE", $LIBS[$showLib]["downloadbinary"])) {
-            throw new \Exception("Download failed: binary download not allowed.");
-        }
-
-    } elseif ($code[0] == "conv") { // is conversion allowed in library file?  TODO: is allowed in conversion settings json?
-        if (!in_array($code[1], $LIBS[$showLib]["downloadconverted"])) {
-            throw new \Exception("Download failed: conversion to ". $code[1] ." not allowed.");
-        }
-        
-        // separate metadata, data and export-options
-        $measurement = collapseMeasurement($measurement, $showDS);
-
-        // set/adjust license
-        if (!isset($measurement["license"])) { // if no license in data file, search license in library or system settings
-            if (isset($LIBS[$showLib]["license"])) {
-                $measurement["license"] = $LIBS[$showLib]["license"];
-            } elseif (!empty(\Core\Config\App::get("license_default"))) {
-                $measurement["license"] = \Core\Config\App::get("license_default");
-            }
-        }
-        if (isset($measurement["license"])) { // if the license is a predefined one, replace it with the textonly version
-            $textonly = \Core\Config\Licenses::searchForNeedle($measurement["license"], "textonly");
-            if ($textonly) {
-                $measurement["license"] = $textonly;
-            }
-        }
-
-    } elseif ($code[0] == "link") {
-        if (filter_var($code[1], FILTER_VALIDATE_URL) === FALSE) {
-            throw new \Exception("Download failed: datalink is not a valid URL.");
-        }
-        $url = $code[1];
-
-    } else {
-        throw new \Exception("Error in download code");
-    }
-
-    // evaluate download logging (via login, cookie or form)
+    /* 
+     * 3. evaluate credentials supplied via login, cookie or form
+     */
     if (\Core\Config\App::get("downloads_log_enable")) {
         if ($isLoggedIn) {
             $downloadLogEntry = array($USERS[$isLoggedIn]["name"], $USERS[$isLoggedIn]["institution"], $USERS[$isLoggedIn]["email"], "login");
@@ -101,58 +70,90 @@ try {
             throw new \Exception("Download failed: no identification.");
         }
     }
+    
+    /* 
+     * 4. add an entry to the download log
+     *
+     * CSV columns: timestamp | name | institution | email | source | IP | library | measurement | dataset | conv/bin | format/target | RESERVED*
+     *  (*) reserved for (optional) conversion rules (eg TXT: tabulated, comma separated, eg SPC: old format), stored in $code[2]  --> TODO
+     */ 
+    if (\Core\Config\App::get("downloads_log_enable")) {
+        array_unshift($downloadLogEntry, date('Y-m-d H:i'));
+        array_push($downloadLogEntry, $_SERVER['REMOTE_ADDR'], $showLib, $showID, $showDS, $code[0], $code[1], "");
 
-    
-    /* ******************
-        prepare download
-       ****************** */
-    
-    // CONVERSION
-    if ($code[0] == "conv") {
-        // filename for the download (extension: the last part of $code[1])
-        $temp = explode(":", $code[1]);
-        $fileName = $showID . (($showDS == 'default') ? "" : "_" . $showDS) . "." . end($temp);
+        // open or create download.csv and append line
+        $logHandle = fopen(\Core\Config\App::get("downloads_log_file"), "a");
+        $success = ($logHandle) ? fputcsv($logHandle, $downloadLogEntry) : false;
+        
+        fclose($logHandle);
 
-        // select convertor and assemble all export options
-        $exportOptions = selectConvertorClass($EXPORT,
-                                              findDataType($measurement["type"], $DATATYPES),
-                                              $code[1], 
-                                              is_array($measurement["options"]["export"]) ? $measurement["options"]["export"] : $exportOptions = array()
-                                             );
-                
-        if (isset($exportOptions["convertor"])) {
-            // create convertor        
-            $className = "Convert\\Export\\" . ucfirst(strtolower($exportOptions["convertor"]));
-            $export = new $className($showID, $measurement, $exportOptions, $DATATYPES);
-            $fileHandle = $export->getFile();
-            $error = $export->getError();
-
-            if ($error or !$fileHandle) {
-                throw new \Exception("Failed to create " . $fileName);
-            }
-        } else {
-            throw new \Exception("Failed to create " . $fileName . ": no convertor found.");
-        }
-    
-    
-    // BINARY
-    } elseif ($code[0] == "bin") {
-        // filename for the download
-        $fileName = basename($code[1]);
-        $fileName = end(explode("__", $fileName));  //download the binary files with the original filename (= part following the last "__")
-
-        // open the binary file as a handle
-        $fileHandle = fopen($code[1], "r");
-    
-        if (!$fileHandle) {
-            throw new \Exception("Failed to fetch " . $fileName);
+        if (!$success) { //don't block the download if this occurs (no exception throwing), but send a mail to the system admin
+            eventLog("WARNING", "could not write to download log [download]", false, true);
         }
     }
-    
-    // file size from the open handle
-    $stat = fstat($fileHandle);
-    $fileSize = $stat["size"];
 
+    /* 
+     * 5. serve the file for download
+     */
+    switch ($dlType) {
+        case "conv":
+            // separate metadata, data and export-options
+            $measurement = collapseMeasurement($measurement, $showDS);
+            
+            // set/adjust license
+            if (!isset($measurement["license"])) { // if no license in data file, search license in library or system settings
+                if (isset($LIBS[$showLib]["license"]))                    $measurement["license"] = $LIBS[$showLib]["license"];
+                elseif (!empty(\Core\Config\App::get("license_default"))) $measurement["license"] = \Core\Config\App::get("license_default");
+            }
+            if (isset($measurement["license"])) { // if the license is a predefined one, replace it with the textonly version
+                $textonly = \Core\Config\Licenses::searchForNeedle($measurement["license"], "textonly");
+                if ($textonly) $measurement["license"] = $textonly;
+            }
+            
+            // filename for the download (extension: the last part of $dlValue)
+            $fileName = $showID . (($showDS == 'default') ? "" : "_" . $showDS) . "." . end(explode(":", $dlValue));
+        
+            // select convertor and assemble all export options
+            $exportOptions = selectConvertorClass($EXPORT,
+                                                  findDataType($measurement["type"], $DATATYPES),
+                                                  $dlValue, 
+                                                  is_array($measurement["options"]["export"]) ? $measurement["options"]["export"] : $exportOptions = array()
+                                                 );
+                    
+            if (isset($exportOptions["convertor"])) {
+                // create convertor        
+                $className = "Convert\\Export\\" . ucfirst(strtolower($exportOptions["convertor"]));
+                $export = new $className($showID, $measurement, $exportOptions, $DATATYPES);
+                $fileHandle = $export->getFile();
+                $error = $export->getError();
+        
+                if ($error or !$fileHandle) {
+                    throw new \Exception("Download failed: could not convert to " . $fileName);
+                }
+            } else {
+                throw new \Exception("Download failed: no suitable convertor available for creating" . $fileName);
+            }
+
+            $result = \Core\Service\Download::handle($fileHandle, $fileName);
+            if (!$result) throw new \Exception("Download failed: file not found or accessible");
+            break;
+            
+        case "path":
+        case "paths":
+            $fileName = basename($dlValue);
+            if (substr_count($dlValue, "__") > 0) {
+                $fileName = end(explode("__", $fileName));  //support (depreciated) binary file naming convention: the original filename (= part following the last "__")
+            }
+
+            $result = \Core\Service\Download::path($dlValue, $fileName);
+            if (!$result) throw new \Exception("Download failed: file not found or accessible");
+            break;
+            
+        case "url":
+            \Core\Service\Download::url($dlValue);
+            if (!$result) throw new \Exception("Download failed: invalid URL");
+            break;
+    }
 } catch (\Exception $e) {
     $errormsg = $e->getMessage();
     eventLog("ERROR", $errormsg  . " [download]");
@@ -160,46 +161,3 @@ try {
     // FALLBACK TO VIEW MODULE
     require_once(PRIVPATH . 'modules/view/main.php');
 }
-
-
-/* ***************
-    download log
-   *************** */
-
-// CSV columns: timestamp | name | institution | email | source | IP | library | measurement | dataset | conv/bin | format/target | RESERVED*
-//  (*) reserved for (optional) conversion rules (eg TXT: tabulated, comma separated, eg SPC: old format), stored in $code[2]  --> TODO
-if (\Core\Config\App::get("downloads_log_enable")) {
-    array_unshift($downloadLogEntry, date('Y-m-d H:i'));
-    array_push($downloadLogEntry, $_SERVER['REMOTE_ADDR'], $showLib, $showID, $showDS, $code[0], $code[1], "");
-
-    // open or create download.csv and append line
-    $logHandle = fopen(\Core\Config\App::get("downloads_log_file"), "a");
-    
-    if ($logHandle) {
-        $success = fputcsv($logHandle, $downloadLogEntry);
-    } else {
-        $success = false;
-    }
-    
-    fclose($logHandle);
-
-    if (!$success) {
-        eventLog("WARNING", "could not write to download log [download]", false, true);
-    }
-}
-
-
-/* ********
-output
-******** */
-
-// echo "DEBUG OUTPUT<br><br>";
-// echo "filename = " . $fileName . "<br>";
-// echo "filesize = " . $fileSize . "<br><br>";
-// fpassthru($fileHandle);
-// fclose($fileHandle);
-// die();
-
-
-
-require_once(__DIR__ . '/template.php');
