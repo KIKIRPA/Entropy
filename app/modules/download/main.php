@@ -21,7 +21,7 @@ try {
 
     $dlType = $code->getType();
     $i = ((isset($_REQUEST["i"])) ? $_REQUEST["i"] : null);
-    $dlValue = getValue($dlType, $i);
+    $dlValue = $code->getValue($dlType, $i);
     if (is_null($dlValue)) {
         throw new \Exception("Download failed: the requested downloadcode is invalid");
     }
@@ -79,7 +79,7 @@ try {
      */ 
     if (\Core\Config\App::get("downloads_log_enable")) {
         array_unshift($downloadLogEntry, date('Y-m-d H:i'));
-        array_push($downloadLogEntry, $_SERVER['REMOTE_ADDR'], $showLib, $showID, $showDS, $code[0], $code[1], "");
+        array_push($downloadLogEntry, $_SERVER['REMOTE_ADDR'], $showLib, $showID, $showDS, $dlType, $dlValue, "");
 
         // open or create download.csv and append line
         $logHandle = fopen(\Core\Config\App::get("downloads_log_file"), "a");
@@ -111,7 +111,8 @@ try {
             }
             
             // filename for the download (extension: the last part of $dlValue)
-            $fileName = $showID . (($showDS == 'default') ? "" : "_" . $showDS) . "." . end(explode(":", $dlValue));
+            $temp = explode(":", $dlValue);
+            $fileName = $showID . (($showDS == 'default') ? "" : "_" . $showDS) . "." . end($temp);
         
             // select convertor and assemble all export options
             $exportOptions = selectConvertorClass($EXPORT,

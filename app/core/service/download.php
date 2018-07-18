@@ -6,7 +6,7 @@ class Download
 {
     public static function path($filePath, $filename = null, $dieOnError = false) 
     {
-        $handle = fopen($filePath);
+        $handle = fopen($filePath, "r");
 
         if ($handle) {
             if (is_null($filename)) $filename = basename($filePath);
@@ -74,7 +74,7 @@ class Download
      *  - "403 Forbidden"
      *  - "404 Not Found"
      */
-    private static function error($msg)
+    public static function error($msg)
     {
         header("{$_SERVER['SERVER_PROTOCOL']} $msg");
         header("Status: $msg");

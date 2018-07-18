@@ -159,7 +159,7 @@ class DownloadCode
      * retrieves downloadcode from the session and fills in the type, value, options...
      * returns true if code is found/retrieved, false if not
      */
-    public function retrieve($Code)
+    public function retrieve($code)
     {
         if (isset($_SESSION['downloadcodes'][$code])) {
             $this->code = $code;

@@ -46,10 +46,10 @@ if (isset($_REQUEST["code"])) {
             switch ($type) { // no support for "conv"!
                 case "path":
                 case "paths":
-                    \Core\Service\Download::path($value, null, true);
+                    \Core\Service\Download::path($path, null, true);
                     break;
                 case "url":
-                    \Core\Service\Download::url($value, true);
+                    \Core\Service\Download::url($path, true);
                     break;
             }
         }
