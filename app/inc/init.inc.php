@@ -9,6 +9,11 @@ if (count(get_included_files()) == 1) {
 
 require_once(PRIVPATH . 'inc/common_basic.inc.php');
 
+if (\Core\Config\App::get("debug_display_errors")) {
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+}
+
 /***********************************************************************************
   1. READ CONFIGURATION FILES
     - config.json     --> $CONFIG (must be first)

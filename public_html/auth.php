@@ -1,4 +1,5 @@
 <?php
+
 require_once('install.conf.php');
 //require_once(PRIVPATH . 'entropy.conf.php');
 require_once(PRIVPATH . 'inc/autoloader.php');
