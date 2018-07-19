@@ -26,16 +26,35 @@ require_once(PRIVPATH . 'inc/common_basic.inc.php');
 
 // usual session management in init.inc.php was disabled because multiple simultaneous requests to this script destroyed the session.
 // the init script always writes to the script. This img.php script only reads the session, which seems to solve the issue.
+
 session_start();
 
-
-if (isset($_REQUEST["code"])) {
-    $code = $_REQUEST["code"];
-} else {
-    $code = ""; //if no downloadcode is supplied, "" will serve as an invalid code, leading to a 400 error
+$iterator = null;
+if (isset($_REQUEST["i"])) {
+    $iterator = $_REQUEST["i"];
 }
 
-\Core\Service\DownloadCode::download($code, true);
+if (isset($_REQUEST["code"])) {
+    // get downloadcode
+    $code = new \Core\Service\DownloadCode();
+    if ($code->retrieve($_REQUEST["code"])) {
+        $type = $code->getType();
+        $path = $code->getValue($type, $iterator);
 
-die();
+        // if no conditions are stored in the downloadcode, try to serve the image
+        if ($code->checkCondition() === false) {
+            switch ($type) { // no support for "conv"!
+                case "path":
+                case "paths":
+                    \Core\Service\Download::path($path, null, true);
+                    break;
+                case "url":
+                    \Core\Service\Download::url($path, true);
+                    break;
+            }
+        }
+    }
 
+    // in all other cases: send a bad request error
+    \Core\Service\Download::error("400 Bad request");
+}

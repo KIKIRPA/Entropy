@@ -16,6 +16,7 @@
     "config_export_file": "%ENTROPY_PATH%config/export.json",
     "config_licenses_file": "%ENTROPY_PATH%config/licenses.json",
     "config_libraries_file": "%ENTROPY_PATH%config/libraries.json",
+    "debug_display_errors": false,
     "libraries_path": "%ENTROPY_PATH%data/libs/",
     "templates_path": "%ENTROPY_PATH%data/templates/",
     "mail_admin": "",

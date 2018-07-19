@@ -1,9 +1,5 @@
 <?php
 
-//DEBUG
-//error_reporting(E_ALL);
-//ini_set('display_errors', 1);
-
 require_once('install.conf.php');
 //require_once(PRIVPATH . 'entropy.conf.php');
 require_once(PRIVPATH . 'inc/autoloader.php');

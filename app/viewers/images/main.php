@@ -13,28 +13,15 @@ $prefix = \Core\Config\App::get("downloads_storage_path");
 $images = array();
 
 foreach ($measurement["data"] as $imgAlt => $imgPath) {
-    // expand if path contains * or ?
-    if ((strpos($imgPath, '*') !== false) or (strpos($imgPath, '?') !== false)) {
-        //prepare path
-        $imgPath = str_replace("file://", "", $imgPath);
-        $imgPath = ltrim($imgPath, "./\\"); //prevent escaping from our "jail" using ../
-        $imgPath = str_replace("..", "", $imgPath);
-        $imgPath = $prefix . "/" . $imgPath;
-        $array = glob($imgPath);
-        
-        foreach ($array as $i => $item) {
-            $code = \Core\Service\DownloadCode::storePath($item);
-            $i++; 
+    $dlc = new \Core\Service\DownloadCode();
+    $numberOfPaths = $dlc->setPath($imgPath, $prefix);
+    $dlc->store();
 
-            if ($code) {
-                $images[$imgAlt . " ($i)"] = "./img.php?code=$code";
-            }
-        }
-    } else {
-        $code = \Core\Service\DownloadCode::storePath($imgPath, $prefix);
-    
-        if ($code) {
-            $images[$imgAlt] = "./img.php?code=$code";
+    if ($numberOfPaths == 1) {
+        $images[$imgAlt] = "./img.php?code=" . $dlc->code;
+    } elseif ($numberOfPaths > 1) {
+        for ($i = 0; $i < $numberOfPaths; ++$i) {
+            $images[$imgAlt . " ($i)"] = "./img.php?code=$dlc->code&i=$i";
         }
     }
 }
