@@ -6,7 +6,6 @@ require_once(PRIVPATH . 'inc/autoloader.php');
 require_once(PRIVPATH . 'inc/init.inc.php');
 require_once(PRIVPATH . 'inc/common_basic.inc.php');
 require_once(PRIVPATH . 'inc/common_cookie.inc.php');
-require_once(PRIVPATH . 'inc/common_mailhide.inc.php');
 
 /*
 replacement for index.php

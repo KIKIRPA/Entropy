@@ -38,8 +38,6 @@ $questions = array(
         "app_catchphrase"       => "Longer website description.",
         "app_keywords"          => "Website keywords used to improve indexing by seach engines (eg google). Separate keywords with commas.",
         "mail_admin"            => "E-mail address of the system administrator.",
-        "mailhide_key_pub"      => "Mailhide is a service that protects e-mail addresses on a website from spam. The addresses are obfuscated until a (human) visitor solves a reCAPTCHA. If you want to use this feature in Entropy, get your public and private API keys on https://www.google.com/recaptcha/mailhide/apikey. Fill in the public key here.",
-        "mailhide_key_priv"     => "Mailhide private key",
         "login_twopass_enable"  => "Enable twopass verification for unknown IPs. Please make sure to have a working sendmail configuration."
     ),
     "users" => array(    
