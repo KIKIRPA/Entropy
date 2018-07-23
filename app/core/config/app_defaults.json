@@ -31,7 +31,7 @@
     "downloads_cookie_name": "downloadid",
     "downloads_cookie_expire": 31536000,
     "downloads_cookie_key": "Tqh1QXGc",
-    "downloads_storage_path": "%ENTROPY_PATH%externalstorage",
+    "downloads_storage_path": "%ENTROPY_PATH%data/storage",
     "events_log_file": "%ENTROPY_PATH%data/logs/events.csv",
     "css_fa": "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css",
     "css_bulma": "https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css",
