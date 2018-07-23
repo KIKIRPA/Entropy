@@ -55,10 +55,7 @@ if (count(get_included_files()) == 1) {
                         <div class="box">
                             <h1 class="title is-5">Download</h1>
                             <hr>
-                            <div class="field is-grouped">
-<?php                         echo implode("", $viewDownloadButtons); ?>
-                            </div>
-                            <br>                     
+<?php                       echo implode("", $viewDownloadButtons); ?>                   
                             <div class="is-size-7 has-text-centered">
                                 <p><em>The complete <?= $LIBS[$showLib]["name"] ?> can be requested by email.</em></p>
                                 <p><em>By downloading this file you agree to the terms described in the license.</em></p>

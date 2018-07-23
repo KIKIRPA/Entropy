@@ -155,17 +155,17 @@ if (    (!$isLoggedIn and $MODULES["lib"]["download"]["public"])
     // BINARY FILES -> downloadbuttons with path/url, inverted colors
     // note: uploading binary files is no longer supported in Entropy 1.1 and higher
     //       this code is here to support data files created with Entropy 1.0, and will be removed at some point
-    $binPath = \Core\Config\App::get("libraries_path") . $showLib . "/" . $transaction . "/" . $showID . (($showDS == 'default')?"":"__".$showDS)  . "__";
-    $binFiles = glob($binpath . "*");  //by using "__*" we exclude the original (converted) data files, json data files and annotations
-    foreach ($binFiles as $file) {
+    $binPath = \Core\Config\App::get("libraries_path") . $showLib . "/" . $transaction . "/" . $showID . (($showDS == 'default')?"":"__".$showDS)  . "__*";
+    //$binFiles = glob($binPath . "*");  //by using "__*" we exclude the original (converted) data files, json data files and annotations
+    //foreach ($binFiles as $file) {
         $dlc = new \Core\Service\DownloadCode();
-        if ($dlc->setPath($file, null, $dlc_conditions, $allowedExtensions) > 0) {
+        if ($dlc->setPath($binPath, null, $dlc_conditions, $allowedExtensions) > 0) {
             if (!is_null($dlc->store())) {
                 $buttonText = str_replace($binPath, "", $file); //remove the path, measurement id and dataset stuff from the file name (revert it to the original file name)
                 $viewDownloadButtons[] = $dlc->makeButtonCode($buttonText, $viewColor, $viewShowModal, true, "paperclip");
             }
         }
-    } 
+    //} 
 }
 
 unset ($cookie, $code, $format, $prefix, $binfiles);

@@ -33,7 +33,7 @@ class DownloadCode
     }
 
     /**
-     * setPath($path, $prefix = null, $conditions = array(), $allowedExtensions = null)
+     * setPath($path, $prefix = null, $conditions = array(), $allowedExtensions = true)
      * 
      * sets a (relative) file path or an (absolute) url in the downloadcode register.
      * If the path starts with http:// or https://, it is treated as an url, in all other cases as a file path
@@ -61,14 +61,6 @@ class DownloadCode
                 if (isset($prefix)) {
                     $path = $prefix . "/" . $path;
                 }
-                
-                // interpret $allowedExtensions ()
-                if (is_array($allowedExtensions)) {
-                    if (in_array("_NONE", $allowedExtensions))    $allowedExtensions = false;
-                    elseif (in_array("_ALL", $allowedExtensions)) $allowedExtensions = true;
-                    // in all other cases, $allowedExtensions is an array of extensions
-                    // (lowercased and without preceding '.' -> this should be taken care of by the libedit module)
-                } elseif ($allowedExtensions !== true)            $allowedExtensions = false;
 
                 //check if file (or files in case of wildcards!) exist(s)
                 if ($allowedExtensions === false) {
@@ -243,7 +235,7 @@ class DownloadCode
         else return 0;
     }
     
-    public function makeButtonCode($buttonText, $buttonColor, $callModal = false, $outlined = false, $icon = "download", $indentation = 32)
+    public function makeButtonCode($buttonText, $buttonColor, $callModal = false, $outlined = false, $icon = "download", $indentation = 28)
     {
         // indentation spaces
         $indentation = str_repeat(" ", $indentation);
@@ -269,10 +261,12 @@ class DownloadCode
             }
             
             // html code for simple button
-            $html = $indentation . "<a $buttonAction class=\"button is-fullwidth ${buttonColor}${outlined}${modalClass}\">\n"
-                  . $indentation . "    <span class=\"icon\"><i class=\"fa fa-$icon\"></i></span>\n"
-                  . $indentation . "    <span>$buttonText</span>\n"
-                  . $indentation . "</a>\n";
+            $html = $indentation . "<div class=\"field\">\n"
+                  . $indentation . "    <a $buttonAction class=\"button is-fullwidth ${buttonColor}${outlined}${modalClass}\">\n"
+                  . $indentation . "        <span class=\"icon\"><i class=\"fa fa-$icon\"></i></span>\n"
+                  . $indentation . "        <span>$buttonText</span>\n"
+                  . $indentation . "    </a>\n"
+                  . $indentation . "</div>\n";
         } elseif ($this->value["count"] > 1) {
             // button action (href or onclick)
             if ($callModal) {
@@ -289,17 +283,17 @@ class DownloadCode
                   . $indentation . "        <div class=\"select is-fullwidth\">\n"
                   . $indentation . "            <select id=\"select$this->code\" $selectAction>\n";
             foreach ($this->value["paths"] as $i => $path) {
-                $html = $indentation . "                <option value=\"$i\">" . basename($path) . "</option>\n";
+                $html .= $indentation . "                <option value=\"$i\">" . basename($path) . "</option>\n";
             }
-            $html = $indentation . "            </select>\n"
-                  . $indentation . "        </div>\n"
-                  . $indentation . "    </div>\n"
-                  . $indentation . "    <div class=\"control\">\n"
-                  . $indentation . "        <a $buttonAction class=\"button ${buttonColor}${outlined}${modalClass}\" id=\"button$this->code\">\n"
-                  . $indentation . "            <span class=\"icon\"><i class=\"fa fa-$icon\"></i></span>\n"
-                  . $indentation . "        </a>\n"
-                  . $indentation . "    </div>\n"
-                  . $indentation . "</div>\n";
+            $html .= $indentation . "            </select>\n"
+                   . $indentation . "        </div>\n"
+                   . $indentation . "    </div>\n"
+                   . $indentation . "    <div class=\"control\">\n"
+                   . $indentation . "        <a $buttonAction class=\"button ${buttonColor}${outlined}${modalClass}\" id=\"button$this->code\">\n"
+                   . $indentation . "            <span class=\"icon\"><i class=\"fa fa-$icon\"></i></span>\n"
+                   . $indentation . "        </a>\n"
+                   . $indentation . "    </div>\n"
+                   . $indentation . "</div>\n";
         }
         else $html = false;
 
