@@ -1074,8 +1074,8 @@ STEP7:
             // 2.3 process supplementary files
             //   these will be renamed {$id}__{$ds}__{$filename}.{$ext}
             if (is_uploaded_file($_FILES["binUp" . $key]['tmp_name'][0])) { //at least one file was uploaded
-            // don't allow uploading .json or .anno files that would overwrite our uploaded data and annotations
-            $arr = array("json", "anno");
+                // don't allow uploading .json or .anno files that would overwrite our uploaded data and annotations
+                $arr = array("json", "anno");
                 foreach ($_FILES["binUp" . $key]['name'] as $file) {
                     $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
                     if (in_array($ext, $arr)) {

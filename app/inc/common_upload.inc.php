@@ -73,16 +73,16 @@ function checkMultiUpload($upload, $updir, $prefix = "")
     // Check $_FILES[$upload]['error'] values.
     foreach ($_FILES[$upload]['error'] as $i => $value) {
         switch ($value) {
-      case UPLOAD_ERR_OK:
-        break;
-      case UPLOAD_ERR_NO_FILE:
-        return 'File ' . $i . ': No file sent.';
-      case UPLOAD_ERR_INI_SIZE:
-      case UPLOAD_ERR_FORM_SIZE:
-        return 'File ' . $i . ': Exceeded filesize limit [html limit].';
-      default:
-        return 'File ' . $i . ': Unknown errors.';
-    }
+            case UPLOAD_ERR_OK:
+                break;
+            case UPLOAD_ERR_NO_FILE:
+                return 'File ' . $i . ': No file sent.';
+            case UPLOAD_ERR_INI_SIZE:
+            case UPLOAD_ERR_FORM_SIZE:
+                return 'File ' . $i . ': Exceeded filesize limit [html limit].';
+            default:
+                return 'File ' . $i . ': Unknown errors.';
+        }
     }
 
     // You should also check filesize here.
@@ -98,8 +98,8 @@ function checkMultiUpload($upload, $updir, $prefix = "")
     }
   
     foreach ($_FILES[$upload]["tmp_name"] as $i => $value) {
-        if (!move_uploaded_file($value, $updir . $prefix . sanitizeStr($_FILES[$upload]["name"][$i]))) {
-            return 'Could not save ' . $prefix . sanitizeStr($_FILES[$upload]["name"][$i]) . ' in the upload directory.';
+        if (!move_uploaded_file($value, $updir . $prefix . $_FILES[$upload]["name"][$i])) {
+            return 'Could not save ' . $prefix . $_FILES[$upload]["name"][$i] . ' in the upload directory.';
         }
     }
     
