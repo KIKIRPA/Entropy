@@ -190,12 +190,19 @@ class DownloadCode
         if (is_null($type)) {
             return null;
         } elseif (isset($this->value[$type])) {
-            if (isset($i) and is_array($this->value[$type])) {
-                if (isset($this->value[$type][$i])) {
-                    return $this->value[$type][$i];
+            if (is_array($this->value[$type])) {
+                // in case of an array (paths): if $i is given, return that value or null if not found, if no $i supplied, give the first value
+                if (isset($i)) {
+                    if (isset($this->value[$type][$i])) {
+                        return $this->value[$type][$i];
+                    }
+                } else {
+                    return array_values($this->value[$type])[0];
                 }
-            }            
-            return $this->value[$type]; 
+            } else {
+                // if not an array (path, url, conv), return the value
+                return $this->value[$type]; 
+            }
         }
         // if no previous return
         return null;
@@ -255,7 +262,7 @@ class DownloadCode
         if ($this->value["count"] === 1) {
             // button action (href or onclick)
             if ($callModal) {
-                $buttonAction ="data-target=\"dlmodal\" onclick=\"updateFormAction($baseURL);\"";
+                $buttonAction ="data-target=\"dlmodal\" onclick=\"updateFormAction('$baseURL');\"";
             } else {
                 $buttonAction = "href=\"" . $baseURL ."\"";
             }
@@ -270,17 +277,17 @@ class DownloadCode
         } elseif ($this->value["count"] > 1) {
             // button action (href or onclick)
             if ($callModal) {
-                $buttonAction ="data-target=\"dlmodal\" onclick=\"updateFormAction($baseURL, $this->code);\"";
+                $buttonAction ="data-target=\"dlmodal\" onclick=\"updateFormAction('$baseURL', '$this->code');\"";
                 $selectAction = "";
             } else {
                 $buttonAction = "href=\"" . $baseURL . "\"";
-                $selectAction = "onchange=\"updateButtonHref($baseURL, $this->code);\"";
+                $selectAction = "onchange=\"updateButtonHref('$baseURL', '$this->code');\"";
             }
             
             // html for button with multiple files
             $html = $indentation . "<div class=\"field has-addons\">\n"
                   . $indentation . "    <div class=\"control is-expanded\">\n"
-                  . $indentation . "        <div class=\"select is-fullwidth\">\n"
+                  . $indentation . "        <div class=\"select is-fullwidth ${buttonColor}\">\n"
                   . $indentation . "            <select id=\"select$this->code\" $selectAction>\n";
             foreach ($this->value["paths"] as $i => $path) {
                 $html .= $indentation . "                <option value=\"$i\">" . basename($path) . "</option>\n";
