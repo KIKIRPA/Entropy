@@ -21,13 +21,8 @@ try {
     $i = ((isset($_REQUEST["i"])) ? $_REQUEST["i"] : null);
     $dlValue = $code->getValue($dlType, $i);
     if (is_null($dlValue)) {
-        echo "ERROR<br>"; //DEBUG
         throw new \Exception("Download failed: the requested downloadcode is invalid");
     }
-
-    echo "<pre>";
-    print_r($dlValue);
-    echo "</pre><br>"; //DEBUG
     
     /* 
      * 2. evaluate if the requested lib, id and ds (in $_REQUEST) correspond with those stored in the downloadcode

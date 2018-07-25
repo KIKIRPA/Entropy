@@ -6,7 +6,7 @@ class Download
 {
     public static function path($filePath, $filename = null, $dieOnError = false) 
     {
-        $handle = fopen($filePath, "r");
+        $handle = fopen($filePath, "rb");
 
         if ($handle) {
             if (is_null($filename)) $filename = basename($filePath);

@@ -68,7 +68,7 @@ $(document).ready(function() {
 });
 
 function updateFormAction(URL, Id) {
-    if (typeof selectId !== 'undefined') { 
+    if ($("#select" + Id).length) { 
         URL += '&i=' + $("#select" + Id).val(); 
     }
 
