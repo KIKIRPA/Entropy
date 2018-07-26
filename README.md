@@ -13,6 +13,7 @@ Although Entropy is considered relatively stable (beta), the authors cannot be h
 
 Releases:
 
+- [Entropy 1.1](https://github.com/KIKIRPA/Entropy/releases/tag/v1.1) (26 July 2018)
 - [Entropy 1.0](https://github.com/KIKIRPA/Entropy/releases/tag/v1.0) (15 March 2018)
 
 For more information see the [Development roadmap and release plan](https://github.com/KIKIRPA/Entropy/wiki/Development-roadmap-and-release-plan) on the wiki.
