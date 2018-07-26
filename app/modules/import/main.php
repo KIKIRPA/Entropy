@@ -909,6 +909,7 @@ STEP6:
             <td style='border:1px dotted black; width:33%;'>SUPPLEMENTARY FILES<br><br>
               These files will be renamed into {measurementid}__{dataset}__{filename}.{ext}, so please use short descriptive names.
               New uploaded files with the same name will overwrite the old files with the same name.<br><br>
+              <div class="notification is-danger">Uploading supplementary files using this function is <strong>depreciated</strong>, and will eventually be removed in the future. The preferred approach is to link to existing files using the attachments field in the CSV file, as described <a href="https://github.com/KIKIRPA/Entropy/wiki/Entropy-data-format#attachments">here</a>.</div>
               <?php if ($hasBin): ?>
               <?php     foreach ($ds["_bin"] as $binfile):
                             $link = "<a href='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $tr . "&step=8&id=" . $id . "&ds=" . $dsid . "&del=" . $binfile . "'>"; ?>
