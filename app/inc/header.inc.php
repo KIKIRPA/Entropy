@@ -136,6 +136,7 @@ unset($lib, $id, $value, $perm);
 <?php foreach ($htmlHeaderStyles as $value): ?>
         <link rel="stylesheet" type="text/css" href="<?= $value ?>">
 <?php endforeach; ?>
+        <link rel="stylesheet" type="text/css" href="./css/extra.css">
 <?php foreach ($htmlHeaderScripts as $value): ?>
         <script type='text/javascript' src="<?= $value ?>"></script>
 <?php endforeach; ?>
