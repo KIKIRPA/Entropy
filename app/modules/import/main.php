@@ -173,6 +173,8 @@ case 6:
 case 7:
     if (isset($_REQUEST["id"])) {
         goto STEP7;
+    } elseif (isset($_REQUEST["searchpath"])) {
+        goto STEP7b;
     } else {
         goto STEP5;
     }
@@ -838,6 +840,12 @@ STEP5:
          . "    </form>\n";
     } else {
         echo "    <div>Data files that need to be uploaded: " . $needdata . "</div><br><br>\n";
+
+        echo "    <form action='" . $_SERVER["SCRIPT_NAME"] . "?mod=import&lib=" . $_REQUEST["lib"] . "&op=" . $tr . "&step=7' method='POST'>\n"
+           . "        <b>Search data files automatically</b><br>\n"
+           . "        <input type='text' name='searchpath' value='" . $_REQUEST["lib"] . "/*'>"
+           . "        <input type='submit' value='Search data files'>\n"
+           . "    </form><br><br>\n";
     }
     
 
@@ -1135,7 +1143,129 @@ STEP7:
 }
 
   
-  
+STEP7b:
+{
+    $prefix = \Core\Config\App::get("downloads_storage_path");
+    $files = glob($prefix . "/" . $_REQUEST["searchpath"]);
+    $build = false;  // rebuild a data json file
+
+    try {
+        foreach ($measurements as $id => $measurement) {
+            $dataFiles = array();
+
+            // search data files for this measurement, only if not already built
+            if (!isset($measurement["_built"])) { 
+                foreach ($measurement["datasets"] as $ds => $temp) {
+                    foreach ($files as $file) {
+                        $haystack = pathinfo($file, PATHINFO_FILENAME);
+                        $haystack = sanitizeStr($haystack, "", "-+:^", 1);
+
+                        $needle1 = sanitizeStr($id, "", "-+:^", 1);
+                        $needle2 = (($ds != "default") ? sanitizeStr($ds, "", "-+:^", 1) : false);
+
+                        if (strpos($haystack, $needle1) !== false) {
+                            if ($needle2) {
+                                if (strpos($haystack, $needle2) !== false) {
+                                    $dataFiles[$ds] = $file;
+                                    unset($files[$file]);
+                                }
+                            } else {
+                                $dataFiles[$ds] = $file;
+                                unset($files[$file]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // if for each dataset a datafile is found, build a json
+            if (count($measurement["datasets"]) == count($dataFiles)) {
+                // prepare $json
+                unset($measurement["_action"], $measurement["_built"]);
+
+                foreach ($dataFiles as $ds => $dataFile) {
+                    unset(
+                        $measurement["datasets"][$ds]["_data"],
+                        $measurement["datasets"][$ds]["_anno"],
+                        $measurement["datasets"][$ds]["_bin"]
+                    );
+
+                    // convert file
+                    $data = false;
+                    $ext = pathinfo($dataFile, PATHINFO_EXTENSION);
+                    $importOptions = selectConvertorClass($IMPORT, findDataType($measurement["type"], $DATATYPES), $ext, $importOptions);
+                    if (isset($importOptions["convertor"])) {
+                        // create convertor        
+                        $className = "Convert\\Import\\" . ucfirst(strtolower($importOptions["convertor"]));
+                        $import = new $className($dataFile, $importOptions);
+                        $data = $import->getData();
+                        $error = $import->getError();
+                        if ($error) {
+                            eventLog("WARNING", $error . " File: " . $dataFile . " [" . $class . "]");
+                        }
+                    }
+                    if (!$data) {
+                        throw new \Exception('Failed to convert ' . $dataFile . ': ' .$error);
+                    }
+            
+                    // merge with metadata, update original $measurements and set $build
+                    if (!is_array($measurement["datasets"][$ds])) {
+                        $measurement["datasets"][$ds] = array();
+                    }
+
+                    $measurement["datasets"][$ds]["data"] = $data;
+                    if (!is_array($measurements[$id]["datasets"][$ds])) {
+                        $measurements[$id]["datasets"][$ds] = array();
+                    }
+
+                    $measurements[$id]["datasets"][$ds]["_data"] = $dataFile;
+                    $build = true;
+        
+                    // set units: correct if supplied in csv, or take the default values
+                    $measurement["datasets"][$ds]["units"] = findDataTypeUnits( 
+                        $measurements[$id]["type"], 
+                        $DATATYPES, 
+                        "json",
+                        isset($measurement["datasets"][$ds]["units"]) ? $measurement["datasets"][$ds]["units"] : null
+                    );
+                }
+            }
+
+            if ($build) {
+                // build JSON data file
+                $error = writeJSONfile($trdir . $id . ".json", $json);
+                if ($error) {
+                    throw new \Exception($error);
+                }
+            
+                // set _built field in $measurements
+                if (isset($measurements[$id]["_built"])) {
+                    $measurements[$id]["_built"]++;
+                } else {
+                    $measurements[$id]["_built"] = 1;
+                }
+            
+                // rebuild JSON measurements_inflated file
+                $error = writeJSONfile($trdir . "_3_inflated.json", $measurements);
+                if ($error) {
+                    throw new \Exception($error);
+                }
+            }
+        }
+
+        goto STEP5;
+
+    } catch (\Exception $e) {
+        $errormsg = $e->getMessage();
+        eventLog("ERROR", $errormsg  . " [module_import: STEP7]");
+        echo "    <span style='color:red'>ERROR: " . $errormsg . "</span><br><br>";
+        goto STEP5;
+    }
+
+}
+
+
+
 /****************************
 *                           *
 *  8 DELETE BIN FILE        *
