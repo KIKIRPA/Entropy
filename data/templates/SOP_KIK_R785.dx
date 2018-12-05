@@ -12,7 +12,7 @@
 ##SPECTROMETER/DATA SYSTEM={meta:instrument}
 ##INSTRUMENT PARAMETERS={meta:parameters}
 ##RESOLUTION=1 1/cm
-##DATA PROCESSING=baseline corr.: Y; fluorescence corr.: N; cosmic ray removal: N; detector binning: N; other data processing: none
+##DATA PROCESSING=baseline corr.: {meta:data processing:baseline correction}; fluorescence corr.: N; cosmic ray removal: N; detector binning: N; other data processing: none
 ##SAMPLE DESCRIPTION=mode: scat; accessories: Renishaw inVia Raman microscope; support: glass slide; objective magnification: 50x; numerical aperture: 0.50; working distance: 8.2 mm; confocal: N; angle: 180 degrees backscattered; polarization: incident, N, scattered, N; filters: edge; grating type: reflection, holographic; grating density: 1200 lines/mm; laser defocus: N
 ##SAMPLING PROCEDURE=mode: scat; prep: bulk
 ##PATHLENGTH=	
