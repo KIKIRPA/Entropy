@@ -1233,7 +1233,7 @@ STEP7b:
 
             if ($build) {
                 // build JSON data file
-                $error = writeJSONfile($trdir . $id . ".json", $json);
+                $error = writeJSONfile($trdir . $id . ".json", $measurement);
                 if ($error) {
                     throw new \Exception($error);
                 }
