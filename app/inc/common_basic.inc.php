@@ -326,15 +326,16 @@ function flattenArray($array, $multirecords = false, $mode = -1, $keysep = ":", 
 
 
 /** 
- * getMeta($metadata, $get, $concatenate = "; ", $description = ": ", $nice = true)
+ * getMeta($metadata, $get, $concatenate = "; ", $description = ": ")
  * 
  * retrieve metadata-item from (inflated) metadata array
  * $get is something like "sample:sample name", "samplesource:0:identifier+source", "measurement:date^long";
  * if multiple fields need to be concatenated, the concatenation symbol (default ;) can be supplied
  * in the concatenated outputs descriptions can be added if a $description symbol (default :) is supplied
- * (if set to false, a short notation will be used without descriptions)
+ * (if set to false, a short notation will be used without descriptions). A description will only be added in 
+ * case of concatenated texts
  */
-function getMeta($metadata, $get, $concatenate = "; ", $description = ": ", $nice = true)
+function getMeta($metadata, $get, $concatenate = "; ", $description = ": ")
 {
     //prepare $get for loose searching (lowercase, remove whitespaces and special characters, except :+^)
     $get = sanitizeStr($get, "", "-", 1);
@@ -387,6 +388,7 @@ function getMeta($metadata, $get, $concatenate = "; ", $description = ": ", $nic
     
     //flatten the resulting thing, even if the "leaves" itselve are arrays
     $metadata = flattenArray($arr, false, 0);
+    $multiple = ((count($metadata) > 1) ? true : false);
     
     //create output: add descriptions (eg "age: 1900") and formatting options (eg. date^year)
     foreach ($metadata as $id => $value) {
@@ -398,7 +400,7 @@ function getMeta($metadata, $get, $concatenate = "; ", $description = ": ", $nic
             // try to convert the string into a DateTime type; will be false if not a valid timestamp
             $ts = strtotime($value);
             if ($ts === FALSE) {
-                //php expects american dates with /, european dates wit - or .; if an error, try to convert
+                //php expects american dates with /, european dates with - or .; if an error, try to convert
                 $ts = strtotime(str_replace('/', '-', $value));
             }
             if ($ts !== FALSE) { //if still not good, give up on timestamp!
@@ -430,8 +432,8 @@ function getMeta($metadata, $get, $concatenate = "; ", $description = ": ", $nic
         }
     
         // descriptions
-        if ($description != false) {
-            $value = nameMeta($id, $nice) . $description . $value;
+        if (($description != false) and (!$multiple)) {
+            $value = nameMeta($id, false) . $description . $value;
         }
     
         $metadata[$id] = $value;
