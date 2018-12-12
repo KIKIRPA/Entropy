@@ -326,7 +326,7 @@ function flattenArray($array, $multirecords = false, $mode = -1, $keysep = ":", 
 
 
 /** 
- * getMeta($metadata, $get, $concatenate = "; ", $description = ": ")
+ * getMeta($metadata, $get, $concatenate = "; ", $description = ": ", $nice = true)
  * 
  * retrieve metadata-item from (inflated) metadata array
  * $get is something like "sample:sample name", "samplesource:0:identifier+source", "measurement:date^long";
@@ -334,7 +334,7 @@ function flattenArray($array, $multirecords = false, $mode = -1, $keysep = ":", 
  * in the concatenated outputs descriptions can be added if a $description symbol (default :) is supplied
  * (if set to false, a short notation will be used without descriptions)
  */
-function getMeta($metadata, $get, $concatenate = "; ", $description = ": ")
+function getMeta($metadata, $get, $concatenate = "; ", $description = ": ", $nice = true)
 {
     //prepare $get for loose searching (lowercase, remove whitespaces and special characters, except :+^)
     $get = sanitizeStr($get, "", "-", 1);
@@ -431,7 +431,7 @@ function getMeta($metadata, $get, $concatenate = "; ", $description = ": ")
     
         // descriptions
         if ($description != false) {
-            $value = nameMeta($id) . $description . $value;
+            $value = nameMeta($id, $nice) . $description . $value;
         }
     
         $metadata[$id] = $value;
@@ -443,13 +443,13 @@ function getMeta($metadata, $get, $concatenate = "; ", $description = ": ")
 
 
 /** 
- * nameMeta($get)
+ * nameMeta($get, $nice = true)
  * 
  * get a nice name for a metadata retrieve query string
  * if $get is $get is something like "sample:sample name", "samplesource:0:identifier+source", "measurement:date^long"
  * output will be resp. "Sample name", "Samplesource 1" and "Date" 
  */
-function nameMeta($get)
+function nameMeta($get, $nice = true)
 {
     //split get-code into hierachical tree
     $tree = explode(":", $get);
@@ -474,24 +474,10 @@ function nameMeta($get)
     }
 
     //make it nice: replace underscores with spaces, first letter uppercase
-    $name = str_replace('_', ' ', $name);
-    $name = ucfirst($name);
-        
-    //by default first letter uppercase, and some fancier hard-coded names
-    // $name = str_replace("samplesource", "Sample source", $name);
-    // switch (strtolower($name)) {
-    //     case "cinumber":
-    //     case "ci number":
-    //         $name = "CI number";
-    //         break;
-    //     case "casnumber":
-    //     case "cas number":
-    //         $name = "CAS number";
-    //         break;
-    //     default:
-    //        $name = ucfirst($name);
-    //         break;
-    // }
+    if ($nice) {
+        $name = str_replace('_', ' ', $name);
+        $name = ucfirst($name);
+    }
 
     return $name;
 }

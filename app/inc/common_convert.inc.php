@@ -30,7 +30,7 @@ function fillTemplateWithMeta($filepath, $meta, $otherCodes = array(), $preserve
                     if (isset($otherCodes[strtolower($code)])) {
                         $replace = $otherCodes[strtolower($code)];
                     } else {
-                        $replace = getMeta($meta, $code, "; ", false);
+                        $replace = getMeta($meta, $code, "; ", ": ", false);
                     }
                     $line = str_replace($search, $replace, $line);
                 }          
