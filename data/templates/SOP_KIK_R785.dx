@@ -1,7 +1,7 @@
 ##TITLE={meta:sample:name}
 ##JCAMP-DX=5.01 $$ {_softwarestring}
 ##DATA TYPE=RAMAN SPECTRUM
-##APPLICATION=Raman microscopy
+##APPLICATION=Raman microscopy/microspectroscopy
 ##ORIGIN={meta:contributor}
 ##OWNER=SPECTRUM COPYRIGHT (C) {meta:measurement:timestamp^year} by the Royal Institute for Cultural Heritage (KIK/IRPA)
 ##$LICENSE={license}
@@ -12,8 +12,8 @@
 ##SPECTROMETER/DATA SYSTEM={meta:instrument}
 ##INSTRUMENT PARAMETERS={meta:parameters}
 ##RESOLUTION=1 1/cm
-##DATA PROCESSING=baseline corr.: {meta:data processing:baseline correction}; fluorescence corr.: N; cosmic ray removal: N; detector binning: N; other data processing: none
-##SAMPLE DESCRIPTION=mode: scat; accessories: Renishaw inVia Raman microscope; support: glass slide; objective magnification: 50x; numerical aperture: 0.50; working distance: 8.2 mm; confocal: N; angle: 180 degrees backscattered; polarization: incident, N, scattered, N; filters: edge; grating type: reflection, holographic; grating density: 1200 lines/mm; laser defocus: N
+##DATA PROCESSING=baseline corr.: {meta:data processing:baseline correction}; fluorescence corr.: no; cosmic ray removal: no; detector binning: no; other data processing: none
+##SAMPLE DESCRIPTION=mode: scat; accessories: (MICR) microscope, Leica, DMLM; support: glass slide; objective magnification: 50x; numerical aperture: 0.50; working distance: 8.2 mm; confocal: no; angle: 180 degrees backscattered; polarization: incident, No, scattered, No; filters: edge; grating type: reflection, holographic; grating density: 1200 lines/mm; laser defocus: no
 ##SAMPLING PROCEDURE=mode: scat; prep: bulk
 ##PATHLENGTH=	
 ##PRESSURE=	
