@@ -432,7 +432,7 @@ function getMeta($metadata, $get, $concatenate = "; ", $description = ": ")
         }
     
         // descriptions
-        if (($description != false) and (!$multiple)) {
+        if (($description != false) and ($multiple)) {
             $value = nameMeta($id, false) . $description . $value;
         }
     
