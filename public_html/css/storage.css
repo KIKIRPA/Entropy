@@ -1,4 +1,4 @@
-body {font-family: "lucida grande","Segoe UI",Arial, sans-serif; font-size: 14px;width:1024;padding:1em;margin:0;}
+
 th {font-weight: normal; color: #1F75CC; background-color: #F0F9FF; padding:.5em 1em .5em .2em;
 	text-align: left;cursor:pointer;user-select: none;}
 th .indicator {margin-left: 6px }
@@ -16,8 +16,7 @@ label { display:block; font-size:11px; color:#555;}
 .no_write #mkdir, .no_write #file_drop_target {display: none}
 .progress_track {display:inline-block;width:200px;height:10px;border:1px solid #333;margin: 0 4px 0 10px;}
 .progress {background-color: #82CFFA;height:10px; }
-footer {font-size:11px; color:#bbbbc5; padding:4em 0 0;text-align: left;}
-footer a, footer a:visited {color:#bbbbc5;}
+
 #breadcrumb { padding-top:34px; font-size:15px; color:#aaa;display:inline-block;float:left;}
 #folder_actions {width: 50%;float:right;}
 a, a:visited { color:#00c; text-decoration: none}
