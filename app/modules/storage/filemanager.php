@@ -251,7 +251,6 @@ $(function(){
 	$('#table').tablesorter();
 
 	$('#table').on('click','.delete',function(data) {
-		//$.post("",{'do':'delete',file:$(this).attr('data-file'),xsrf:XSRF},function(response){
 		$.post(pageAddress, {'do':'delete',file:$(this).attr('data-file'),xsrf:XSRF}, function(response){
 			list();
 		},'json');
@@ -262,9 +261,7 @@ $(function(){
 		var hashval = decodeURIComponent(window.location.hash.substr(1)),
 			$dir = $(this).find('[name=name]');
 		e.preventDefault();
-		//$dir.val().length && $.post('?',{'do':'mkdir',name:$dir.val(),xsrf:XSRF,file:hashval},function(data){
 		$dir.val().length && $.post(pageAddress, {'do': 'mkdir', 'name': $dir.val(), 'xsrf': XSRF, 'file': hashval}, function(data){
-			console.log(data);
 			list();
 		},'json');
 		$dir.val('');
