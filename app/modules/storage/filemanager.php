@@ -13,7 +13,6 @@ Liscense: MIT
 $allow_delete = true; // Set to false to disable delete button and delete POST request.
 $allow_upload = true; // Set to true to allow upload files
 $allow_create_folder = true; // Set to false to disable folder creation
-$allow_direct_link = true; // Set to false to only allow downloads and not direct link
 $allow_show_folders = true; // Set to false to hide all subdirectories
 
 $disallowed_extensions = ['php'];  // must be an array. Extensions disallowed to be uploaded
@@ -360,12 +359,10 @@ $(function(){
 	}
 
 	function renderFileRow(data) {
-		var $link = $('<a class="name" />')
-			.attr('href', data.is_dir ? '#' + data.path : './'+ encodeURIComponent(data.path))
-			.text(data.name);
-		var allow_direct_link = <?php echo $allow_direct_link?'true':'false'; ?>;
-        	if (!data.is_dir && !allow_direct_link)  $link.css('pointer-events','none');
-		var $dl_link = $('<a/>').attr('href','?do=download&file='+ encodeURIComponent(data.path))
+		var $filename = data.is_dir ? 
+						$('<a />').attr('href', '#' + data.path).html('<span class="icon has-text-link"><i class="fa fa-folder fa-lg"></i></span>' + data.name) : 
+						'<span class="icon"><i class="fa fa-file fa-lg"></i></span>' + data.name;
+		var $dl_link = $('<a/>').attr('href','?do=download&file=' + encodeURIComponent(data.path))
 			.addClass('download').text('download');
 		var $delete_link = $('<a href="#" />').attr('data-file',data.path).addClass('delete').text('delete');
 		var perms = [];
@@ -374,7 +371,7 @@ $(function(){
 		if(data.is_executable) perms.push('exec');
 		var $html = $('<tr />')
 			.addClass(data.is_dir ? 'is_dir' : '')
-			.append( $('<td class="first" />').append($link) )
+			.append( $('<td class="first" />').append($filename) )
 			.append( $('<td/>').attr('data-sort',data.is_dir ? -1 : data.size)
 				.html($('<span class="size" />').text(formatFileSize(data.size))) )
 			.append( $('<td/>').attr('data-sort',data.mtime).text(formatTimestamp(data.mtime)) )
