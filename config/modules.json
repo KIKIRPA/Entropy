@@ -82,6 +82,11 @@
             "navMenuShow": false,
             "public": false
         },
+        "storage": {
+            "caption": "Storage",
+            "navMenuShow": true,
+            "public": false
+        },
         "usermgmt": {
             "caption": "User management",
             "navMenuShow": false,
