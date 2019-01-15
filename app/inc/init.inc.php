@@ -64,8 +64,10 @@ define("BLACKLIST_COUNT", $temp);
 define("IS_BLACKLISTED", ($temp >= \Core\Config\App::get("login_ip_attempts")));
 
 // SESSION MANAGEMENT
+// open session; in case of the (storage) API, close it instantaneously  (many concurrent connections destroy the session!!!)
+if (isset($_REQUEST["do"])) session_start(['read_and_close' => true]);
+else session_start();
 
-session_start();
 $isLoggedIn = $isExpired = false;
 
 if (isset($_SESSION['username']) and $_SESSION['trusted'] and $_SESSION['pwdok']) {
