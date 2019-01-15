@@ -14,7 +14,6 @@ $allow_delete = true; // Set to false to disable delete button and delete POST r
 $allow_upload = true; // Set to true to allow upload files
 $allow_create_folder = true; // Set to false to disable folder creation
 $allow_show_folders = true; // Set to false to hide all subdirectories
-
 $disallowed_extensions = ['php'];  // must be an array. Extensions disallowed to be uploaded
 $hidden_extensions = ['php']; // must be an array of lowercase file extensions. Extensions hidden in directory index
 
@@ -26,13 +25,11 @@ $hidden_extensions = ['php']; // must be an array of lowercase file extensions. 
 // must be in UTF-8 or `basename` doesn't work
 setlocale(LC_ALL,'en_US.UTF-8');
 
-$tmp_dir = \Core\Config\App::get("downloads_storage_path") . '/';
-$tmp = get_absolute_path($tmp_dir . $_REQUEST['file']);
-$file = $tmp;
+$file = get_absolute_path($jailDir . $_REQUEST['file']);
 
-if($tmp === false)
+if($file === false)
 	err(404,'File or Directory Not Found');
-if(substr($tmp, 0,strlen($tmp_dir)) !== $tmp_dir)
+if(substr($file, 0,strlen($jailDir)) !== $jailDir)
 	err(403,"Forbidden");
 if(strpos($_REQUEST['file'], DIRECTORY_SEPARATOR) === 0)
 	err(403,"Forbidden");
@@ -60,7 +57,7 @@ if($_GET['do'] == 'list') {
 				'mtime' => $stat['mtime'],
 				'size' => $stat['size'],
 				'name' => basename($i),
-				'path' => preg_replace('@^\./@', '', str_replace($tmp_dir, "", $i)),
+				'path' => preg_replace('@^\./@', '', str_replace($jailDir, "", $i)),
 				'is_dir' => is_dir($i),
 				'is_deleteable' => $allow_delete && ((!is_dir($i) && is_writable($directory)) ||
 								(is_dir($i) && is_writable($directory) && is_recursively_deleteable($i))),

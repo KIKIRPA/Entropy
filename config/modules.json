@@ -40,6 +40,11 @@
             "navMenuShow": true,
             "public": false
         },
+        "storage": {
+            "caption": "Storage",
+            "navMenuShow": true,
+            "public": false
+        },
         "export": {
             "caption": "Export data",
             "navMenuShow": false,

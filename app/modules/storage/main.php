@@ -7,6 +7,15 @@ if (count(get_included_files()) == 1) {
 }
 
 
+$jailDir = \Core\Config\App::get("downloads_storage_path") . '/';
+if (isset($_REQUEST["lib"])) {
+    $jailDir .= $_REQUEST["lib"] . '/';
+
+    if (!file_exists($jailDir) && !is_dir($jailDir)) {
+        mkdir($jailDir);         
+    } 
+}
+
 
 if(isset($_REQUEST['do'])) {
 
