@@ -363,8 +363,9 @@ $(function(){
 						$('<a />').attr('href', '#' + data.path).html('<span class="icon has-text-link"><i class="fa fa-folder fa-lg"></i></span>' + data.name) : 
 						'<span class="icon"><i class="fa fa-file fa-lg"></i></span>' + data.name;
 		var $dl_link = $('<a/>').attr('href','?do=download&file=' + encodeURIComponent(data.path))
-			.addClass('download').text('download');
-		var $delete_link = $('<a href="#" />').attr('data-file',data.path).addClass('delete').text('delete');
+			.html('<span class="icon has-text-link"><i class="fa fa-download fa-lg"></i></span>');
+		var $delete_link = $('<a href="#" />').attr('data-file',data.path)
+			.html('<span class="icon has-text-danger"><i class="fa fa-trash fa-lg"></i></span>');
 		var perms = [];
 		if(data.is_readable) perms.push('read');
 		if(data.is_writable) perms.push('write');
