@@ -78,10 +78,8 @@ if ($showLib) {
             }          
         }
     }
-}
-
-// if an $showMod is an adm mod
-if ($showMod and $isLoggedIn) {
+} elseif ($showMod and $isLoggedIn) { 
+    // if an $showMod is an adm mod
     if (isset($MODULES["adm"][$showMod])) {
         // list admin modules with non-false "navMenuShow"
         foreach ($MODULES["adm"] as $id => $value) {
@@ -232,8 +230,8 @@ unset($lib, $id, $value, $perm);
                     <div class="container">
                         <ul>
 <?php                     foreach ($navMenuMods as $id => $caption): ?>
-                            <li<?= ($showMod == $id) ? " class=\"is-active\"" : "" ?>>
-                                <a href="./<?= ($id == "list") ? "index.php?" : "tools.php?mod=".$id."&" ?><?= $showLib ? "lib=". $showLib : "" ?>">
+                            <li <?= ($showMod == $id) ? "class=\"is-active\"" : "" ?>>
+                                <a href="./<?= ($id == "list") ? "index.php?" : "tools.php?mod=" . $id ?><?= $showLib ? "&lib=". $showLib : "" ?>">
                                     <?= $caption ?> 
                                 </a>
                             </li>
