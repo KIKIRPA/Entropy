@@ -27,8 +27,8 @@ if (count(get_included_files()) == 1) {
                 selector: ".tinymce",
                 statusbar: false,
                 menubar: false,
-                plugins: 'code image autolink link textcolor colorpicker',
-                toolbar: 'undo redo styleselect bold italic alignleft aligncenter alignright bullist numlist outdent indent | link image | code',
+                plugins: 'code image autolink link textcolor colorpicker table lists',
+                toolbar: 'styleselect bold italic underline | forecolor backcolor | alignleft aligncenter alignright alignjustify | outdent indent | bullist numlist table | link image | code',
                 // image_list: [
                 //     {title: 'My image 1', value: 'https://www.tinymce.com/my1.gif'},
                 //     {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}

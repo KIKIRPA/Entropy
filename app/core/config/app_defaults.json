@@ -43,5 +43,6 @@
     "js_dt": "./js/datatables.min.js",
     "js_dt_bulma": "./js/dataTables.bulma.min.js",
     "js_dygraphs": "https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.js",
-    "js_flickity": "https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"
+    "js_flickity": "https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js",
+    "js_tinymce": "./js/tinymce/tinymce.min.js"
 }
