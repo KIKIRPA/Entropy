@@ -22,15 +22,32 @@ if (count(get_included_files()) == 1) {
 <?php endif; ?>
 
         <script type="text/javascript">
+
+            tinymce.init({
+                selector: ".tinymce",
+                statusbar: false,
+                menubar: false,
+                plugins: 'code image autolink link textcolor colorpicker table lists',
+                toolbar: 'styleselect bold italic underline | forecolor backcolor | alignleft aligncenter alignright alignjustify | outdent indent | bullist numlist table | link image | code',
+                // image_list: [
+                //     {title: 'My image 1', value: 'https://www.tinymce.com/my1.gif'},
+                //     {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
+                // ],
+                // link_list:  [
+                //     {title: 'My image 1', value: 'https://www.tinymce.com/my1.gif'},
+                //     {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
+                // ]
+            });
+
             function addNews(divName){
                 var newdiv = document.createElement('div');
-                newdiv.innerHTML = "<textarea name='news[]' rows=2 class='textarea'></textarea><br>";
+                newdiv.innerHTML = "<textarea name='news[]' rows=2 class='textarea tinymce'></textarea><br>";
                 document.getElementById(divName).appendChild(newdiv);
             }
 
             function addRef(divName){
                 var newdiv = document.createElement('div');
-                newdiv.innerHTML = "<textarea name='references[]' rows=2 class='textarea'></textarea><br>";
+                newdiv.innerHTML = "<textarea name='references[]' rows=2 class='textarea '></textarea><br>";
                 document.getElementById(divName).appendChild(newdiv);
             }
 
@@ -234,7 +251,7 @@ if (count(get_included_files()) == 1) {
                         <div class="field-body">
                             <div class="field">
                                 <p class="control">
-                                    <textarea id="logobox" name="logobox" rows=4 class="textarea"><?= $preset["logobox"] ?></textarea>
+                                    <textarea id="logobox" name="logobox" rows=4 class="textarea tinymce"><?= $preset["logobox"] ?></textarea>
                                 </p>
                                 <p class="help">
                                     Area in the headers and in the library list on the start page, and can be used to put formatted text and small images, such as logos.  
@@ -251,7 +268,7 @@ if (count(get_included_files()) == 1) {
                         <div class="field-body">
                             <div class="field">
                                 <p class="control">
-                                    <textarea id="text" name="text" rows=8 class="textarea"><?= $preset["text"] ?></textarea>
+                                    <textarea id="text" name="text" rows=8 class="textarea tinymce"><?= $preset["text"] ?></textarea>
                                 </p>
                                 <p class="help">
                                     Extensive description of the repository or library that will be displayed above the start page or the library list page.
@@ -268,7 +285,7 @@ if (count(get_included_files()) == 1) {
                         <div class="field-body">
                             <div class="field">
                                 <p class="control">
-                                    <textarea id="contact" name="contact" rows=4 class="textarea"><?= $preset["contact"] ?></textarea><br>
+                                    <textarea id="contact" name="contact" rows=4 class="textarea tinymce"><?= $preset["contact"] ?></textarea><br>
                                 </p>
                                 <p class="help">
                                     Contents in this box will be displayed in box with "Contact details" header on the start page or the library list page. 
@@ -287,7 +304,7 @@ if (count(get_included_files()) == 1) {
                                 <div id="dynamicInputNews">
 <?php                             foreach ($preset["news"] as $item): ?>
                                     <div class="control">
-                                        <textarea id="news" name="news[]" rows=2 class="textarea"><?= $item ?></textarea><br>
+                                        <textarea id="news" name="news[]" rows=2 class="textarea tinymce"><?= $item ?></textarea><br>
                                     </div>
 <?php                             endforeach; ?>
                                 </div>
@@ -317,7 +334,7 @@ if (count(get_included_files()) == 1) {
                                 <div id="dynamicInputRef">
 <?php                             foreach ($preset["references"] as $item): ?>
                                     <div class="control">
-                                        <textarea id="references" name="references[]" rows=2 class="textarea"><?= $item ?></textarea><br>
+                                        <textarea id="references" name="references[]" rows=2 class="textarea tinymce"><?= $item ?></textarea><br>
                                     </div>
 <?php                             endforeach; ?>
                                 </div>
@@ -440,7 +457,7 @@ if (count(get_included_files()) == 1) {
                                     </div>
                                 </p>
                                 <p class="control">
-                                    <br><textarea id="otherlicense" name="otherlicense" rows=2 class="textarea"><?= $preset["otherlicense"] ?></textarea>
+                                    <br><textarea id="otherlicense" name="otherlicense" rows=2 class="textarea tinymce"><?= $preset["otherlicense"] ?></textarea>
                                 </p>
                                 <p class="help">
                                     License that will be applied to all measurements in this library. This will overrule the system-wide license, but will in turn be overruled if a license is defined in the measurment.
