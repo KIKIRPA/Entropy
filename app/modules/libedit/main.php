@@ -242,6 +242,7 @@ if ($f == "error") {
 // HEADER + NAVBAR
 array_push($htmlHeaderStyles, \Core\Config\App::get("css_dt_bulma"));
 array_push($htmlHeaderScripts, \Core\Config\App::get("js_dt"), \Core\Config\App::get("js_dt_bulma"));  
+array_push($htmlHeaderScripts, "https://cloud.tinymce.com/stable/tinymce.min.js");
 include(PRIVPATH . 'inc/header.inc.php');
 
 // MAIN
