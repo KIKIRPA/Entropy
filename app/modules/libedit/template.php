@@ -22,33 +22,40 @@ if (count(get_included_files()) == 1) {
 <?php endif; ?>
 
         <script type="text/javascript">
+            tinymceInit('.tinymce');
 
-            tinymce.init({
-                selector: ".tinymce",
-                statusbar: false,
-                menubar: false,
-                plugins: 'code image autolink link textcolor colorpicker table lists',
-                toolbar: 'styleselect bold italic underline | forecolor backcolor | alignleft aligncenter alignright alignjustify | outdent indent | bullist numlist table | link image | code',
-                // image_list: [
-                //     {title: 'My image 1', value: 'https://www.tinymce.com/my1.gif'},
-                //     {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
-                // ],
-                // link_list:  [
-                //     {title: 'My image 1', value: 'https://www.tinymce.com/my1.gif'},
-                //     {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
-                // ]
-            });
+            function tinymceInit(sel){
+                tinymce.init({
+                    selector: sel,
+                    statusbar: false,
+                    menubar: false,
+                    plugins: 'code image autolink link textcolor colorpicker table lists',
+                    toolbar: 'styleselect bold italic underline | forecolor backcolor | alignleft aligncenter alignright alignjustify | outdent indent | bullist numlist table | link image | code',
+                    // image_list: [
+                    //     {title: 'My image 1', value: 'https://www.tinymce.com/my1.gif'},
+                    //     {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
+                    // ],
+                    // link_list:  [
+                    //     {title: 'My image 1', value: 'https://www.tinymce.com/my1.gif'},
+                    //     {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
+                    // ]
+                });
+            }
 
             function addNews(divName){
                 var newdiv = document.createElement('div');
-                newdiv.innerHTML = "<textarea name='news[]' rows=2 class='textarea tinymce'></textarea><br>";
+                var id = 'textarea' + document.querySelectorAll("textarea").length;
+                newdiv.innerHTML = '<textarea name="news[]" rows=2 class="textarea tinymce" id="' + id + '"></textarea><br>';
                 document.getElementById(divName).appendChild(newdiv);
+                tinymceInit('#' + id);
             }
 
             function addRef(divName){
                 var newdiv = document.createElement('div');
-                newdiv.innerHTML = "<textarea name='references[]' rows=2 class='textarea '></textarea><br>";
+                var id = 'textarea' + document.querySelectorAll("textarea").length;
+                newdiv.innerHTML = '<textarea name="references[]" rows=2 class="textarea tinymce" id="' + id + '"></textarea><br>';
                 document.getElementById(divName).appendChild(newdiv);
+                tinymceInit('#' + id);
             }
 
             function addCol(divName){
