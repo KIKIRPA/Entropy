@@ -31,10 +31,11 @@ if (count(get_included_files()) == 1) {
                     menubar: false,
                     plugins: 'code image autolink link textcolor colorpicker table lists',
                     toolbar: 'styleselect bold italic underline | forecolor backcolor | alignleft aligncenter alignright alignjustify | outdent indent | bullist numlist table | link image | code',
-                    // image_list: [
-                    //     {title: 'My image 1', value: 'https://www.tinymce.com/my1.gif'},
-                    //     {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
-                    // ],
+                    image_list: [
+<?php                 foreach ($images as $title => $url): ?>
+                         {title: '<?= $title ?>', value: '<?= $url ?>'},
+<?php                 endforeach; ?>
+                    ],
                     // link_list:  [
                     //     {title: 'My image 1', value: 'https://www.tinymce.com/my1.gif'},
                     //     {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}

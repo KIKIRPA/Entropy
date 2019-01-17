@@ -224,6 +224,21 @@ if (($f == "edit") or ($f == "set") or ($f == "warning")) {
 }
 
 
+// create a list of locally hosted images that can be used in the textareas
+$imgDir = dirname($_SERVER["SCRIPT_FILENAME"]) . "/img";
+if (is_dir($imgDir)) {
+    $images = [];
+    $files = array_diff(scandir($imgDir), ['.','..']);
+    foreach ($files as $entry) {
+        $i = $directory . '/' . $entry;
+        $i = str_replace("//", "/", $i);
+        if (!is_dir($i) && in_array(strtolower(pathinfo($i, PATHINFO_EXTENSION)), array("jpg", "jpeg", "png", "gif", "svg", "tiff", "tif")))
+            $images[basename($i)] = "./img/" . $i;
+    }
+}
+
+
+
 /* *********************************************************
 3. ERROR if some data are missing
 ********************************************************* */
