@@ -42,6 +42,7 @@ Incorporates code from:
 - DataTables (GPL v2 / BSD) by Allan Jardine, www.datatables.net
 - Dygraphs (MIT license) by Dan Vanderkam, dygraphs.com
 - Flickity (GPL v3 license) by Metafizzy LLC, flickity.metafizzy.co
+- TinyMCE (LGPL v2.1 license) by Tiny Technologies Inc, https://www.tiny.cloud/
 - simple-file-manager (MIT license) by John Campbell, https://github.com/jcampbell1/simple-file-manager
 - Notify Bar (MIT license) by Dmitri Smirnov, www.whoop.ee
 - Freecons (Free) by Jiri Silha
