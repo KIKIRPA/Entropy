@@ -216,7 +216,7 @@ unset($lib, $id, $value, $perm);
                         </div>
 <?php                 if ($navMenuLogoBox): ?>
                         <div class="column is-narrow">
-                            <div class="content is-small has-text-left-touch has-text-right-desktop">
+                            <div class="<?= \Core\Config\App::get("bulmacontent_logobox") ? "content is-small has-text-left-touch has-text-right-desktop" : "logobox" ?>">
                                 <?= $navMenuLogoBox ?> 
                             </div>
                         </div>

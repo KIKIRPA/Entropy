@@ -14,7 +14,7 @@ if (count(get_included_files()) == 1) {
             <div class="container">
                 <div class="columns">
                     <div class="column is-8">
-                        <div class="content is-size-6">
+                        <div class="<?= \Core\Config\App::get("bulmacontent_footerbox") ? "content is-size-6" : "footerbox" ?>">
                             <?= \Core\Service\MailHider::search(\Core\Config\App::get("app_footer_box"), ($isLoggedIn ? false : true)) ?> 
                         </div>
                     </div>

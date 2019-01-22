@@ -22,9 +22,9 @@ if (count(get_included_files()) == 1) {
                 <div class="columns">
 <?php             if ($listText): ?>
                     <div class="column">
-                        <h1 class="title">About <?= $listTitle ?></h1>
+                        <h1 class="title">About</h1>
                         <hr>
-                        <div class="content">
+                        <div class="<?= \Core\Config\App::get("bulmacontent_textbox") ? "content" : "textbox" ?>">
                             <?= $listText ?> 
                         </div>
                     </div>
@@ -35,7 +35,7 @@ if (count(get_included_files()) == 1) {
 
 <?php                 foreach ($listNews as $item): ?>
                         <div class="notification <?= $listNewsColor ?>">
-                            <div class="content">
+                            <div class="<?= \Core\Config\App::get("bulmacontent_newsbox") ? "content" : "newsbox" ?>">
                                 <?= $item ?> 
                             </div>
                         </div>
@@ -45,7 +45,7 @@ if (count(get_included_files()) == 1) {
                         <div class="box">
                             <h1 class="title is-5">Contact</h1>
                             <hr>
-                            <div class="content">
+                            <div class="<?= \Core\Config\App::get("bulmacontent_contactbox") ? "content" : "contactbox" ?>">
                                 <?= $listContact ?> 
                             </div>
                         </div>
@@ -55,7 +55,7 @@ if (count(get_included_files()) == 1) {
                         <div class="box">
                             <h1 class="title is-5">Related literature</h1>
                             <hr>
-                            <div class="content">
+                            <div class="<?= \Core\Config\App::get("bulmacontent_refbox") ? "content" : "refbox" ?>">
                                 <ul>
 <?php                             foreach ($listReferences as $item): ?>
                                     <li><?= $item ?></li>
