@@ -6,6 +6,7 @@
     "app_icon": "./img/favicon_turquoise.png",
     "app_color_navbar": "white",
     "app_color_default": "primary",
+    "app_background_image": "",
     "app_footer_box": "<p><strong>Footer text box</strong></p><p>Link to privacy policy</p>",
     "config_users_file": "%ENTROPY_PATH%config/users.json",
     "config_blacklist_file": "%ENTROPY_PATH%config/blacklist.json",

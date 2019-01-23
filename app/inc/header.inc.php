@@ -40,6 +40,16 @@ $navMenuTitle = \Core\Config\App::get("app_name");
 $navMenuSubtitle = \Core\Config\App::get("app_catchphrase");
 $navMenuLogoBox = false;
 
+$navMenuBarColor = bulmaColorModifier(\Core\Config\App::get("app_color_navbar"), $COLORS, "white");
+$navMenuColor = bulmaColorModifier(
+    $showLib ? $LIBS[$showLib]["color"] : \Core\Config\App::get("app_color_default"), 
+    $COLORS, 
+    \Core\Config\App::get("app_color_default")
+);
+
+$navMenuImage = \Core\Config\App::get("app_background_image") ;
+$navMenuImage = $navMenuImage ? "style=\"background: url('$navMenuImage') center center; background-size: cover;\"" : "";
+
 // list accessible libraries
 foreach (array_keys($LIBS) as $lib) {
     if (strtoupper($lib) != "_START") {
@@ -142,7 +152,7 @@ unset($lib, $id, $value, $perm);
     </head>
   
     <body>
-        <nav class="navbar <?= bulmaColorModifier(\Core\Config\App::get("app_color_navbar"), $COLORS, "white") ?>">
+        <nav class="navbar <?= $navMenuBarColor ?>">
             <div class="container">
                 <div class="navbar-brand">
                     <a class="navbar-item" href=".\">
@@ -169,17 +179,17 @@ unset($lib, $id, $value, $perm);
                         <div class="navbar-item">
                             <div class="field has-addons">
                                 <p class="control">
-                                    <a class="button <?= bulmaColorModifier(\Core\Config\App::get("app_color_navbar"), $COLORS, "white") ?> is-inverted is-outlined is-static"><?= $isLoggedIn ?></a>
+                                    <a class="button <?= $navMenuBarColor ?> is-inverted is-outlined is-static"><?= $isLoggedIn ?></a>
                                 </p>
                                 <p class="control">
-                                    <a class="button <?= bulmaColorModifier(\Core\Config\App::get("app_color_navbar"), $COLORS, "white") ?> is-inverted" href="./tools.php?mod=console">
+                                    <a class="button <?= $navMenuBarColor ?> is-inverted" href="./tools.php?mod=console">
                                         <span class="icon">
                                             <i class="fa fa-cog" aria-hidden="true"></i>
                                         </span>
                                     </a>
                                 </p>
                                 <p class="control">
-                                    <a class="button <?= bulmaColorModifier(\Core\Config\App::get("app_color_navbar"), $COLORS, "white") ?> is-inverted" href="./auth.php?logout">
+                                    <a class="button <?= $navMenuBarColor ?> is-inverted" href="./auth.php?logout">
                                         <span class="icon">
                                             <i class="fa fa-sign-out" aria-hidden="true"></i>
                                         </span>
@@ -190,7 +200,7 @@ unset($lib, $id, $value, $perm);
 <?php                 else: ?>
                         <div class="navbar-item">
                             <p class="control">
-                                <a class="button <?= bulmaColorModifier(\Core\Config\App::get("app_color_navbar"), $COLORS, "white") ?> is-inverted" href="./auth.php">
+                                <a class="button <?= $navMenuBarColor ?> is-inverted" href="./auth.php">
                                     <span class="icon">
                                         <i class="fa fa-sign-in" aria-hidden="true"></i>
                                     </span>
@@ -205,7 +215,7 @@ unset($lib, $id, $value, $perm);
             </div>
         </nav>
 
-        <section class="hero <?= bulmaColorModifier($showLib ? $LIBS[$showLib]["color"] : \Core\Config\App::get("app_color_default"), $COLORS, \Core\Config\App::get("app_color_default")) ?>">
+        <section class="hero <?= $navMenuColor ?>" <?= $navMenuImage ?>>
             <div class="hero-body">
                 <div class="container">
 
