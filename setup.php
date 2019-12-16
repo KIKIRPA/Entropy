@@ -217,7 +217,7 @@ foreach (scandir2("./public_html/") as $f) {
 rcopy("./public_html", $pubpath, $defaults["setup"]["htgroup"]);
 
 // recursively copy vendor/
-if (!file_exists("./vendor/")) {
+if (file_exists("./vendor/")) {
     rcopy("./vendor/", $privpath . "vendor/", $defaults["setup"]["htgroup"]);
 }
 

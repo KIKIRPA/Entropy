@@ -49,20 +49,23 @@ class Mail
             // multipart (plain + html)
             if ($sendAsHtml) {
                 $headers .= "Content-Type: multipart/alternative; boundary=\"$boundary\"\r\n\r\n";
-                
+
                 // Plain text version of message
                 $body = "--$boundary\r\n"
-                    . "Content-Type: text/plain; charset=ISO-8859-1\r\n" 
+                    . "Content-Type: text/plain; charset=UTF-8\r\n" 
                     . "Content-Transfer-Encoding: base64\r\n\r\n"
                     . chunk_split(base64_encode($message_plain));
                 
                 // HTML version of message
                 $body .= "--$boundary\r\n" 
-                    . "Content-Type: text/html; charset=ISO-8859-1\r\n" 
+                    . "Content-Type: text/html; charset=UTF-8\r\n" 
                     . "Content-Transfer-Encoding: base64\r\n\r\n"
                     . chunk_split(base64_encode($message))
                     . "--$boundary--";
-            }         
+            } else {
+                $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+                $body = chunk_split(base64_encode($message_plain)) . "\r\n\r\n";
+            }   
             
             // Send Email
             mail($to, $subject, $body, $headers);
@@ -70,8 +73,8 @@ class Mail
         }
 
         // SENDGRID
-        if ($backend === "sendgrid") {    
-            require 'vendor/autoload.php';
+        if ($backend === "sendgrid") {
+            require PRIVPATH . 'vendor/autoload.php';
 
             $apikey = \Core\Config\App::get("mail_sendgrid_apikey");
             
@@ -88,12 +91,12 @@ class Mail
                 $response = $sendgrid->send($email);
                 if ($response->statusCode() == 202) return true;
                 //TODO add eventlog()
-                echo 'Statuscode: ' . $response->statusCode() . "\n"; // DEBUG
+                //echo 'Statuscode: ' . $response->statusCode() . "\n"; // DEBUG
                 //print_r($response->headers());
                 //print $response->body() . "\n";
             } catch (Exception $e) {
                 //TODO add eventlog()
-                echo 'Caught exception: '. $e->getMessage() ."\n"; // DEBUG
+                //echo 'Caught exception: '. $e->getMessage() ."\n"; // DEBUG
             }
         }
 
