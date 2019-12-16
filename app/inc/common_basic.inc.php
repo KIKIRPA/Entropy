@@ -731,9 +731,7 @@ function mdate($format = 'Y-m-d H:i:s.u', $microtime = null)
  * !! returns $msg !!
  */
 function eventLog($cat, $msg, $fatal = false, $mail = false)
-{
-    //global $logdir, $evlog, $adminMail;
-    
+{ 
     $event = array( "timestamp"   => mdate(),
                     "category"    => strtoupper($cat),
                     "message"     => $msg,
@@ -752,24 +750,15 @@ function eventLog($cat, $msg, $fatal = false, $mail = false)
     }
     
     // mail: if asked ($mail=true), and if failed to write log ($success=false)
-    if ($mail or !$success) {
-        $title = \Core\Config\App::get("app_name") . " event " . $cat;
-        $body = "Automated mail from " . gethostname() . ":\r\n\r\n";
-        $from = \Core\Config\App::get("mail_admin");
-        $headers = "From: " . $from . "\r\n"
-            . "Reply-To: " . $from . "\r\n"
-            . "X-Mailer: PHP/" . phpversion();
+    $to = \Core\Config\App::get("events_mail_address");
+    if (($mail or !$success) and $to) {
+        $subject = strtoupper($cat) . " event notification";
+        $message = "Event message:\r\n" . json_encode($event, JSON_PRETTY_PRINT);
+            
+        if (!$success)
+            $body .= "\r\n\r\nFAILED TO WRITE TO EVENT LOG FILE";
     
-        if (!$success) {
-            $title .= " - failed to log!";
-            $body .= "FAILED TO WRITE TO EVENT LOG FILE\r\n\r\n";
-        }
-    
-        foreach ($event as $key => $value) {
-            $body .= $key . ": " . $value . "\r\n";
-        }
-    
-        mail($from, $title, $body, $headers);
+        \Core\Service\Mail::send($to, $message, $subject);
     }
 
     // proceed or die if fatal error

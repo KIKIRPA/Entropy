@@ -43,6 +43,7 @@
     "downloads_cookie_key": "Tqh1QXGc",
     "downloads_storage_path": "%ENTROPY_PATH%data/storage",
     "events_log_file": "%ENTROPY_PATH%data/logs/events.csv",
+    "events_mail_address": "",
     "css_fa": "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css",
     "css_bulma": "https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css",
     "css_dt": "./js/datatables.min.css",

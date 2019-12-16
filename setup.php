@@ -39,6 +39,7 @@ $questions = array(
         "app_keywords"          => "Website keywords used to improve indexing by seach engines (eg google). Separate keywords with commas.",
         "mail_from_address"     => "E-mail address used for automated messages (e.g. noreply@entropyinstance.com)",
         "mail_from_name"        => "Name used for automated messages (e.g. DO NOT REPLY)",
+        "events_mail_address"   => "E-mail address to which event notifications will be sent; probably this will be the system administrator",
         "login_twopass_enable"  => "Enable twopass verification for unknown IPs. Please make sure to have a working sendmail configuration."
     ),
     "users" => array(    
@@ -57,6 +58,7 @@ $types = array(
     "pubpath"                   => "path",
     "mail_from_address"         => "e-mail",
     "mail_from_name"            => "string",
+    "events_mail_address"       => "e-mail",
     "login_twopass_enable"      => "boolean",
     "login_session_expire"      => "integer",
     "login_password_attempts"   => "integer",
