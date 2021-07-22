@@ -146,13 +146,14 @@ if (\Core\Config\App::get("login_twopass_enable")) {
         // if no trustcode is given (POST): create one and show form
         if (empty($_POST['trustcode'])) {
             $_SESSION['trustcode'] = sprintf("%04d", mt_rand(0, 9999));
-            $from = \Core\Config\App::get("mail_admin");
-            mail(
-                $USERS[$user]['email'],
-                APP_NAME . " authorisation code",
-                "Automated mail from " . gethostname() . ", do not reply.\r\n\r\nAuthorisation code : <b>" . $_SESSION['trustcode'] . "</b>\r\n\r\nCopy this code in the designated code box on " . gethostname() . ".\r\nThe code is time-limited and will expire after a given time.\r\n",
-                "From:  " . $from . "\r\nReply-To:  " . $from . "\r\nX-Mailer: PHP/" . phpversion()
-            );
+            
+            $to = $USERS[$user]['email'];
+            $subject = "Authorisation code";
+            $message = "<b>" . \Core\Config\App::get("app_name") . " Authorisation code : " . $_SESSION['trustcode'] . "</b>\r\n\r\n" 
+                . "Copy this code in the designated code box.\r\nThe code is time-limited and will expire after a given time.\r\n"
+                . "This is an automated mail, do not reply.";
+            \Core\Service\Mail::send($to, $message, $subject);
+
             $showMod = "trustform";
             unset($msg);
         }
